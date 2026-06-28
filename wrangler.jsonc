@@ -6,6 +6,5 @@
   "vars": { "VALUE_FROM_CLOUDFLARE": "Hello from Cloudflare" },
   "observability": { "enabled": true },
   "upload_source_maps": true,
-  "compatibility_flags": ["nodejs_compat"],
-  "routes": [{ "pattern": "spire.synov8studio.com", "custom_domain": true }]
+  "compatibility_flags": ["nodejs_compat"]
 }
