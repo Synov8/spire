@@ -57,36 +57,38 @@ export default function BlogPost() {
       <FAQSchema faq={faqItems} />
       <OrganizationSchema />
 
-      <article className="mx-auto max-w-3xl px-6 pt-16 pb-24">
+      <article className="mx-auto max-w-6xl px-6 pt-16 pb-24">
         <Link to="/blog" className="text-sm text-[#8B8B93] hover:text-[#00D4AA] transition-colors">&larr; Back to blog</Link>
-        <div className="mt-8 flex items-center gap-3 text-xs text-[#5C5C66]">
-          <time>{new Date(post.published).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}</time>
-          <span>·</span>
-          <span>{post.author}</span>
-        </div>
-        <h1 className="mt-4 text-3xl font-bold tracking-tight text-[#F1F1F3] md:text-4xl">{post.title}</h1>
-        <p className="mt-3 text-lg text-[#8B8B93]">{post.description}</p>
-        {post.tags && post.tags.length > 0 && (
-          <div className="mt-4 flex flex-wrap gap-2">
-            {post.tags.map((t) => <span key={t} className="rounded bg-[#1C1C24] px-2.5 py-1 text-xs text-[#8B8B93]">{t}</span>)}
+        <div className="mx-auto max-w-3xl">
+          <div className="mt-8 flex items-center gap-3 text-xs text-[#5C5C66]">
+            <time>{new Date(post.published).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}</time>
+            <span>·</span>
+            <span>{post.author}</span>
           </div>
-        )}
-        <div className="mt-10 prose prose-invert max-w-none prose-a:text-[#00D4AA] prose-code:text-[#00D4AA] prose-strong:text-[#F1F1F3] prose-headings:text-[#F1F1F3] prose-p:text-[#B0B0B8] prose-li:text-[#B0B0B8] prose-hr:border-[#1C1C24] prose-td:text-[#B0B0B8] prose-th:text-[#F1F1F3]" dangerouslySetInnerHTML={{ __html: post.html }} />
+          <h1 className="mt-4 text-3xl font-bold tracking-tight text-[#F1F1F3] md:text-5xl leading-[1.1]">{post.title}</h1>
+          <p className="mt-4 text-lg text-[#8B8B93] leading-relaxed">{post.description}</p>
+          {post.tags && post.tags.length > 0 && (
+            <div className="mt-5 flex flex-wrap gap-2">
+              {post.tags.map((t) => <span key={t} className="rounded bg-[#1C1C24] px-2.5 py-1 text-xs text-[#8B8B93]">{t}</span>)}
+            </div>
+          )}
+        </div>
+        <div className="mx-auto mt-12 max-w-3xl prose prose-invert prose-lg prose-a:text-[#00D4AA] prose-code:text-[#00D4AA] prose-strong:text-[#F1F1F3] prose-headings:text-[#F1F1F3] prose-p:text-[#B0B0B8] prose-li:text-[#B0B0B8] prose-hr:border-[#1C1C24] prose-td:text-[#B0B0B8] prose-th:text-[#F1F1F3]" dangerouslySetInnerHTML={{ __html: post.html }} />
 
         {(() => {
-          const related = allPosts.filter((p) => p.slug !== slug && p.tags?.some((t) => post.tags?.includes(t))).slice(0, 2);
+          const related = allPosts.filter((p) => p.slug !== slug && p.tags?.some((t) => post.tags?.includes(t))).slice(0, 3);
           if (related.length === 0) return null;
           return (
-            <section className="mt-16 border-t border-[#1C1C24] pt-12">
+            <section className="mx-auto mt-16 max-w-6xl border-t border-[#1C1C24] pt-12">
               <h2 className="text-lg font-bold text-[#F1F1F3]">Related posts</h2>
-              <div className="mt-6 grid gap-4 md:grid-cols-2">
+              <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {related.map((rp) => (
-                  <Link key={rp.slug} to={`/blog/${rp.slug}`} className="rounded-xl border border-[#1C1C24] bg-[#111116] p-5 hover:border-[#00D4AA]/30 transition-colors">
+                  <Link key={rp.slug} to={`/blog/${rp.slug}`} className="group rounded-xl border border-[#1C1C24] bg-[#111116] p-5 hover:border-[#00D4AA]/20 hover:bg-[#16161D] transition-all">
                     <div className="flex items-center gap-2 text-xs text-[#5C5C66]">
                       <time>{new Date(rp.published).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</time>
                     </div>
-                    <h3 className="mt-2 font-medium text-[#F1F1F3]">{rp.title}</h3>
-                    <p className="mt-1 text-xs text-[#8B8B93]">{rp.description}</p>
+                    <h3 className="mt-2 font-medium text-[#F1F1F3] group-hover:text-[#00D4AA] transition-colors">{rp.title}</h3>
+                    <p className="mt-1 text-xs text-[#8B8B93] line-clamp-2">{rp.description}</p>
                   </Link>
                 ))}
               </div>
