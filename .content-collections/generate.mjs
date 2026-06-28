@@ -1,10 +1,22 @@
 import { readFileSync, readdirSync, writeFileSync, mkdirSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
+import { unified } from "unified";
+import remarkParse from "remark-parse";
+import remarkGfm from "remark-gfm";
+import remarkHtml from "remark-html";
 
 const dir = dirname(fileURLToPath(import.meta.url));
 const contentDir = join(dir, "..", "content");
 const outDir = join(dir, "generated");
+
+const markdown = unified().use(remarkParse).use(remarkGfm).use(remarkHtml);
+
+function compileMd(raw) {
+  try {
+    return String(markdown.processSync(raw));
+  } catch { return "<p>" + raw.replace(/\n\n/g, "</p><p>").replace(/\n/g, "<br>") + "</p>"; }
+}
 
 function parseFrontmatter(raw) {
   const m = raw.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
@@ -40,6 +52,12 @@ const posts = files.map((f) => {
   const raw = readFileSync(join(contentDir, f), "utf8");
   const fm = parseFrontmatter(raw);
   const slug = f.replace(/\.md$/, "");
+  const body = raw.replace(/^---[\s\S]*?---\n*/, "");
+  const compiled = compileMd(body);
+  const styled = compiled.replace(
+    /^<p>(.+?)<\/p>/,
+    '<div class="answer-capsule"><p>$1</p></div>'
+  );
   return {
     slug,
     title: fm.title || "",
@@ -48,7 +66,7 @@ const posts = files.map((f) => {
     updated: fm.updated || undefined,
     author: fm.author || "Spire Team",
     tags: fm.tags || [],
-    html: "",
+    html: styled,
   };
 });
 

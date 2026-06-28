@@ -73,7 +73,6 @@ export function PublicFooter() {
               <Link to="/blog/soc2-cost-breakdown-startups-2026" className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">SOC 2 cost breakdown</Link>
               <Link to="/blog/soc2-vs-iso27001-comparison-which-first" className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">SOC 2 vs ISO 27001</Link>
               <Link to="/blog/automated-evidence-collection-soc2-guide" className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">Evidence collection guide</Link>
-              <Link to="/glossary" className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">Glossary</Link>
             </div>
           </div>
           <div>

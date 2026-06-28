@@ -30,3 +30,18 @@ body {
 .animate-fade-up-2 { animation-delay: 0.2s; }
 .animate-fade-up-3 { animation-delay: 0.3s; }
 .animate-fade-up-4 { animation-delay: 0.4s; }
+
+.answer-capsule {
+  border-left: 3px solid #00D4AA;
+  background: rgba(0, 212, 170, 0.04);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+  border-radius: 0 0.5rem 0.5rem 0;
+}
+.answer-capsule p {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.65;
+  color: #E0E0E6;
+}
+.answer-capsule p:last-child { margin-bottom: 0; }
