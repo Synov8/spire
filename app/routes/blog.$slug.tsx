@@ -59,21 +59,19 @@ export default function BlogPost() {
 
       <article className="mx-auto max-w-6xl px-6 pt-16 pb-24">
         <Link to="/blog" className="text-sm text-[#8B8B93] hover:text-[#00D4AA] transition-colors">&larr; Back to blog</Link>
-        <div className="mx-auto max-w-3xl">
-          <div className="mt-8 flex items-center gap-3 text-xs text-[#5C5C66]">
-            <time>{new Date(post.published).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}</time>
-            <span>·</span>
-            <span>{post.author}</span>
-          </div>
-          <h1 className="mt-4 text-3xl font-bold tracking-tight text-[#F1F1F3] md:text-5xl leading-[1.1]">{post.title}</h1>
-          <p className="mt-4 text-lg text-[#8B8B93] leading-relaxed">{post.description}</p>
-          {post.tags && post.tags.length > 0 && (
-            <div className="mt-5 flex flex-wrap gap-2">
-              {post.tags.map((t) => <span key={t} className="rounded bg-[#1C1C24] px-2.5 py-1 text-xs text-[#8B8B93]">{t}</span>)}
-            </div>
-          )}
+        <div className="mt-8 flex items-center gap-3 text-xs text-[#5C5C66]">
+          <time>{new Date(post.published).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}</time>
+          <span>·</span>
+          <span>{post.author}</span>
         </div>
-        <div className="mx-auto mt-12 max-w-3xl prose prose-invert prose-lg prose-a:text-[#00D4AA] prose-code:text-[#00D4AA] prose-strong:text-[#F1F1F3] prose-headings:text-[#F1F1F3] prose-p:text-[#B0B0B8] prose-li:text-[#B0B0B8] prose-hr:border-[#1C1C24] prose-td:text-[#B0B0B8] prose-th:text-[#F1F1F3]" dangerouslySetInnerHTML={{ __html: post.html }} />
+        <h1 className="mt-4 text-3xl font-bold tracking-tight text-[#F1F1F3] md:text-5xl leading-[1.1]">{post.title}</h1>
+        <p className="mt-4 text-lg text-[#8B8B93] leading-relaxed">{post.description}</p>
+        {post.tags && post.tags.length > 0 && (
+          <div className="mt-5 flex flex-wrap gap-2">
+            {post.tags.map((t) => <span key={t} className="rounded bg-[#1C1C24] px-2.5 py-1 text-xs text-[#8B8B93]">{t}</span>)}
+          </div>
+        )}
+        <div className="mt-12 max-w-5xl prose prose-invert prose-lg prose-a:text-[#00D4AA] prose-code:text-[#00D4AA] prose-strong:text-[#F1F1F3] prose-headings:text-[#F1F1F3] prose-p:text-[#B0B0B8] prose-li:text-[#B0B0B8] prose-hr:border-[#1C1C24] prose-td:text-[#B0B0B8] prose-th:text-[#F1F1F3]" dangerouslySetInnerHTML={{ __html: post.html }} />
 
         {(() => {
           const related = allPosts.filter((p) => p.slug !== slug && p.tags?.some((t) => post.tags?.includes(t))).slice(0, 3);
