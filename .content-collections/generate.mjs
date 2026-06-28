@@ -18,10 +18,10 @@ function parseFrontmatter(raw) {
       continue;
     }
     listKey = null;
-    const sep = line.indexOf(": ");
-    if (sep > 0) {
+    const sep = line.indexOf(":");
+    if (sep > 0 && line[sep + 1] !== undefined) {
       const key = line.slice(0, sep).trim();
-      let val = line.slice(sep + 2).trim();
+      let val = line.slice(sep + 1).trim();
       if (val === "") {
         listKey = key;
         fm[key] = [];
