@@ -1,3 +1,31 @@
-import { type RouteConfig, index } from "@react-router/dev/routes";
+import { type RouteConfig, route, index } from "@react-router/dev/routes";
 
-export default [index("routes/home.tsx")] satisfies RouteConfig;
+export default [
+  route("api/auth/*", "routes/api/auth.ts"),
+  route("api/audit/stream", "routes/api.audit.stream.ts"),
+  route("api/composio/connect", "routes/api/composio.connect.ts"),
+  route("login", "routes/login.tsx"),
+  route("logout", "routes/logout.tsx"),
+  route("dashboard", "routes/dashboard.tsx", [
+    index("routes/dashboard.index.tsx"),
+    route("integrations", "routes/dashboard.integrations.tsx"),
+    route("questionnaires", "routes/dashboard.questionnaires.tsx"),
+    route("questionnaires/upload", "routes/dashboard.questionnaire-upload.tsx"),
+    route("questionnaires/:id", "routes/dashboard.questionnaire-detail.tsx"),
+
+    route("review", "routes/dashboard.review.tsx"),
+    route("export", "routes/dashboard.compliance-export.tsx"),
+    route("billing", "routes/dashboard.billing.tsx"),
+    route("settings", "routes/dashboard.settings.tsx"),
+  ]),
+  route("pricing", "routes/pricing.tsx"),
+  route("features", "routes/features.tsx"),
+  route("integrations", "routes/integrations-page.tsx"),
+  route("security", "routes/security.tsx"),
+  route("accept-invitation/:id", "routes/accept-invitation.$id.tsx"),
+  route("faq", "routes/faq.tsx"),
+  route("contact", "routes/contact.tsx"),
+  route("privacy", "routes/privacy.tsx"),
+  route("terms", "routes/terms.tsx"),
+  index("routes/home.tsx"),
+] satisfies RouteConfig;

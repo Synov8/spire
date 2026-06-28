@@ -9,19 +9,21 @@
     "worker-configuration.d.ts"
   ],
   "compilerOptions": {
-    "composite": true,
-    "strict": true,
+    "declaration": false,
+    "composite": false,
+    "incremental": false,
     "lib": ["DOM", "DOM.Iterable", "ES2022"],
     "types": ["vite/client"],
     "target": "ES2022",
     "module": "ES2022",
     "moduleResolution": "bundler",
     "jsx": "react-jsx",
-    "rootDirs": [".", "./.react-router/types"],
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "strict": true,
     "paths": {
       "~/*": ["./app/*"]
     },
-    "esModuleInterop": true,
-    "resolveJsonModule": true
+    "rootDirs": [".", "./.react-router/types"]
   }
 }

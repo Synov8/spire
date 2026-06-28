@@ -1,0 +1,1 @@
+ALTER TABLE "control" ADD CONSTRAINT "control_control_id_unique" UNIQUE("control_id");

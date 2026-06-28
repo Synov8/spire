@@ -1,0 +1,55 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1782647576411,
+      "tag": "0000_uneven_captain_cross",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1782647654783,
+      "tag": "0001_spooky_vindicator",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1782648618294,
+      "tag": "0002_real_machine_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1782651836266,
+      "tag": "0003_useful_goblin_queen",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1782652621666,
+      "tag": "0004_round_falcon",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1782656730246,
+      "tag": "0005_legal_scarecrow",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1782657935037,
+      "tag": "0006_lively_vermin",
+      "breakpoints": true
+    }
+  ]
+}
