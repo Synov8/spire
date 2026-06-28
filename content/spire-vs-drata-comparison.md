@@ -2,7 +2,7 @@
 title: "Spire vs Drata: SOC 2 Compliance Platform Comparison for Engineering-Led Teams"
 published: "2026-06-27"
 description: "Spire vs Drata comparison: Drata has the best UI and Compliance-as-Code at $7.5K–$15K/year with 140+ integrations. Spire has an AI compliance agent for on-demand audits, native EU AI Act coverage, AI questionnaire automation, and transparent $6K/year pricing."
-author: "Joseph Cooper"
+author: "Spire Team"
 tags:
   - Comparison
   - Drata

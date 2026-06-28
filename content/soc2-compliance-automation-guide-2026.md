@@ -2,7 +2,7 @@
 title: "SOC 2 Compliance Automation for B2B SaaS: Complete 2026 Guide"
 published: "2026-06-28"
 description: "Learn how automated evidence collection, continuous monitoring, and AI-driven policy checks replace manual SOC 2 prep. Includes checklist, timeline, and tool comparison for B2B SaaS teams."
-author: "Joseph Cooper"
+author: "Spire Team"
 tags:
   - SOC 2
   - Compliance Automation

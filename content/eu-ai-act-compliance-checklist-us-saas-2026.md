@@ -2,7 +2,7 @@
 title: "EU AI Act Compliance Checklist for US SaaS Companies Selling to Europe in 2026"
 published: "2026-06-24"
 description: "Complete EU AI Act compliance checklist for US B2B SaaS companies: AI literacy (Article 4), transparency obligations (Article 50), risk classification, and procurement requirements that now appear in European enterprise security questionnaires."
-author: "Joseph Cooper"
+author: "Spire Team"
 tags:
   - EU AI Act
   - Compliance

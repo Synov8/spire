@@ -2,7 +2,7 @@
 title: "SOC 2 Type II vs Type I: What B2B SaaS Companies Need to Know Before Choosing"
 published: "2026-06-20"
 description: "SOC 2 Type II vs Type I comparison for B2B SaaS: costs ($10K–$25K Type I vs $30K–$60K Type II), timeline (4–8 weeks vs 7–9 months), enterprise acceptance, and when each makes sense for your business stage."
-author: "Joseph Cooper"
+author: "Spire Team"
 tags:
   - SOC 2
   - Type II

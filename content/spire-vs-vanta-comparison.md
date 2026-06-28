@@ -2,7 +2,7 @@
 title: "Spire vs Vanta: SOC 2 Compliance Platform Comparison for B2B SaaS"
 published: "2026-06-28"
 description: "Spire vs Vanta comparison: Vanta has 400+ integrations and 500+ CPA firm auditor network at $10K–$12K/year. Spire has an AI compliance agent for on-demand audits, native EU AI Act coverage, AI questionnaire automation, and starts at $6,000/year."
-author: "Joseph Cooper"
+author: "Spire Team"
 tags:
   - Comparison
   - Vanta

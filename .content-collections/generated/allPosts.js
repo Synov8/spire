@@ -4,7 +4,7 @@ export default [
     "title": "AI-Powered Security Questionnaire Automation for B2B SaaS Enterprise Procurement",
     "published": new Date("2026-06-18T00:00:00.000Z"),
     "description": "How AI automation transforms security questionnaire response from a 40-hour manual process to minutes. Includes SOC 2 evidence integration, EU AI Act response templates, and enterprise procurement velocity metrics.",
-    "author": "Joseph Cooper",
+    "author": "Spire Team",
     "tags": [
       "Security Questionnaires",
       "AI Automation",
@@ -28,7 +28,7 @@ export default [
     "title": "Automated Evidence Collection for SOC 2 Audits: Complete Guide for B2B SaaS",
     "published": new Date("2026-06-22T00:00:00.000Z"),
     "description": "How automated evidence collection works for SOC 2 audits — AWS, GitHub, GCP, and identity provider integrations that continuously collect control evidence. Includes integration setup checklist and control mapping guide.",
-    "author": "Joseph Cooper",
+    "author": "Spire Team",
     "tags": [
       "SOC 2",
       "Evidence Collection",
@@ -52,7 +52,7 @@ export default [
     "title": "EU AI Act Compliance Checklist for US SaaS Companies Selling to Europe in 2026",
     "published": new Date("2026-06-24T00:00:00.000Z"),
     "description": "Complete EU AI Act compliance checklist for US B2B SaaS companies: AI literacy (Article 4), transparency obligations (Article 50), risk classification, and procurement requirements that now appear in European enterprise security questionnaires.",
-    "author": "Joseph Cooper",
+    "author": "Spire Team",
     "tags": [
       "EU AI Act",
       "Compliance",
@@ -76,7 +76,7 @@ export default [
     "title": "EU AI Act High-Risk Classification: Complete Guide for B2B SaaS Deployers",
     "published": new Date("2026-06-08T00:00:00.000Z"),
     "description": "EU AI Act high-risk classification guide for B2B SaaS: the eight high-risk categories under Annex III, the provider-led assessment process, deployer obligations, and how the December 2027 enforcement timeline affects US companies selling to Europe.",
-    "author": "Joseph Cooper",
+    "author": "Spire Team",
     "tags": [
       "EU AI Act",
       "High Risk",
@@ -100,7 +100,7 @@ export default [
     "title": "EU AI Act Penalties and Enforcement Timeline 2026: What B2B SaaS Companies Face",
     "published": new Date("2026-05-22T00:00:00.000Z"),
     "description": "EU AI Act enforcement 2026 penalties: up to €35M or 7% of global turnover for prohibited practices, €15M or 3% for GPAI non-compliance, €7.5M or 1.5% for incorrect information. Timeline for high-risk system enforcement delayed to December 2027.",
-    "author": "Joseph Cooper",
+    "author": "Spire Team",
     "tags": [
       "EU AI Act",
       "Penalties",
@@ -124,7 +124,7 @@ export default [
     "title": "EU AI Act Provider vs Deployer: Who Is Responsible for What?",
     "published": new Date("2026-06-06T00:00:00.000Z"),
     "description": "EU AI Act provider vs deployer obligations explained for B2B SaaS: provider develops and places the system, deployer uses it under authority. Article 25 role-shift rules for substantial modifications and changed intended purpose affecting US SaaS companies.",
-    "author": "Joseph Cooper",
+    "author": "Spire Team",
     "tags": [
       "EU AI Act",
       "Provider",
@@ -148,7 +148,7 @@ export default [
     "title": "How to Choose a SOC 2 Auditor for B2B SaaS: Selection Guide for Startups",
     "published": new Date("2026-06-04T00:00:00.000Z"),
     "description": "SOC 2 auditor selection guide for B2B SaaS startups: boutique firm ($8K–$18K Type I) vs Big Four ($30K–$100K+), fixed-fee engagement letters, auditor specialization, and the 5 questions to ask before signing.",
-    "author": "Joseph Cooper",
+    "author": "Spire Team",
     "tags": [
       "SOC 2",
       "Auditor",
@@ -172,7 +172,7 @@ export default [
     "title": "ISO 42001 vs SOC 2: What B2B SaaS Companies Need to Know About AI Compliance Certification",
     "published": new Date("2026-06-02T00:00:00.000Z"),
     "description": "ISO 42001 vs SOC 2 comparison for B2B SaaS: ISO 42001 covers AI governance, risk management, and lifecycle controls while SOC 2 covers security, availability, and privacy. Combined they provide complete coverage for enterprise AI procurement requirements.",
-    "author": "Joseph Cooper",
+    "author": "Spire Team",
     "tags": [
       "ISO 42001",
       "SOC 2",
@@ -196,7 +196,7 @@ export default [
     "title": "7 SOC 2 Audit Mistakes That Cause Failures for B2B SaaS Companies",
     "published": new Date("2026-06-14T00:00:00.000Z"),
     "description": "Common SOC 2 audit mistakes including starting too late, skipping readiness assessments, weak access control documentation, and treating compliance as IT-only. Over 60% of first-time audits experience preventable delays.",
-    "author": "Joseph Cooper",
+    "author": "Spire Team",
     "tags": [
       "SOC 2",
       "Audit Mistakes",
@@ -219,7 +219,7 @@ export default [
     "title": "How Long Does SOC 2 Certification Take With Automation Tools in 2026?",
     "published": new Date("2026-06-26T00:00:00.000Z"),
     "description": "Timeline breakdown for SOC 2 Type II certification with automation: readiness (2–4 weeks), evidence collection (6 months minimum observation), remediation (2–4 weeks). Total: 7–9 months from start to signed report.",
-    "author": "Joseph Cooper",
+    "author": "Spire Team",
     "tags": [
       "SOC 2",
       "Timeline",
@@ -242,7 +242,7 @@ export default [
     "title": "SOC 2 Compliance Automation for B2B SaaS: Complete 2026 Guide",
     "published": new Date("2026-06-28T00:00:00.000Z"),
     "description": "Learn how automated evidence collection, continuous monitoring, and AI-driven policy checks replace manual SOC 2 prep. Includes checklist, timeline, and tool comparison for B2B SaaS teams.",
-    "author": "Joseph Cooper",
+    "author": "Spire Team",
     "tags": [
       "SOC 2",
       "Compliance Automation",
@@ -265,7 +265,7 @@ export default [
     "title": "SOC 2 Compliance for Startups Under 50 Employees: Complete 2026 Guide",
     "published": new Date("2026-06-12T00:00:00.000Z"),
     "description": "Step-by-step SOC 2 certification guide for startups with fewer than 50 employees. Timeline (6–9 months for Type II), costs ($30K–$80K first year), and common mistakes specific to small engineering teams with no dedicated compliance staff.",
-    "author": "Joseph Cooper",
+    "author": "Spire Team",
     "tags": [
       "SOC 2",
       "Startups",
@@ -289,7 +289,7 @@ export default [
     "title": "How Much Does SOC 2 Cost for Startups in 2026? Complete Cost Breakdown",
     "published": new Date("2026-06-16T00:00:00.000Z"),
     "description": "SOC 2 cost breakdown for startups: Type I audit fees $8K–$25K, Type II $15K–$40K, plus compliance platform $7.5K–$20K/year, penetration testing $5K–$15K, and internal engineering time 100–300 hours. Total first-year: $30K–$150K.",
-    "author": "Joseph Cooper",
+    "author": "Spire Team",
     "tags": [
       "SOC 2",
       "Pricing",
@@ -313,7 +313,7 @@ export default [
     "title": "SOC 2 for AI Companies: How AI-Native B2B SaaS Startups Pass Compliance",
     "published": new Date("2026-05-26T00:00:00.000Z"),
     "description": "SOC 2 compliance guide for AI companies building on LLM APIs: evidence collection for AI infrastructure, prompt security monitoring, training data governance, and the unique controls AI-native startups must implement beyond standard cloud security.",
-    "author": "Joseph Cooper",
+    "author": "Spire Team",
     "tags": [
       "SOC 2",
       "AI",
@@ -337,7 +337,7 @@ export default [
     "title": "How to Maintain SOC 2 Compliance After Certification: Ongoing Program Guide",
     "published": new Date("2026-05-24T00:00:00.000Z"),
     "description": "SOC 2 ongoing compliance maintenance guide: annual re-certification timelines, daily/weekly evidence collection schedules, continuous monitoring alert response, policy review cycles, and how automation reduces ongoing compliance burden to 3-5 hours per week.",
-    "author": "Joseph Cooper",
+    "author": "Spire Team",
     "tags": [
       "SOC 2",
       "Maintenance",
@@ -361,7 +361,7 @@ export default [
     "title": "SOC 2 Penetration Testing Requirements: What Auditors and Enterprise Customers Expect in 2026",
     "published": new Date("2026-05-30T00:00:00.000Z"),
     "description": "SOC 2 penetration testing requirements for 2026: annual minimum, scope alignment with system boundary, CVSS 4.0 scoring, $8K–$30K cost, and the CC4.1 and CC7.1 criteria that auditors evaluate when reviewing pen test evidence.",
-    "author": "Joseph Cooper",
+    "author": "Spire Team",
     "tags": [
       "SOC 2",
       "Penetration Testing",
@@ -385,7 +385,7 @@ export default [
     "title": "SOC 2 Type II vs Type I: What B2B SaaS Companies Need to Know Before Choosing",
     "published": new Date("2026-06-20T00:00:00.000Z"),
     "description": "SOC 2 Type II vs Type I comparison for B2B SaaS: costs ($10K–$25K Type I vs $30K–$60K Type II), timeline (4–8 weeks vs 7–9 months), enterprise acceptance, and when each makes sense for your business stage.",
-    "author": "Joseph Cooper",
+    "author": "Spire Team",
     "tags": [
       "SOC 2",
       "Type II",
@@ -409,7 +409,7 @@ export default [
     "title": "SOC 2 vs ISO 27001: Which Do You Need First for Your B2B SaaS in 2026?",
     "published": new Date("2026-06-01T00:00:00.000Z"),
     "description": "SOC 2 vs ISO 27001 comparison for B2B SaaS: costs ($30K–$80K SOC 2 vs $25K–$60K ISO 27001), timelines, buyer geography, and 80% control overlap. Decision framework based on whether your customers are US or EU-based.",
-    "author": "Joseph Cooper",
+    "author": "Spire Team",
     "tags": [
       "SOC 2",
       "ISO 27001",
@@ -433,7 +433,7 @@ export default [
     "title": "Spire vs Drata: SOC 2 Compliance Platform Comparison for Engineering-Led Teams",
     "published": new Date("2026-06-27T00:00:00.000Z"),
     "description": "Spire vs Drata comparison: Drata has the best UI and Compliance-as-Code at $7.5K–$15K/year with 140+ integrations. Spire has an AI compliance agent for on-demand audits, native EU AI Act coverage, AI questionnaire automation, and transparent $6K/year pricing.",
-    "author": "Joseph Cooper",
+    "author": "Spire Team",
     "tags": [
       "Comparison",
       "Drata",
@@ -457,7 +457,7 @@ export default [
     "title": "Spire vs Manual SOC 2: Is Compliance Automation Worth It for B2B SaaS?",
     "published": new Date("2026-06-22T00:00:00.000Z"),
     "description": "Manual SOC 2 vs compliance automation comparison: manual costs 300+ engineering hours and takes 12–18 months, automation costs $6K/year with an AI agent and takes 6–9 months. Spire reduces engineering time by 80% and replaces quarterly evidence scrambles.",
-    "author": "Joseph Cooper",
+    "author": "Spire Team",
     "tags": [
       "Comparison",
       "Manual SOC 2",
@@ -482,7 +482,7 @@ export default [
     "title": "Spire vs Secureframe: SOC 2 Compliance Platform Comparison for First-Time Audits",
     "published": new Date("2026-06-26T00:00:00.000Z"),
     "description": "Spire vs Secureframe comparison: Secureframe has 300+ integrations and guided onboarding at $7.5K–$20K/year. Spire has an AI compliance agent for on-demand audits, native EU AI Act, AI questionnaire automation, and transparent $6K/year pricing.",
-    "author": "Joseph Cooper",
+    "author": "Spire Team",
     "tags": [
       "Comparison",
       "Secureframe",
@@ -506,7 +506,7 @@ export default [
     "title": "Spire vs Sprinto: SOC 2 Compliance Platform Comparison for Seed-Stage Startups",
     "published": new Date("2026-06-24T00:00:00.000Z"),
     "description": "Spire vs Sprinto comparison: Sprinto has the lowest entry pricing ($4K–$8K/year) for seed-stage startups and Indian entity billing. Spire has an AI compliance agent for on-demand audits, native EU AI Act, questionnaire automation, and transparent $6K/year pricing.",
-    "author": "Joseph Cooper",
+    "author": "Spire Team",
     "tags": [
       "Comparison",
       "Sprinto",
@@ -530,7 +530,7 @@ export default [
     "title": "Spire vs Vanta: SOC 2 Compliance Platform Comparison for B2B SaaS",
     "published": new Date("2026-06-28T00:00:00.000Z"),
     "description": "Spire vs Vanta comparison: Vanta has 400+ integrations and 500+ CPA firm auditor network at $10K–$12K/year. Spire has an AI compliance agent for on-demand audits, native EU AI Act coverage, AI questionnaire automation, and starts at $6,000/year.",
-    "author": "Joseph Cooper",
+    "author": "Spire Team",
     "tags": [
       "Comparison",
       "Vanta",
@@ -554,7 +554,7 @@ export default [
     "title": "Vanta vs Drata vs Secureframe vs Spire: SOC 2 Compliance Tools Compared for 2026",
     "published": new Date("2026-06-10T00:00:00.000Z"),
     "description": "Honest comparison of SOC 2 compliance automation platforms Vanta, Drata, Secureframe, and Spire. Pricing ($7.5K–$20K/year), integrations, auditor networks, multi-framework support, and AI capabilities evaluated for B2B SaaS teams.",
-    "author": "Joseph Cooper",
+    "author": "Spire Team",
     "tags": [
       "SOC 2",
       "Compliance Tools",
@@ -579,7 +579,7 @@ export default [
     "title": "Vendor Risk Management for B2B SaaS: Complete SOC 2 Compliance Guide",
     "published": new Date("2026-05-28T00:00:00.000Z"),
     "description": "SOC 2 vendor risk management guide for B2B SaaS: CC9.2 compliance, vendor tiering (critical/high/medium/low), due diligence procedures, subprocessor management, CUEC validation, and ongoing monitoring cadence.",
-    "author": "Joseph Cooper",
+    "author": "Spire Team",
     "tags": [
       "Vendor Risk Management",
       "SOC 2",
@@ -598,5 +598,27 @@ export default [
     "slug": "vendor-risk-management-soc2-guide",
     "html": "<p>SOC 2 vendor risk management under criterion CC9.2 requires organizations to assess and manage risks associated with vendors and business partners. The auditor expects a documented vendor management policy, a complete vendor inventory, evidence of risk-based due diligence, and proof of ongoing monitoring. SOC 2 audits most frequently fail on vendor management controls because organizations invest heavily in their own security while overlooking the third parties that access their systems and data.</p>\n<h2>What Is SOC 2 Vendor Risk Management?</h2>\n<p>Vendor risk management under SOC 2 is the discipline of identifying, assessing, monitoring, and mitigating risks introduced by third-party relationships. Under CC9.2, auditors evaluate whether your organization has a documented vendor management policy, performs due diligence before onboarding vendors, classifies vendors by risk tier, monitors vendors on a recurring schedule, manages subprocessor dependencies, and documents risk acceptance decisions for vendors that lack SOC 2 reports.</p>\n<p>The scope of vendor management extends beyond cloud providers. Any third party with access to customer data, production systems, privileged admin access, code repositories, or critical service delivery falls within scope. This includes payroll providers, customer support tools, observability platforms, identity systems, contractors with code access, backup providers, and AI tool vendors.</p>\n<p>A 2025 survey by the Cloud Security Alliance found that 68% of SOC 2 exceptions in first-time audits were related to incomplete vendor documentation. The most common gap is a missing vendor inventory — companies do not know how many vendors they have or which vendors have access to customer data.</p>\n<h2>How Do You Tier Vendors by Risk Level?</h2>\n<p>SOC 2 does not require equal rigor for every vendor. It requires a risk-based approach that focuses attention on the vendors that could materially affect your security posture. Most compliance programs use four tiers.</p>\n<p>Critical vendors store or process customer data or provide infrastructure that hosts your production environment. They require annual assessment including SOC 2 report review, CUEC validation, contract review, and ongoing monitoring. High-risk vendors have access to internal systems or employee data or provide services that could impact availability. They require annual assessment with SOC 2 report review, security questionnaire, and contract review.</p>\n<p>Medium-risk vendors have indirect access to systems or provide non-critical services. They require initial due diligence and periodic reassessment. Low-risk vendors have no access to customer or internal systems. They require initial approval only.</p>\n<p>For critical and high-risk vendors that lack SOC 2 reports, document your risk acceptance decision. Include what alternative evidence was reviewed (security questionnaire, penetration test results, contractual commitments), what compensating controls were implemented, and who approved the vendor onboarding. Auditors are reasonable — they want to see an informed decision, not that the risk was ignored.</p>\n<h2>What Does Vendor Due Diligence Look Like for SOC 2?</h2>\n<p>Vendor due diligence before onboarding includes: request SOC 2 Type II report (or equivalent) from the vendor, review the report for qualified opinions, exceptions, and scope alignment with the services you use, identify all Complementary User Entity Controls in the vendor's SOC 2 report and document how your organization fulfills each one, verify data processing agreement terms covering data handling, breach notification, data deletion, and subprocessor management, confirm cyber liability insurance coverage, and assess business continuity and incident response posture.</p>\n<p>For vendors without SOC 2 reports, send a risk-weighted security questionnaire that covers the key control areas relevant to the vendor's function. The questionnaire should be shorter and more targeted for lower-risk vendors — not every vendor needs the full 200-question SIG assessment.</p>\n<p>Document the due diligence outcome and the approval decision. A vendor inventory that tracks owner, service purpose, data categories processed, region, risk tier, contract status, and review date is the single most valuable piece of vendor management evidence for your auditor.</p>\n<h2>How Do You Manage Subprocessors Under SOC 2?</h2>\n<p>A subprocessor is a third party engaged by your vendor to process data on the vendor's behalf. Under SOC 2, your vendor management program must account for subprocessors that handle your customer data downstream from your direct vendors.</p>\n<p>If a vendor's SOC 2 report uses the inclusive method — where the vendor takes responsibility for subprocessor controls — your contract should require the vendor to manage subprocessors on your behalf. If the report uses the carve-out method — subprocessor controls are excluded — you may need to assess subprocessors directly.</p>\n<p>At minimum, your subprocessor management program should include: a current inventory of all subprocessors with defined processing purposes, due diligence records for each subprocessor, contract coverage for data protection, security, confidentiality, and incident handling, external disclosure such as a customer-facing subprocessor list, and a change notification process for when vendors add or remove subprocessors.</p>\n<p>Enterprise customers increasingly ask for subprocessor lists during vendor due diligence. Your subprocessor documentation should be audit-ready and customer-ready simultaneously.</p>\n<h2>How Do You Monitor Vendors After Onboarding?</h2>\n<p>Ongoing vendor monitoring should match the risk tier. Critical vendors need annual reassessment with updated SOC 2 report review and CUEC validation, continuous monitoring for security incidents or service disruptions, and quarterly SLA compliance reviews. High-risk vendors need annual review with updated SOC 2 report or security questionnaire and periodic monitoring. Medium and low-risk vendors need periodic review on an 18 to 24 month cycle.</p>\n<p>The annual vendor review cycle is a common process that can be automated through compliance platforms. Set a review date at onboarding rather than waiting for contract renewal. When vendors are offboarded, document the termination and data deletion confirmation.</p>\n<p>The most common ongoing monitoring failure is not reviewing vendor SOC 2 exceptions. Collecting vendor SOC 2 reports annually is necessary but insufficient — you must read the report, identify exceptions, and document your review. A qualified opinion in a critical vendor's SOC 2 report requires a documented risk acceptance or remediation plan.</p>\n<h2>FAQ</h2>\n<h3>How many vendors do most B2B SaaS companies have in scope?</h3>\n<p>A B2B SaaS company with 20 to 50 employees typically has 40 to 80 vendors in its inventory, of which 10 to 20 are critical or high-risk. The most commonly overlooked vendor categories are analytics tools, AI/ML API providers, customer support platforms, and observability services.</p>\n<h3>Do I need a SOC 2 report from every vendor?</h3>\n<p>No. SOC 2 requires risk-based vendor management, not equal rigor for all vendors. Critical vendors — those with access to customer data or production infrastructure — should have SOC 2 reports. Vendors with no access to customer data or internal systems require lighter due diligence.</p>\n<h3>What is a CUEC in vendor management?</h3>\n<p>Complementary User Entity Controls are controls that a vendor's SOC 2 report identifies as the customer's responsibility. For each CUEC in a critical vendor's SOC 2 report, you must document how your organization implements the required control. Examples include configuring MFA on the vendor platform, restricting access to authorized users, and maintaining your own incident response process.</p>\n<h3>Can I use automated vendor risk assessment tools?</h3>\n<p>Yes. Most compliance automation platforms include vendor risk management modules that automate SOC 2 report collection, security questionnaire distribution, and risk scoring. These tools reduce the manual overhead of vendor management from days per vendor to hours.</p>",
     "updated": undefined
+  }
+]}
+]
+  }
+]}
+]}
+]}
+]}
+]}
+]}
+]}
+]}
+]}
+]}
+]}
+]}
+]}
+]}
+]
+  }
+]}
+]ned
   }
 ]

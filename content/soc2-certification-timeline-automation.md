@@ -2,7 +2,7 @@
 title: "How Long Does SOC 2 Certification Take With Automation Tools in 2026?"
 published: "2026-06-26"
 description: "Timeline breakdown for SOC 2 Type II certification with automation: readiness (2–4 weeks), evidence collection (6 months minimum observation), remediation (2–4 weeks). Total: 7–9 months from start to signed report."
-author: "Joseph Cooper"
+author: "Spire Team"
 tags:
   - SOC 2
   - Timeline

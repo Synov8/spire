@@ -2,7 +2,7 @@
 title: "Vanta vs Drata vs Secureframe vs Spire: SOC 2 Compliance Tools Compared for 2026"
 published: "2026-06-10"
 description: "Honest comparison of SOC 2 compliance automation platforms Vanta, Drata, Secureframe, and Spire. Pricing ($7.5K–$20K/year), integrations, auditor networks, multi-framework support, and AI capabilities evaluated for B2B SaaS teams."
-author: "Joseph Cooper"
+author: "Spire Team"
 tags:
   - SOC 2
   - Compliance Tools

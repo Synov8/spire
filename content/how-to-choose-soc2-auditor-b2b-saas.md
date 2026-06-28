@@ -2,7 +2,7 @@
 title: "How to Choose a SOC 2 Auditor for B2B SaaS: Selection Guide for Startups"
 published: "2026-06-04"
 description: "SOC 2 auditor selection guide for B2B SaaS startups: boutique firm ($8K–$18K Type I) vs Big Four ($30K–$100K+), fixed-fee engagement letters, auditor specialization, and the 5 questions to ask before signing."
-author: "Joseph Cooper"
+author: "Spire Team"
 tags:
   - SOC 2
   - Auditor

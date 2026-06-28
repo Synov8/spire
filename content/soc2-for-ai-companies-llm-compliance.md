@@ -2,7 +2,7 @@
 title: "SOC 2 for AI Companies: How AI-Native B2B SaaS Startups Pass Compliance"
 published: "2026-05-26"
 description: "SOC 2 compliance guide for AI companies building on LLM APIs: evidence collection for AI infrastructure, prompt security monitoring, training data governance, and the unique controls AI-native startups must implement beyond standard cloud security."
-author: "Joseph Cooper"
+author: "Spire Team"
 tags:
   - SOC 2
   - AI

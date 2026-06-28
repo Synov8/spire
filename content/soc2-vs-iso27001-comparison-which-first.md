@@ -2,7 +2,7 @@
 title: "SOC 2 vs ISO 27001: Which Do You Need First for Your B2B SaaS in 2026?"
 published: "2026-06-01"
 description: "SOC 2 vs ISO 27001 comparison for B2B SaaS: costs ($30K–$80K SOC 2 vs $25K–$60K ISO 27001), timelines, buyer geography, and 80% control overlap. Decision framework based on whether your customers are US or EU-based."
-author: "Joseph Cooper"
+author: "Spire Team"
 tags:
   - SOC 2
   - ISO 27001

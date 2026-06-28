@@ -2,7 +2,7 @@
 title: "Automated Evidence Collection for SOC 2 Audits: Complete Guide for B2B SaaS"
 published: "2026-06-22"
 description: "How automated evidence collection works for SOC 2 audits — AWS, GitHub, GCP, and identity provider integrations that continuously collect control evidence. Includes integration setup checklist and control mapping guide."
-author: "Joseph Cooper"
+author: "Spire Team"
 tags:
   - SOC 2
   - Evidence Collection

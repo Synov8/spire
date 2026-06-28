@@ -2,7 +2,7 @@
 title: "SOC 2 Penetration Testing Requirements: What Auditors and Enterprise Customers Expect in 2026"
 published: "2026-05-30"
 description: "SOC 2 penetration testing requirements for 2026: annual minimum, scope alignment with system boundary, CVSS 4.0 scoring, $8K–$30K cost, and the CC4.1 and CC7.1 criteria that auditors evaluate when reviewing pen test evidence."
-author: "Joseph Cooper"
+author: "Spire Team"
 tags:
   - SOC 2
   - Penetration Testing

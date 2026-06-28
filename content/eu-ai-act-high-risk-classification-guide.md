@@ -2,7 +2,7 @@
 title: "EU AI Act High-Risk Classification: Complete Guide for B2B SaaS Deployers"
 published: "2026-06-08"
 description: "EU AI Act high-risk classification guide for B2B SaaS: the eight high-risk categories under Annex III, the provider-led assessment process, deployer obligations, and how the December 2027 enforcement timeline affects US companies selling to Europe."
-author: "Joseph Cooper"
+author: "Spire Team"
 tags:
   - EU AI Act
   - High Risk

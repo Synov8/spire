@@ -2,7 +2,7 @@
 title: "Spire vs Manual SOC 2: Is Compliance Automation Worth It for B2B SaaS?"
 published: "2026-06-22"
 description: "Manual SOC 2 vs compliance automation comparison: manual costs 300+ engineering hours and takes 12–18 months, automation costs $6K/year with an AI agent and takes 6–9 months. Spire reduces engineering time by 80% and replaces quarterly evidence scrambles."
-author: "Joseph Cooper"
+author: "Spire Team"
 tags:
   - Comparison
   - Manual SOC 2

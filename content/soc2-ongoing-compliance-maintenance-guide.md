@@ -2,7 +2,7 @@
 title: "How to Maintain SOC 2 Compliance After Certification: Ongoing Program Guide"
 published: "2026-05-24"
 description: "SOC 2 ongoing compliance maintenance guide: annual re-certification timelines, daily/weekly evidence collection schedules, continuous monitoring alert response, policy review cycles, and how automation reduces ongoing compliance burden to 3-5 hours per week."
-author: "Joseph Cooper"
+author: "Spire Team"
 tags:
   - SOC 2
   - Maintenance

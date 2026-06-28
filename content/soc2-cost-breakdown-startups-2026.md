@@ -2,7 +2,7 @@
 title: "How Much Does SOC 2 Cost for Startups in 2026? Complete Cost Breakdown"
 published: "2026-06-16"
 description: "SOC 2 cost breakdown for startups: Type I audit fees $8K–$25K, Type II $15K–$40K, plus compliance platform $7.5K–$20K/year, penetration testing $5K–$15K, and internal engineering time 100–300 hours. Total first-year: $30K–$150K."
-author: "Joseph Cooper"
+author: "Spire Team"
 tags:
   - SOC 2
   - Pricing

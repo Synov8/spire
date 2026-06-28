@@ -2,7 +2,7 @@
 title: "Spire vs Secureframe: SOC 2 Compliance Platform Comparison for First-Time Audits"
 published: "2026-06-26"
 description: "Spire vs Secureframe comparison: Secureframe has 300+ integrations and guided onboarding at $7.5K–$20K/year. Spire has an AI compliance agent for on-demand audits, native EU AI Act, AI questionnaire automation, and transparent $6K/year pricing."
-author: "Joseph Cooper"
+author: "Spire Team"
 tags:
   - Comparison
   - Secureframe

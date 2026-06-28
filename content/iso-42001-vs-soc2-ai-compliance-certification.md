@@ -2,7 +2,7 @@
 title: "ISO 42001 vs SOC 2: What B2B SaaS Companies Need to Know About AI Compliance Certification"
 published: "2026-06-02"
 description: "ISO 42001 vs SOC 2 comparison for B2B SaaS: ISO 42001 covers AI governance, risk management, and lifecycle controls while SOC 2 covers security, availability, and privacy. Combined they provide complete coverage for enterprise AI procurement requirements."
-author: "Joseph Cooper"
+author: "Spire Team"
 tags:
   - ISO 42001
   - SOC 2

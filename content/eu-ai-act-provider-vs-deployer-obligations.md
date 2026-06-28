@@ -2,7 +2,7 @@
 title: "EU AI Act Provider vs Deployer: Who Is Responsible for What?"
 published: "2026-06-06"
 description: "EU AI Act provider vs deployer obligations explained for B2B SaaS: provider develops and places the system, deployer uses it under authority. Article 25 role-shift rules for substantial modifications and changed intended purpose affecting US SaaS companies."
-author: "Joseph Cooper"
+author: "Spire Team"
 tags:
   - EU AI Act
   - Provider

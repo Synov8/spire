@@ -2,7 +2,7 @@
 title: "SOC 2 Compliance for Startups Under 50 Employees: Complete 2026 Guide"
 published: "2026-06-12"
 description: "Step-by-step SOC 2 certification guide for startups with fewer than 50 employees. Timeline (6–9 months for Type II), costs ($30K–$80K first year), and common mistakes specific to small engineering teams with no dedicated compliance staff."
-author: "Joseph Cooper"
+author: "Spire Team"
 tags:
   - SOC 2
   - Startups

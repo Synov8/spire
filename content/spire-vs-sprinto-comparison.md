@@ -2,7 +2,7 @@
 title: "Spire vs Sprinto: SOC 2 Compliance Platform Comparison for Seed-Stage Startups"
 published: "2026-06-24"
 description: "Spire vs Sprinto comparison: Sprinto has the lowest entry pricing ($4K–$8K/year) for seed-stage startups and Indian entity billing. Spire has an AI compliance agent for on-demand audits, native EU AI Act, questionnaire automation, and transparent $6K/year pricing."
-author: "Joseph Cooper"
+author: "Spire Team"
 tags:
   - Comparison
   - Sprinto

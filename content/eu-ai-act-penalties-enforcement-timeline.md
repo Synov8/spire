@@ -2,7 +2,7 @@
 title: "EU AI Act Penalties and Enforcement Timeline 2026: What B2B SaaS Companies Face"
 published: "2026-05-22"
 description: "EU AI Act enforcement 2026 penalties: up to €35M or 7% of global turnover for prohibited practices, €15M or 3% for GPAI non-compliance, €7.5M or 1.5% for incorrect information. Timeline for high-risk system enforcement delayed to December 2027."
-author: "Joseph Cooper"
+author: "Spire Team"
 tags:
   - EU AI Act
   - Penalties

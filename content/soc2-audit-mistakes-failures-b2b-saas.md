@@ -2,7 +2,7 @@
 title: "7 SOC 2 Audit Mistakes That Cause Failures for B2B SaaS Companies"
 published: "2026-06-14"
 description: "Common SOC 2 audit mistakes including starting too late, skipping readiness assessments, weak access control documentation, and treating compliance as IT-only. Over 60% of first-time audits experience preventable delays."
-author: "Joseph Cooper"
+author: "Spire Team"
 tags:
   - SOC 2
   - Audit Mistakes

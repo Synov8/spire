@@ -2,7 +2,7 @@
 title: "Vendor Risk Management for B2B SaaS: Complete SOC 2 Compliance Guide"
 published: "2026-05-28"
 description: "SOC 2 vendor risk management guide for B2B SaaS: CC9.2 compliance, vendor tiering (critical/high/medium/low), due diligence procedures, subprocessor management, CUEC validation, and ongoing monitoring cadence."
-author: "Joseph Cooper"
+author: "Spire Team"
 tags:
   - Vendor Risk Management
   - SOC 2

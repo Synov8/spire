@@ -2,7 +2,7 @@
 title: "AI-Powered Security Questionnaire Automation for B2B SaaS Enterprise Procurement"
 published: "2026-06-18"
 description: "How AI automation transforms security questionnaire response from a 40-hour manual process to minutes. Includes SOC 2 evidence integration, EU AI Act response templates, and enterprise procurement velocity metrics."
-author: "Joseph Cooper"
+author: "Spire Team"
 tags:
   - Security Questionnaires
   - AI Automation
