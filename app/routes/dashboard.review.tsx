@@ -1,14 +1,16 @@
-import { useLoaderData, useFetcher } from "react-router";
+import { useLoaderData, useFetcher, redirect } from "react-router";
 import { db } from "~/db";
 import { policyCheck, control, manualEvidence } from "~/db/schema";
 import { auth } from "~/lib/auth.server";
 import { eq, and, desc } from "drizzle-orm";
+import { hasActiveSubscription } from "~/lib/subscription-check";
 import type { Route } from "./+types/dashboard.review";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const session = await auth.api.getSession({ headers: request.headers });
   if (!session) return { pending: [], submitted: [] };
   const orgId = session.session.activeOrganizationId!;
+  if (!await hasActiveSubscription(orgId, session.user.id)) throw redirect("/dashboard/billing");
 
   const checks = await db.select().from(policyCheck).where(
     and(eq(policyCheck.organizationId, orgId), eq(policyCheck.needsReview, true)),

@@ -1,17 +1,18 @@
 import { useState } from "react";
-import { useLoaderData, Link } from "react-router";
+import { useLoaderData, Link, redirect } from "react-router";
 import { db } from "~/db";
 import { control, policyCheck } from "~/db/schema";
 import { auth } from "~/lib/auth.server";
 import { eq } from "drizzle-orm";
+import { hasActiveSubscription } from "~/lib/subscription-check";
 import type { Route } from "./+types/dashboard.index";
 import { generateComplianceSummary } from "~/lib/ai";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const session = await auth.api.getSession({ headers: request.headers });
   if (!session) return { controls: [], total: 0, verified: 0, failed: 0, warned: 0, unchecked: 0, summary: null, orgId: "", hasAudit: false };
-
   const orgId = session.session.activeOrganizationId!;
+  if (!await hasActiveSubscription(orgId, session.user.id)) throw redirect("/dashboard/billing");
   const allControls = await db.select().from(control).where(eq(control.framework, "soc2"));
   const verdicts = await db.select().from(policyCheck).where(eq(policyCheck.organizationId, orgId));
 

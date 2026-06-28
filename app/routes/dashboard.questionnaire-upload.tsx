@@ -1,8 +1,9 @@
-import { useNavigate, useFetcher } from "react-router";
+import { useNavigate, useFetcher, redirect } from "react-router";
 import { db } from "~/db";
 import { questionnaire, control, policyCheck } from "~/db/schema";
 import { auth } from "~/lib/auth.server";
 import { eq } from "drizzle-orm";
+import { hasActiveSubscription } from "~/lib/subscription-check";
 import { parseQuestionnaire } from "~/lib/ai";
 import type { Route } from "./+types/dashboard.questionnaire-upload";
 
@@ -20,9 +21,18 @@ async function extractPdfText(buffer: ArrayBuffer): Promise<string> {
   }
 }
 
+export async function loader({ request }: Route.LoaderArgs) {
+  const session = await auth.api.getSession({ headers: request.headers });
+  if (!session) throw redirect("/login");
+  const orgId = session.session.activeOrganizationId!;
+  if (!await hasActiveSubscription(orgId, session.user.id)) throw redirect("/dashboard/billing");
+  return null;
+}
+
 export async function action({ request }: Route.ActionArgs) {
   const session = await auth.api.getSession({ headers: request.headers });
   if (!session) return { ok: false, error: "Not authenticated" };
+  if (!await hasActiveSubscription(session.session.activeOrganizationId!, session.user.id)) return { ok: false, error: "Subscription required" };
 
 
   const formData = await request.formData();

@@ -2,6 +2,7 @@ import { db } from "~/db";
 import { control, policyCheck } from "~/db/schema";
 import { auth } from "~/lib/auth.server";
 import { eq } from "drizzle-orm";
+import { hasActiveSubscription } from "~/lib/subscription-check";
 import type { Route } from "./+types/dashboard.compliance-export";
 
 export async function loader({ request }: Route.LoaderArgs) {
@@ -9,6 +10,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   if (!session) return new Response("Unauthorized", { status: 401 });
 
   const orgId = session.session.activeOrganizationId!;
+  if (!await hasActiveSubscription(orgId, session.user.id)) return new Response("Subscription required", { status: 402 });
   const [allControls, verdicts] = await Promise.all([
     db.select().from(control),
     db.select().from(policyCheck).where(eq(policyCheck.organizationId, orgId)),

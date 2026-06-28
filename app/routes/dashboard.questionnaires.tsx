@@ -1,14 +1,16 @@
-import { useLoaderData, Link } from "react-router";
+import { useLoaderData, Link, redirect } from "react-router";
 import { db } from "~/db";
 import { questionnaire } from "~/db/schema";
 import { auth } from "~/lib/auth.server";
 import { eq } from "drizzle-orm";
+import { hasActiveSubscription } from "~/lib/subscription-check";
 import type { Route } from "./+types/dashboard.questionnaires";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const session = await auth.api.getSession({ headers: request.headers });
   if (!session) return { questionnaires: [] };
   const orgId = session.session.activeOrganizationId!;
+  if (!await hasActiveSubscription(orgId, session.user.id)) throw redirect("/dashboard/billing");
   return { questionnaires: await db.select().from(questionnaire).where(eq(questionnaire.organizationId, orgId)) };
 }
 

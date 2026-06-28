@@ -3,7 +3,6 @@ import { db } from "~/db";
 import { subscription } from "~/db/schema";
 import { eq } from "drizzle-orm";
 import { Composio } from "@composio/core";
-import { hasActiveSubscription } from "~/lib/subscription-check";
 import type { ActionFunctionArgs } from "react-router";
 
 const LIMITS: Record<string, number> = { starter: 3, growth: 10, enterprise: -1 };
@@ -20,9 +19,6 @@ export async function action({ request }: ActionFunctionArgs) {
   if (!session) return Response.json({ error: "Unauthorized" }, { status: 401 });
 
   const orgId = session.session.activeOrganizationId!;
-  if (!await hasActiveSubscription(orgId, session.user.id)) {
-    return Response.json({ error: "Active subscription required. Go to /pricing to subscribe." }, { status: 402 });
-  }
   const apiKey = process.env.COMPOSIO_API_KEY;
   if (!apiKey) return Response.json({ error: "COMPOSIO_API_KEY not set" }, { status: 500 });
 
