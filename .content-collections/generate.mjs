@@ -19,7 +19,7 @@ function parseFrontmatter(raw) {
     }
     listKey = null;
     const sep = line.indexOf(":");
-    if (sep > 0 && line[sep + 1] !== undefined) {
+    if (sep > 0) {
       const key = line.slice(0, sep).trim();
       let val = line.slice(sep + 1).trim();
       if (val === "") {
