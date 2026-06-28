@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "build": "react-router build",
-    "dev": "react-router dev",
+    "dev": "node .content-collections/generate.mjs && react-router dev",
+    "prebuild": "node .content-collections/generate.mjs",
     "typecheck": "wrangler types && react-router typegen && tsc -b",
     "deploy": "npm run build && wrangler deploy",
     "preview": "npm run build && vite preview",

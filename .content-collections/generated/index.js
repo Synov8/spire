@@ -1,1 +1,1 @@
-export const allPosts = [];
+export { allPosts } from "./allPosts.js";
