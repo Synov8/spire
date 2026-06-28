@@ -22,7 +22,8 @@
     "resolveJsonModule": true,
     "strict": true,
     "paths": {
-      "~/*": ["./app/*"]
+      "~/*": ["./app/*"],
+      "content-collections": ["./.content-collections/generated"]
     },
     "rootDirs": [".", "./.react-router/types"]
   }

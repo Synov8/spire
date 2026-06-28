@@ -121,7 +121,7 @@ export default function Pricing() {
           <div className="flex items-center gap-6 text-sm text-[#5C5C66]">
             <Link to="/privacy" className="hover:text-[#8B8B93] transition-colors">Privacy</Link>
             <Link to="/terms" className="hover:text-[#8B8B93] transition-colors">Terms</Link>
-            <span>© {new Date().getFullYear()}</span>
+            <span>© {new Date().getFullYear()} Synov8 Ltd.</span>
           </div>
         </div>
       </footer>

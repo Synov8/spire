@@ -56,7 +56,8 @@ export default function FAQPage() {
         <div className="mt-12 rounded-xl border border-[#1C1C24] bg-[#111116] p-8 text-center">
           <h2 className="text-lg font-bold text-[#F1F1F3]">Still have questions?</h2>
           <p className="mt-2 text-sm text-[#8B8B93]">We're here to help.</p>
-          <Link to="/contact" className="mt-4 inline-block rounded-lg bg-[#00D4AA] px-6 py-2.5 text-sm font-medium text-black hover:bg-[#00B894] transition-colors">
+          <Link to="/blog" className="hover:text-[#8B8B93] transition-colors">Blog</Link>
+            <Link to="/contact" className="mt-4 inline-block rounded-lg bg-[#00D4AA] px-6 py-2.5 text-sm font-medium text-black hover:bg-[#00B894] transition-colors">
             Contact us
           </Link>
         </div>
@@ -68,7 +69,7 @@ export default function FAQPage() {
           <div className="flex items-center gap-6 text-sm text-[#5C5C66]">
             <Link to="/privacy" className="hover:text-[#8B8B93] transition-colors">Privacy</Link>
             <Link to="/terms" className="hover:text-[#8B8B93] transition-colors">Terms</Link>
-            <span>© {new Date().getFullYear()}</span>
+            <span>© {new Date().getFullYear()} Synov8 Ltd.</span>
           </div>
         </div>
       </footer>

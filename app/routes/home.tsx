@@ -41,6 +41,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
           <Link to="/integrations" className="text-sm text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">Integrations</Link>
           <Link to="/pricing" className="text-sm text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">Pricing</Link>
           <Link to="/security" className="text-sm text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">Security</Link>
+          <Link to="/blog" className="text-sm text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">Blog</Link>
           <Link to="/login" className="rounded-lg border border-[#1C1C24] px-4 py-2 text-sm font-medium text-[#8B8B93] hover:border-[#00D4AA] hover:text-[#00D4AA] transition-colors">Sign in</Link>
         </div>
       </header>
@@ -162,15 +163,10 @@ export default function Home({ loaderData }: Route.ComponentProps) {
             <h3 className="mt-5 text-xl font-bold">Continuous evidence collection</h3>
             <ul className="mt-4 space-y-3">
               {[
-                ["AWS", "CloudTrail, IAM, S3, EC2"],
-                ["GitHub", "commits, PRs, branch protection"],
-                ["Google Workspace", "admin audit, directory, OAuth"],
-                ["Vercel", "deployments, env, team access"],
-                ["Cloudflare", "WAF, SSL/TLS, DDoS"],
-                ["Clerk", "MFA, SSO, session management"],
-                ["Supabase", "encryption, RLS, auth"],
-                ["Stripe", "PCI, webhooks, API keys"],
-                ["Resend", "DKIM, SPF, encryption"],
+                ["AWS / GitHub", "infra, code, access controls"],
+                ["Google / Vercel", "workspace audit, deployments"],
+                ["Cloudflare / Clerk", "WAF, SSL, MFA, sessions"],
+                ["Stripe / Supabase / Resend", "PCI, RLS, encryption — 9 total"],
               ].map(([label, desc]) => (
                 <li key={label} className="flex items-start gap-3 text-sm text-[#8B8B93]">
                   <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#00D4AA]" />
@@ -364,10 +360,11 @@ export default function Home({ loaderData }: Route.ComponentProps) {
             <Link to="/features" className="hover:text-[#8B8B93] transition-colors">Features</Link>
             <Link to="/pricing" className="hover:text-[#8B8B93] transition-colors">Pricing</Link>
             <Link to="/faq" className="hover:text-[#8B8B93] transition-colors">FAQ</Link>
+            <Link to="/blog" className="hover:text-[#8B8B93] transition-colors">Blog</Link>
             <Link to="/contact" className="hover:text-[#8B8B93] transition-colors">Contact</Link>
             <Link to="/privacy" className="hover:text-[#8B8B93] transition-colors">Privacy</Link>
             <Link to="/terms" className="hover:text-[#8B8B93] transition-colors">Terms</Link>
-            <span>© {new Date().getFullYear()}</span>
+            <span>© {new Date().getFullYear()} Synov8 Ltd.</span>
           </div>
         </div>
       </footer>

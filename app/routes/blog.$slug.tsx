@@ -1,0 +1,119 @@
+import { Link, useParams } from "react-router";
+import { allPosts } from "content-collections";
+import { ArticleSchema, OrganizationSchema, FAQSchema } from "~/components/geo-schema";
+
+export function meta({ params }: { params: { slug: string } }) {
+  const post = allPosts.find((p) => p.slug === params.slug);
+  if (!post) return [{ title: "Post Not Found | Spire" }];
+  return [
+    { title: `${post.title} | Spire` },
+    { name: "description", content: post.description },
+    { property: "og:title", content: `${post.title} | Spire` },
+    { property: "og:description", content: post.description },
+    { property: "og:url", content: `https://spire.synov8studio.com/blog/${post.slug}` },
+    { property: "og:type", content: "article" },
+    { property: "article:published_time", content: post.published.toISOString?.() ?? post.published },
+    ...(post.tags?.map((t: string) => ({ property: "article:tag", content: t })) ?? []),
+    { name: "twitter:card", content: "summary_large_image" },
+    { name: "twitter:title", content: post.title },
+    { name: "twitter:description", content: post.description },
+  ];
+}
+
+function extractFaq(html: string) {
+  const faqH2 = '<h2 id="faq">FAQ</h2>';
+  const idx = html.indexOf(faqH2);
+  if (idx === -1) return undefined;
+  const afterFaq = html.slice(idx + faqH2.length);
+  const faq: Array<{ question: string; answer: string }> = [];
+  const h3Re = /<h3[^>]*>([\s\S]*?)<\/h3>\s*<p>([\s\S]*?)<\/p>/g;
+  let m;
+  while ((m = h3Re.exec(afterFaq)) !== null) {
+    const question = m[1].replace(/<[^>]+>/g, "").trim();
+    const answer = m[2].replace(/<[^>]+>/g, "").trim();
+    if (question && answer) faq.push({ question, answer });
+  }
+  return faq.length > 0 ? faq : undefined;
+}
+
+export default function BlogPost() {
+  const { slug } = useParams();
+  const post = allPosts.find((p) => p.slug === slug);
+
+  if (!post) return (
+    <div className="flex min-h-screen items-center justify-center bg-[#0A0A0C]">
+      <div className="text-center"><p className="text-[#8B8B93]">Post not found.</p><Link to="/blog" className="mt-4 inline-block text-[#00D4AA]">Back to blog</Link></div>
+    </div>
+  );
+
+  const url = `https://spire.synov8studio.com/blog/${post.slug}`;
+
+  const faqItems = extractFaq(post.html);
+
+  return (
+    <div className="min-h-screen bg-[#0A0A0C]">
+      <ArticleSchema meta={{ title: post.title, description: post.description, published: post.published.toISOString?.() ?? post.published, updated: post.updated?.toISOString?.(), author: post.author, tags: post.tags, slug: post.slug, url }} />
+      <FAQSchema faq={faqItems} />
+      <OrganizationSchema />
+      <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
+        <Link to="/" className="text-lg font-bold tracking-tight text-[#F1F1F3]">Spire</Link>
+        <div className="flex items-center gap-8">
+          <Link to="/features" className="text-sm text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">Features</Link>
+          <Link to="/pricing" className="text-sm text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">Pricing</Link>
+          <Link to="/blog" className="text-sm text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">Blog</Link>
+          <Link to="/login" className="rounded-lg border border-[#1C1C24] px-4 py-2 text-sm font-medium text-[#8B8B93] hover:border-[#00D4AA] hover:text-[#00D4AA] transition-colors">Sign in</Link>
+        </div>
+      </header>
+
+      <article className="mx-auto max-w-3xl px-6 pt-16 pb-24">
+        <Link to="/blog" className="text-sm text-[#8B8B93] hover:text-[#00D4AA] transition-colors">&larr; Back to blog</Link>
+        <div className="mt-8 flex items-center gap-3 text-xs text-[#5C5C66]">
+          <time>{new Date(post.published).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}</time>
+          <span>·</span>
+          <span>{post.author}</span>
+        </div>
+        <h1 className="mt-4 text-3xl font-bold tracking-tight text-[#F1F1F3] md:text-4xl">{post.title}</h1>
+        <p className="mt-3 text-lg text-[#8B8B93]">{post.description}</p>
+        {post.tags && post.tags.length > 0 && (
+          <div className="mt-4 flex flex-wrap gap-2">
+            {post.tags.map((t) => <span key={t} className="rounded bg-[#1C1C24] px-2.5 py-1 text-xs text-[#8B8B93]">{t}</span>)}
+          </div>
+        )}
+        <div className="mt-10 prose prose-invert max-w-none prose-a:text-[#00D4AA] prose-code:text-[#00D4AA] prose-strong:text-[#F1F1F3] prose-headings:text-[#F1F1F3] prose-p:text-[#B0B0B8] prose-li:text-[#B0B0B8] prose-hr:border-[#1C1C24] prose-td:text-[#B0B0B8] prose-th:text-[#F1F1F3]" dangerouslySetInnerHTML={{ __html: post.html }} />
+
+        {(() => {
+          const related = allPosts.filter((p) => p.slug !== slug && p.tags?.some((t) => post.tags?.includes(t))).slice(0, 2);
+          if (related.length === 0) return null;
+          return (
+            <section className="mt-16 border-t border-[#1C1C24] pt-12">
+              <h2 className="text-lg font-bold text-[#F1F1F3]">Related posts</h2>
+              <div className="mt-6 grid gap-4 md:grid-cols-2">
+                {related.map((rp) => (
+                  <Link key={rp.slug} to={`/blog/${rp.slug}`} className="rounded-xl border border-[#1C1C24] bg-[#111116] p-5 hover:border-[#00D4AA]/30 transition-colors">
+                    <div className="flex items-center gap-2 text-xs text-[#5C5C66]">
+                      <time>{new Date(rp.published).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</time>
+                    </div>
+                    <h3 className="mt-2 font-medium text-[#F1F1F3]">{rp.title}</h3>
+                    <p className="mt-1 text-xs text-[#8B8B93]">{rp.description}</p>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          );
+        })()}
+      </article>
+
+      <footer className="border-t border-[#1C1C24] py-10">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-6">
+          <span className="text-sm font-bold tracking-tight text-[#F1F1F3]">Spire</span>
+          <div className="flex items-center gap-6 text-sm text-[#5C5C66]">
+            <Link to="/blog" className="hover:text-[#8B8B93] transition-colors">Blog</Link>
+            <Link to="/privacy" className="hover:text-[#8B8B93] transition-colors">Privacy</Link>
+            <Link to="/terms" className="hover:text-[#8B8B93] transition-colors">Terms</Link>
+            <span>© {new Date().getFullYear()} Synov8 Ltd.</span>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}
