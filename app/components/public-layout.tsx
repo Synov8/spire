@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { allPosts } from "content-collections";
 
 const navLinks = [
@@ -19,10 +19,13 @@ function isActive(pathname: string, to: string) {
 
 export function PublicNav() {
   const { pathname } = useLocation();
+  const [menuOpen, setMenuOpen] = useState(false);
+
   return (
     <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
       <Link to="/" className="text-lg font-bold tracking-tight text-[#F1F1F3]">Spire</Link>
-      <div className="flex items-center gap-8">
+
+      <div className="hidden sm:flex items-center gap-8">
         {navLinks.map((link) => (
           <Link
             key={link.to}
@@ -43,6 +46,48 @@ export function PublicNav() {
           Sign in
         </Link>
       </div>
+
+      <button onClick={() => setMenuOpen(true)} className="sm:hidden p-2 text-[#8B8B93] hover:text-[#F1F1F3] transition-colors" aria-label="Open menu">
+        <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M3 12h18M3 6h18M3 18h18" />
+        </svg>
+      </button>
+
+      {menuOpen && (
+        <div className="fixed inset-0 z-50 flex flex-col bg-[#0A0A0C] sm:hidden">
+          <div className="flex items-center justify-between px-6 py-5">
+            <span className="text-lg font-bold tracking-tight text-[#F1F1F3]">Spire</span>
+            <button onClick={() => setMenuOpen(false)} className="p-2 text-[#8B8B93] hover:text-[#F1F1F3] transition-colors" aria-label="Close menu">
+              <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M18 6L6 18M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          <nav className="flex flex-1 flex-col items-center justify-center gap-8">
+            {navLinks.map((link) => (
+              <Link
+                key={link.to}
+                to={link.to}
+                onClick={() => setMenuOpen(false)}
+                className={`text-xl transition-colors ${
+                  isActive(pathname, link.to)
+                    ? "text-[#00D4AA]"
+                    : "text-[#8B8B93] hover:text-[#F1F1F3]"
+                }`}
+              >
+                {link.label}
+              </Link>
+            ))}
+            <Link
+              to="/login"
+              onClick={() => setMenuOpen(false)}
+              className="mt-4 rounded-lg bg-[#00D4AA] px-8 py-3 text-lg font-medium text-black hover:bg-[#00B894] transition-colors"
+            >
+              Sign in
+            </Link>
+          </nav>
+        </div>
+      )}
     </header>
   );
 }

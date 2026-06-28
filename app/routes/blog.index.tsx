@@ -24,7 +24,7 @@ export default function BlogIndex() {
     <PublicLayout>
       <OrganizationSchema />
 
-      <section className="mx-auto max-w-7xl px-6 pt-20 pb-24">
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 pt-16 sm:pt-20 pb-24">
         <div className="text-center">
           <span className="text-xs font-semibold uppercase tracking-[0.15em] text-[#00D4AA]">Blog</span>
           <h1 className="mt-3 text-4xl font-bold tracking-tight text-[#F1F1F3] md:text-5xl">Compliance, engineering, and the AI Act</h1>
