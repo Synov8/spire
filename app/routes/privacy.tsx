@@ -1,4 +1,14 @@
 import { Link } from "react-router";
+import { PublicLayout } from "~/components/public-layout";
+
+export function meta() {
+  return [
+    { title: "Privacy Policy | Spire" },
+    { name: "description", content: "Spire's privacy policy covering data collection, data processing, subprocessor management, and customer data protection for our SOC 2 and EU AI Act compliance platform." },
+    { property: "og:title", content: "Privacy Policy | Spire" },
+    { property: "og:type", content: "website" },
+  ];
+}
 
 const sections = [
   { title: "Information we collect", content: "When you sign up for Spire, we collect your name, email address, and company name. When you connect integrations, we collect read-only data from those systems including configuration metadata, access logs, and activity records. We do not collect sensitive personal data, passwords, or private keys." },
@@ -12,16 +22,7 @@ const sections = [
 
 export default function PrivacyPage() {
   return (
-    <div className="min-h-screen bg-[#0A0A0C]">
-      <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
-        <Link to="/" className="text-lg font-bold tracking-tight text-[#F1F1F3]">Spire</Link>
-        <div className="flex items-center gap-8">
-          <Link to="/features" className="text-sm text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">Features</Link>
-          <Link to="/pricing" className="text-sm text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">Pricing</Link>
-          <Link to="/faq" className="text-sm text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">FAQ</Link>
-          <Link to="/login" className="rounded-lg border border-[#1C1C24] px-4 py-2 text-sm font-medium text-[#8B8B93] hover:border-[#00D4AA] hover:text-[#00D4AA] transition-colors">Sign in</Link>
-        </div>
-      </header>
+    <PublicLayout>
 
       <section className="mx-auto max-w-3xl px-6 pt-20 pb-24">
         <div className="text-center">
@@ -46,16 +47,6 @@ export default function PrivacyPage() {
         </div>
       </section>
 
-      <footer className="border-t border-[#1C1C24] py-10">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6">
-          <span className="text-sm font-bold tracking-tight text-[#F1F1F3]">Spire</span>
-          <div className="flex items-center gap-6 text-sm text-[#5C5C66]">
-            <Link to="/privacy" className="text-[#8B8B93] transition-colors">Privacy</Link>
-            <Link to="/terms" className="hover:text-[#8B8B93] transition-colors">Terms</Link>
-            <span>© {new Date().getFullYear()} Synov8 Ltd.</span>
-          </div>
-        </div>
-      </footer>
-    </div>
+    </PublicLayout>
   );
 }
