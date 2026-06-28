@@ -10,12 +10,22 @@ function parseFrontmatter(raw) {
   const m = raw.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
   if (!m) return {};
   const fm = {};
-  for (const line of m[1].split("\n")) {
+  const lines = m[1].split("\n");
+  let listKey = null;
+  for (const line of lines) {
+    if (/^\s+-\s/.test(line) && listKey) {
+      fm[listKey].push(line.trim().replace(/^- /, "").replace(/^["']|["']$/g, ""));
+      continue;
+    }
+    listKey = null;
     const sep = line.indexOf(": ");
     if (sep > 0) {
       const key = line.slice(0, sep).trim();
       let val = line.slice(sep + 2).trim();
-      if (val.startsWith("[") && val.endsWith("]")) {
+      if (val === "") {
+        listKey = key;
+        fm[key] = [];
+      } else if (val.startsWith("[") && val.endsWith("]")) {
         fm[key] = val.slice(1, -1).split(", ").map((s) => s.replace(/^["']|["']$/g, ""));
       } else {
         fm[key] = val.replace(/^["']|["']$/g, "");
