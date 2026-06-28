@@ -1,5 +1,6 @@
 import { Link, useLocation } from "react-router";
 import type { ReactNode } from "react";
+import { allPosts } from "content-collections";
 
 const navLinks = [
   { to: "/features", label: "Features" },
@@ -7,16 +8,6 @@ const navLinks = [
   { to: "/pricing", label: "Pricing" },
   { to: "/security", label: "Security" },
   { to: "/blog", label: "Blog" },
-];
-
-const footerLinks = [
-  { to: "/features", label: "Features" },
-  { to: "/pricing", label: "Pricing" },
-  { to: "/faq", label: "FAQ" },
-  { to: "/blog", label: "Blog" },
-  { to: "/contact", label: "Contact" },
-  { to: "/privacy", label: "Privacy" },
-  { to: "/terms", label: "Terms" },
 ];
 
 function isActive(pathname: string, to: string) {
@@ -57,24 +48,60 @@ export function PublicNav() {
 }
 
 export function PublicFooter() {
-  const { pathname } = useLocation();
+  const sorted = [...allPosts].sort((a, b) => new Date(b.published).getTime() - new Date(a.published).getTime());
+  const comparisons = sorted.filter((p) => p.tags?.includes("Comparison")).slice(0, 5);
+  const soc2 = sorted.find((p) => p.tags?.includes("SOC 2") && !p.tags?.includes("Comparison") && !p.tags?.includes("Manual SOC 2"));
+  const euAi = sorted.find((p) => p.tags?.includes("EU AI Act"));
+  const vendorRisk = sorted.find((p) => p.tags?.includes("Vendor Risk Management"));
+
   return (
-    <footer className="border-t border-[#1C1C24] py-10">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-6">
-        <span className="text-sm font-bold tracking-tight text-[#F1F1F3]">Spire</span>
-        <div className="flex items-center gap-6 text-sm text-[#5C5C66]">
-          {footerLinks.map((link) => (
-            <Link
-              key={link.to}
-              to={link.to}
-              className={`transition-colors ${
-                isActive(pathname, link.to) ? "text-[#8B8B93]" : "hover:text-[#8B8B93]"
-              }`}
-            >
-              {link.label}
-            </Link>
-          ))}
-          <span>&copy; {new Date().getFullYear()} Synov8 Ltd.</span>
+    <footer className="border-t border-[#1C1C24]">
+      <div className="mx-auto max-w-6xl px-6 py-12">
+        <div className="grid gap-10 sm:grid-cols-2 md:grid-cols-4">
+          <div>
+            <span className="text-sm font-bold tracking-tight text-[#F1F1F3]">Spire</span>
+            <p className="mt-2 text-xs text-[#5C5C66] leading-relaxed">AI-powered SOC&nbsp;2 and EU&nbsp;AI&nbsp;Act compliance automation for B2B SaaS.</p>
+            <div className="mt-4 space-y-1.5">
+              <Link to="/features" className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">Features</Link>
+              <Link to="/integrations" className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">Integrations</Link>
+              <Link to="/pricing" className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">Pricing</Link>
+              <Link to="/security" className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">Security</Link>
+              <Link to="/glossary" className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">Glossary</Link>
+            </div>
+          </div>
+          <div>
+            <span className="text-xs font-semibold uppercase tracking-[0.1em] text-[#5C5C66]">Resources</span>
+            <div className="mt-4 space-y-1.5">
+              <Link to="/blog" className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">Blog home</Link>
+              {soc2 && <Link to={`/blog/${soc2.slug}`} className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors truncate">{soc2.title}</Link>}
+              {euAi && <Link to={`/blog/${euAi.slug}`} className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors truncate">{euAi.title}</Link>}
+              {vendorRisk && <Link to={`/blog/${vendorRisk.slug}`} className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors truncate">{vendorRisk.title}</Link>}
+              <Link to="/blog/soc2-cost-breakdown-startups-2026" className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors truncate">SOC 2 cost breakdown</Link>
+              <Link to="/blog/soc2-vs-iso27001-comparison-which-first" className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors truncate">SOC 2 vs ISO 27001</Link>
+              <Link to="/faq" className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">FAQ</Link>
+            </div>
+          </div>
+          <div>
+            <span className="text-xs font-semibold uppercase tracking-[0.1em] text-[#5C5C66]">Compare</span>
+            <div className="mt-4 space-y-1.5">
+              {comparisons.map((p) => (
+                <Link key={p.slug} to={`/blog/${p.slug}`} className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors truncate">{p.title}</Link>
+              ))}
+            </div>
+          </div>
+          <div>
+            <span className="text-xs font-semibold uppercase tracking-[0.1em] text-[#5C5C66]">Company</span>
+            <div className="mt-4 space-y-1.5">
+              <Link to="/blog" className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">Blog</Link>
+              <Link to="/faq" className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">FAQ</Link>
+              <Link to="/contact" className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">Contact</Link>
+              <Link to="/privacy" className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">Privacy</Link>
+              <Link to="/terms" className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">Terms</Link>
+            </div>
+          </div>
+        </div>
+        <div className="mt-10 border-t border-[#1C1C24] pt-6 text-center text-xs text-[#5C5C66]">
+          &copy; {new Date().getFullYear()} Synov8 Ltd.
         </div>
       </div>
     </footer>
