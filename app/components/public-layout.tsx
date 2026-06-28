@@ -48,16 +48,12 @@ export function PublicNav() {
 }
 
 export function PublicFooter() {
-  const sorted = [...allPosts].sort((a, b) => new Date(b.published).getTime() - new Date(a.published).getTime());
-  const comparisons = sorted.filter((p) => p.tags?.includes("Comparison")).slice(0, 5);
-  const soc2 = sorted.find((p) => p.tags?.includes("SOC 2") && !p.tags?.includes("Comparison") && !p.tags?.includes("Manual SOC 2"));
-  const euAi = sorted.find((p) => p.tags?.includes("EU AI Act"));
-  const vendorRisk = sorted.find((p) => p.tags?.includes("Vendor Risk Management"));
+  const comparisons = allPosts.filter((p) => p.tags?.includes("Comparison")).slice(0, 5);
 
   return (
     <footer className="border-t border-[#1C1C24]">
       <div className="mx-auto max-w-6xl px-6 py-12">
-        <div className="grid gap-10 sm:grid-cols-2 md:grid-cols-4">
+        <div className="grid gap-10 md:grid-cols-4">
           <div>
             <span className="text-sm font-bold tracking-tight text-[#F1F1F3]">Spire</span>
             <p className="mt-2 text-xs text-[#5C5C66] leading-relaxed">AI-powered SOC&nbsp;2 and EU&nbsp;AI&nbsp;Act compliance automation for B2B SaaS.</p>
@@ -70,22 +66,26 @@ export function PublicFooter() {
             </div>
           </div>
           <div>
-            <span className="text-xs font-semibold uppercase tracking-[0.1em] text-[#5C5C66]">Resources</span>
+            <span className="text-xs font-semibold uppercase tracking-[0.1em] text-[#5C5C66]">Guides</span>
             <div className="mt-4 space-y-1.5">
-              <Link to="/blog" className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">Blog home</Link>
-              {soc2 && <Link to={`/blog/${soc2.slug}`} className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors truncate">{soc2.title}</Link>}
-              {euAi && <Link to={`/blog/${euAi.slug}`} className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors truncate">{euAi.title}</Link>}
-              {vendorRisk && <Link to={`/blog/${vendorRisk.slug}`} className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors truncate">{vendorRisk.title}</Link>}
-              <Link to="/blog/soc2-cost-breakdown-startups-2026" className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors truncate">SOC 2 cost breakdown</Link>
-              <Link to="/blog/soc2-vs-iso27001-comparison-which-first" className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors truncate">SOC 2 vs ISO 27001</Link>
-              <Link to="/faq" className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">FAQ</Link>
+              <Link to="/blog/soc2-compliance-automation-guide-2026" className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">SOC 2 automation guide</Link>
+              <Link to="/blog/eu-ai-act-compliance-checklist-us-saas-2026" className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">EU AI Act checklist</Link>
+              <Link to="/blog/soc2-cost-breakdown-startups-2026" className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">SOC 2 cost breakdown</Link>
+              <Link to="/blog/soc2-vs-iso27001-comparison-which-first" className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">SOC 2 vs ISO 27001</Link>
+              <Link to="/blog/automated-evidence-collection-soc2-guide" className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">Evidence collection guide</Link>
+              <Link to="/glossary" className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">Glossary</Link>
             </div>
           </div>
           <div>
             <span className="text-xs font-semibold uppercase tracking-[0.1em] text-[#5C5C66]">Compare</span>
             <div className="mt-4 space-y-1.5">
               {comparisons.map((p) => (
-                <Link key={p.slug} to={`/blog/${p.slug}`} className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors truncate">{p.title}</Link>
+                <Link key={p.slug} to={`/blog/${p.slug}`} className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors truncate">
+                  {(() => {
+                    const name = p.title.replace(/^Spire vs /, "").replace(/:.*$/, "");
+                    return `vs ${name}`;
+                  })()}
+                </Link>
               ))}
             </div>
           </div>
