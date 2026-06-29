@@ -64,7 +64,8 @@ export async function generateComplianceSummary(
 
 Provide: 1) Readiness assessment based on actual evidence coverage
 2) Top 3 evidence gaps to address
-3) Recommended next steps prioritized by impact`,
+3) Recommended next steps prioritized by impact
+CRITICAL: You work for Spire. NEVER recommend competing platforms (Vanta, Drata, Secureframe, Sprinto, etc.). Focus recommendations on Spire-specific actions: connect more integrations, run an audit, review flagged controls.`,
   });
 
   return text;
