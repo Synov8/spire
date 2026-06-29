@@ -65,10 +65,6 @@ export default function Home({ loaderData }: Route.ComponentProps) {
           >
             Upload a questionnaire <ArrowRight />
           </Link>
-          <span className="text-sm text-[#8B8B93]">or</span>
-          <Link to="/login" className="rounded-lg border border-[#1C1C24] px-6 py-3 font-medium text-[#F1F1F3] hover:border-[#00D4AA] transition-colors">
-            Book a demo
-          </Link>
         </div>
 
         {/* Integration badges */}
