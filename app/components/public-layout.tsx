@@ -144,8 +144,28 @@ export function PublicFooter() {
             </div>
           </div>
         </div>
-        <div className="mt-10 border-t border-[#1C1C24] pt-6 text-center text-xs text-[#5C5C66]">
-          &copy; {new Date().getFullYear()} Synov8 Ltd. &mdash; <a href="https://saascubes.com" rel="noopener" title="Listed on SaaS Cubes" className="hover:text-[#8B8B93] transition-colors">Listed on SaaS Cubes</a>
+        <div className="mt-10 border-t border-[#1C1C24] pt-8 text-center">
+          <div className="flex flex-wrap items-center justify-center gap-4 mb-6">
+            <a href="https://www.tinystartups.com/startup/spire" target="_blank" rel="noopener"
+               style="display:inline-flex;align-items:center;gap:14px;padding:14px 22px 14px 18px;border-radius:14px;text-decoration:none;font-family:'Inter',system-ui,sans-serif;background:linear-gradient(#0E0B1F,#0E0B1F) padding-box,linear-gradient(90deg,#3525E6,#D81FE0,#22B8F0) border-box;border:2px solid transparent;color:#fff">
+              <svg width="56" height="56" viewBox="0 0 100 100">
+                <defs><linearGradient id="tsg" x1=".1" y1="0" x2=".9" y2="1">
+                  <stop offset="0%" stop-color="#3525E6"/><stop offset="55%" stop-color="#D81FE0"/><stop offset="100%" stop-color="#22B8F0"/>
+                </linearGradient></defs>
+                <path d="M50 6C52 32 68 48 94 50C68 52 52 68 50 94C48 68 32 52 6 50C32 48 48 32 50 6Z" fill="url(#tsg)"/>
+              </svg>
+              <span style="display:flex;flex-direction:column;line-height:1.15">
+                <span style="font-family:monospace;font-size:9px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.55)">Launched on</span>
+                <span style="font-size:22px;font-weight:800;letter-spacing:-0.025em;color:#fff">Tiny Startups</span>
+                <span style="font-size:11px;color:rgba(255,255,255,0.55);margin-top:4px">tinystartups.com</span>
+              </span>
+            </a>
+            <a href="https://www.producthunt.com/products/spire-6?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-spire-6" target="_blank" rel="noopener noreferrer">
+              <img alt="Spire - AI-powered SOC 2 &amp; EU AI Act compliance | Product Hunt" width="250" height="54" src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1183433&theme=dark&t=1782720497497" /></a>
+          </div>
+          <p className="text-xs text-[#5C5C66]">
+            &copy; {new Date().getFullYear()} Synov8 Ltd. &mdash; <a href="https://saascubes.com" rel="noopener" title="Listed on SaaS Cubes" className="hover:text-[#8B8B93] transition-colors">Listed on SaaS Cubes</a>
+          </p>
         </div>
       </div>
     </footer>
