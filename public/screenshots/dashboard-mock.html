@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: Inter, system-ui, sans-serif; background: #07080A; color: #E8E8E8; }
+.flex { display: flex; }
+.min-h-screen { min-height: 100vh; }
+.w-64 { width: 256px; }
+.flex-1 { flex: 1; }
+.border-r { border-right: 1px solid #1A1D1E; }
+.bg-\[\#0B0D0E\] { background: #0B0D0E; }
+.bg-\[\#07080A\] { background: #07080A; }
+.p-4 { padding: 16px; }
+.p-6 { padding: 24px; }
+.p-8 { padding: 32px; }
+.p-5 { padding: 20px; }
+.px-4 { padding-left: 16px; padding-right: 16px; }
+.px-3 { padding-left: 12px; padding-right: 12px; }
+.px-2 { padding-left: 8px; padding-right: 8px; }
+.py-3 { padding-top: 12px; padding-bottom: 12px; }
+.py-2 { padding-top: 8px; padding-bottom: 8px; }
+.py-1\.5 { padding-top: 6px; padding-bottom: 6px; }
+.py-16 { padding-top: 64px; padding-bottom: 64px; }
+.pt-4 { padding-top: 16px; }
+.pt-6 { padding-top: 24px; }
+.pb-24 { padding-bottom: 96px; }
+.mt-0\.5 { margin-top: 2px; }
+.mt-1 { margin-top: 4px; }
+.mt-1\.5 { margin-top: 6px; }
+.mt-2 { margin-top: 8px; }
+.mt-3 { margin-top: 12px; }
+.mt-4 { margin-top: 16px; }
+.mt-5 { margin-top: 20px; }
+.mt-6 { margin-top: 24px; }
+.mt-8 { margin-top: 32px; }
+.mt-12 { margin-top: 48px; }
+.mb-2 { margin-bottom: 8px; }
+.mb-3 { margin-bottom: 12px; }
+.mb-4 { margin-bottom: 16px; }
+.mb-6 { margin-bottom: 24px; }
+.gap-2 { gap: 8px; }
+.gap-3 { gap: 12px; }
+.gap-4 { gap: 16px; }
+.gap-1\.5 { gap: 6px; }
+.space-y-0\.5 > * + * { margin-top: 2px; }
+.space-y-2 > * + * { margin-top: 8px; }
+.space-y-3 > * + * { margin-top: 12px; }
+.space-y-4 > * + * { margin-top: 16px; }
+.space-y-6 > * + * { margin-top: 24px; }
+.space-y-8 > * + * { margin-top: 32px; }
+.grid { display: grid; }
+.grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+.grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
+.items-center { align-items: center; }
+.items-start { align-items: flex-start; }
+.justify-between { justify-content: space-between; }
+.justify-center { justify-content: center; }
+.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.max-w-6xl { max-width: 1152px; margin-left: auto; margin-right: auto; }
+.max-w-28 { max-width: 112px; }
+.max-w-3xl { max-width: 768px; }
+.w-full { width: 100%; }
+.h-1 { height: 4px; }
+.h-1\.5 { height: 6px; }
+.h-2 { height: 8px; }
+.h-4 { height: 16px; }
+.h-5 { height: 20px; }
+.h-6 { height: 24px; }
+.h-7 { height: 28px; }
+.h-10 { height: 40px; }
+.h-12 { height: 48px; }
+.h-48 { height: 192px; }
+.w-4 { width: 16px; }
+.w-5 { width: 20px; }
+.w-6 { width: 24px; }
+.w-7 { width: 28px; }
+.w-10 { width: 40px; }
+.w-12 { width: 48px; }
+.overflow-auto { overflow: auto; }
+.rounded-lg { border-radius: 8px; }
+.rounded-md { border-radius: 6px; }
+.rounded-xl { border-radius: 12px; }
+.rounded-full { border-radius: 9999px; }
+.border { border: 1px solid #1A1D1E; }
+.border-t { border-top: 1px solid #1A1D1E; }
+.border-dashed { border-style: dashed; }
+.border-b { border-bottom: 1px solid #1A1D1E; }
+.text-xs { font-size: 12px; }
+.text-sm { font-size: 14px; }
+.text-base { font-size: 16px; }
+.text-lg { font-size: 18px; }
+.text-xl { font-size: 20px; }
+.text-3xl { font-size: 30px; }
+.text-\[10px\] { font-size: 10px; }
+.text-\[11px\] { font-size: 11px; }
+.font-medium { font-weight: 500; }
+.font-semibold { font-weight: 600; }
+.font-bold { font-weight: 700; }
+.font-mono { font-family: 'JetBrains Mono', monospace; }
+.leading-relaxed { line-height: 1.625; }
+.tracking-tight { letter-spacing: -0.02em; }
+.tracking-wider { letter-spacing: 0.05em; }
+.uppercase { text-transform: uppercase; }
+.capitalize { text-transform: capitalize; }
+.text-\[\#00D4AA\] { color: #00D4AA; }
+.text-\[\#E8E8E8\] { color: #E8E8E8; }
+.text-\[\#6A6D6E\] { color: #6A6D6E; }
+.text-\[\#4A4D4E\] { color: #4A4D4E; }
+.text-\[\#F59E0B\] { color: #F59E0B; }
+.text-\[\#EF4444\] { color: #EF4444; }
+.text-black { color: black; }
+.bg-\[\#00D4AA\] { background: #00D4AA; }
+.bg-\[\#141718\] { background: #141718; }
+.bg-\[\#00D4AA\]\/10 { background: rgba(0,212,170,0.1); }
+.bg-\[\#00D4AA\]\/5 { background: rgba(0,212,170,0.05); }
+.bg-\[\#F59E0B\]\/10 { background: rgba(245,158,11,0.1); }
+.shrink-0 { flex-shrink: 0; }
+.overflow-hidden { overflow: hidden; }
+/* prose styles for summary */
+.prose { max-width: none; }
+.prose h3 { color: #E8E8E8; font-size: 15px; font-weight: 600; margin-top: 20px; margin-bottom: 8px; }
+.prose p { color: #6A6D6E; font-size: 13px; line-height: 1.6; margin-bottom: 12px; }
+.prose ul { color: #6A6D6E; font-size: 13px; line-height: 1.6; padding-left: 20px; margin-bottom: 12px; }
+.prose li { margin-bottom: 4px; }
+.prose strong { color: #E8E8E8; font-weight: 600; }
+.prose table { border-collapse: collapse; width: 100%; margin-bottom: 16px; }
+.prose th { color: #E8E8E8; border: 1px solid #1A1D1E; padding: 8px 12px; background: #141718; font-size: 12px; text-align: left; }
+.prose td { color: #6A6D6E; border: 1px solid #1A1D1E; padding: 8px 12px; font-size: 13px; }
+.prose hr { border: none; border-top: 1px solid #1A1D1E; margin: 20px 0; }
+</style>
+</head>
+<body>
+<div class="flex min-h-screen">
+  <!-- Sidebar -->
+  <aside class="w-64 border-r bg-[#0B0D0E] flex flex-col">
+    <div class="flex h-14 items-center gap-3 border-b border-[#1A1D1E] px-4">
+      <div class="flex h-7 w-7 items-center justify-center rounded-md bg-[#00D4AA] text-[10px] font-bold text-black">S</div>
+      <div class="flex-1 truncate">
+        <div class="flex items-center gap-1.5 text-sm font-medium text-[#E8E8E8]">
+          <span class="truncate max-w-28">Demo Org</span>
+          <svg class="h-3 w-3 text-[#4A4D4E]" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6l4 4 4-4"/></svg>
+        </div>
+      </div>
+    </div>
+    <nav class="flex-1 space-y-0.5 px-2 py-3">
+      <a class="flex items-center justify-between rounded-lg px-3 py-2 text-sm bg-[#141718] text-[#E8E8E8]">
+        <span class="flex items-center gap-3">
+          <svg class="h-4 w-4 text-[#00D4AA]" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 8.5l6-6 6 6M4 7v5h3v-3h2v3h3V7M1 14h14"/></svg>
+          Overview
+        </span>
+      </a>
+      <a class="flex items-center justify-between rounded-lg px-3 py-2 text-sm text-[#6A6D6E] hover:bg-[#141718] hover:text-[#E8E8E8]">
+        <span class="flex items-center gap-3">
+          <svg class="h-4 w-4 text-[#4A4D4E]" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h8v8H4z"/><path d="M8 8l1.5-1.5M8 8l-1.5 1.5M8 8l-1.5-1.5M8 8l1.5 1.5"/></svg>
+          Integrations
+        </span>
+      </a>
+      <a class="flex items-center justify-between rounded-lg px-3 py-2 text-sm text-[#6A6D6E] hover:bg-[#141718] hover:text-[#E8E8E8]">
+        <span class="flex items-center gap-3">
+          <svg class="h-4 w-4 text-[#4A4D4E]" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 2h10a1 1 0 011 1v10a1 1 0 01-1 1H3a1 1 0 01-1-1V3a1 1 0 011-1z"/><path d="M5 5h6M5 8h4M5 11h3"/></svg>
+          Questionnaires
+        </span>
+      </a>
+      <a class="flex items-center justify-between rounded-lg px-3 py-2 text-sm text-[#6A6D6E] hover:bg-[#141718] hover:text-[#E8E8E8]">
+        <span class="flex items-center gap-3">
+          <svg class="h-4 w-4 text-[#4A4D4E]" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 5v3.5M8 11h.01"/></svg>
+          Review
+        </span>
+        <span class="flex h-5 min-w-5 items-center justify-center rounded-full bg-[#F59E0B]/10 px-1.5 text-[10px] font-medium text-[#F59E0B]">5</span>
+      </a>
+      <a class="flex items-center justify-between rounded-lg px-3 py-2 text-sm text-[#6A6D6E] hover:bg-[#141718] hover:text-[#E8E8E8]">
+        <span class="flex items-center gap-3">
+          <svg class="h-4 w-4 text-[#4A4D4E]" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="4" width="14" height="8" rx="1"/><path d="M4 8h8"/></svg>
+          Billing
+        </span>
+      </a>
+      <a class="flex items-center justify-between rounded-lg px-3 py-2 text-sm text-[#6A6D6E] hover:bg-[#141718] hover:text-[#E8E8E8]">
+        <span class="flex items-center gap-3">
+          <svg class="h-4 w-4 text-[#4A4D4E]" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="2"/><path d="M8 1.5V3M8 13v1.5M3.05 3.05l1.06 1.06M11.89 11.89l1.06 1.06M1.5 8H3M13 8h1.5M3.05 12.95l1.06-1.06M11.89 4.11l1.06-1.06"/></svg>
+          Settings
+        </span>
+      </a>
+    </nav>
+    <div class="border-t border-[#1A1D1E] p-2">
+      <div class="flex items-center gap-3 rounded-lg px-3 py-2 text-xs text-[#4A4D4E]">
+        <div class="flex h-6 w-6 items-center justify-center rounded-full bg-[#141718] text-[10px] font-medium text-[#6A6D6E]">D</div>
+        <span class="flex-1 truncate">demo@synov8studio.com</span>
+      </div>
+      <div class="mt-0.5">
+        <button class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-xs text-[#4A4D4E] hover:bg-[#141718] hover:text-[#EF4444] transition-colors">
+          <svg class="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 14H3a1 1 0 01-1-1V3a1 1 0 011-1h3M11 11l3-3-3-3M6 8h8"/></svg>
+          Sign out
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main content -->
+  <main class="flex-1 overflow-auto bg-[#07080A]">
+    <div class="max-w-6xl p-6 lg:p-8">
+      <div class="space-y-8">
+        <!-- Header -->
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-xl font-semibold text-[#E8E8E8]">Overview</h1>
+            <p class="mt-0.5 text-sm text-[#6A6D6E]">SOC 2 compliance status at a glance</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <button class="rounded-lg border border-[#1A1D1E] px-4 py-2 text-sm font-medium text-[#6A6D6E] hover:border-[#2A2D2E] hover:text-[#E8E8E8] transition-colors">Export</button>
+            <button class="rounded-lg bg-[#00D4AA] px-5 py-2 text-sm font-medium text-black hover:bg-[#00B894] transition-colors">Run AI audit</button>
+          </div>
+        </div>
+
+        <!-- Stat cards -->
+        <div class="grid grid-cols-4 gap-4">
+          <div class="rounded-xl border border-[#1A1D1E] bg-[#0B0D0E] p-5">
+            <p class="text-xs text-[#4A4D4E] uppercase tracking-wider">Total controls</p>
+            <p class="mt-2 text-3xl font-semibold text-[#E8E8E8]">56</p>
+            <div class="mt-3 h-1 w-full overflow-hidden rounded-full bg-[#1A1D1E]">
+              <div class="h-full rounded-full bg-[#00D4AA] transition-all" style="width:95%"></div>
+            </div>
+            <p class="mt-1.5 text-xs text-[#4A4D4E]">95% coverage</p>
+          </div>
+          <div class="rounded-xl border border-[#1A1D1E] bg-[#0B0D0E] p-5">
+            <p class="text-xs text-[#4A4D4E] uppercase tracking-wider">Verified</p>
+            <p class="mt-2 text-3xl font-semibold text-[#00D4AA]">45</p>
+            <p class="mt-1.5 text-xs text-[#4A4D4E]">80% of all controls</p>
+          </div>
+          <div class="rounded-xl border border-[#1A1D1E] bg-[#0B0D0E] p-5">
+            <p class="text-xs text-[#4A4D4E] uppercase tracking-wider">Needs review</p>
+            <p class="mt-2 text-3xl font-semibold text-[#F59E0B]">5</p>
+            <p class="mt-1.5 text-xs text-[#4A4D4E]">Requires attention</p>
+          </div>
+          <div class="rounded-xl border border-[#1A1D1E] bg-[#0B0D0E] p-5">
+            <p class="text-xs text-[#4A4D4E] uppercase tracking-wider">Unchecked</p>
+            <p class="mt-2 text-3xl font-semibold text-[#4A4D4E]">3</p>
+            <p class="mt-1.5 text-xs text-[#4A4D4E]">Run audit to evaluate</p>
+          </div>
+        </div>
+
+        <!-- AI Summary -->
+        <div class="rounded-xl border border-[#1A1D1E] bg-[#0B0D0E] p-6">
+          <div class="mb-4 flex items-center gap-2">
+            <span class="flex h-6 w-6 items-center justify-center rounded-md bg-[#00D4AA]/10 text-[11px] font-bold text-[#00D4AA]">AI</span>
+            <div>
+              <p class="text-sm font-medium text-[#E8E8E8]">Compliance summary</p>
+              <p class="text-xs text-[#4A4D4E]">AI-generated analysis based on live evidence</p>
+            </div>
+          </div>
+          <div class="prose">
+            <h3>1) Readiness Assessment</h3>
+            <p>Evidence coverage is strong (94.6% of controls checked), but readiness is moderate.</p>
+            <ul>
+              <li>45 of 53 tested controls pass (85% pass rate), but 3 failures and 5 warnings indicate significant gaps.</li>
+              <li>Critical risk: 3 controls have zero evidence — these are blind spots.</li>
+            </ul>
+            <p>Overall: The environment is on track, but the missing and failed controls block a clean SOC 2 report.</p>
+            <h3>2) Top 3 Evidence Gaps to Address</h3>
+            <table>
+              <thead><tr><th>Gap</th><th>Description</th><th>Impact</th></tr></thead>
+              <tbody>
+                <tr><td>Missing controls (3)</td><td>No evidence collected at all. Likely high-risk areas.</td><td>Highest risk — auditor will flag as non-compliant.</td></tr>
+                <tr><td>Failed controls (3)</td><td>Evidence collected but does not meet requirements.</td><td>Direct failures — must be remediated before audit.</td></tr>
+                <tr><td>Partial/warning controls (5)</td><td>Evidence exists but is incomplete.</td><td>Undermines evidence quality; prone to auditor challenge.</td></tr>
+              </tbody>
+            </table>
+            <h3>3) Recommended Next Steps</h3>
+            <ol>
+              <li><strong>Connect integrations in Spire</strong> — Link cloud services, HRIS, SSO, and ticketing tools.</li>
+              <li><strong>Run a Pre-Audit in Spire</strong> — Test the 3 failed and 5 partial controls.</li>
+              <li><strong>Review Flagged Controls</strong> — Assign owners to missing and failed controls.</li>
+            </ol>
+          </div>
+        </div>
+
+        <!-- Controls -->
+        <div>
+          <div class="mb-4 flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-[#E8E8E8]">Controls</p>
+              <p class="text-xs text-[#4A4D4E]">53 of 56 controls evaluated</p>
+            </div>
+          </div>
+          <div class="mb-4 h-1.5 w-full overflow-hidden rounded-full bg-[#1A1D1E]">
+            <div class="flex h-full">
+              <div class="bg-[#00D4AA] rounded-l-full transition-all" style="width:80%"></div>
+              <div class="bg-[#F59E0B] transition-all" style="width:9%"></div>
+              <div class="bg-[#EF4444] rounded-r-full transition-all" style="width:5%"></div>
+            </div>
+          </div>
+          <div class="grid grid-cols-3 gap-2">
+            <div class="flex items-center gap-2.5 rounded-lg border border-[#1A1D1E] bg-[#0B0D0E] px-3 py-2"><span class="font-mono text-[10px] text-[#4A4D4E]">CC1.1</span><span class="truncate text-xs text-[#6A6D6E]">Control Environment</span></div>
+            <div class="flex items-center gap-2.5 rounded-lg border border-[#1A1D1E] bg-[#0B0D0E] px-3 py-2"><span class="font-mono text-[10px] text-[#4A4D4E]">CC1.2</span><span class="truncate text-xs text-[#6A6D6E]">Board Oversight</span></div>
+            <div class="flex items-center gap-2.5 rounded-lg border border-[#1A1D1E] bg-[#0B0D0E] px-3 py-2"><span class="font-mono text-[10px] text-[#4A4D4E]">CC1.3</span><span class="truncate text-xs text-[#6A6D6E]">Organizational Structure</span></div>
+            <div class="flex items-center gap-2.5 rounded-lg border border-[#1A1D1E] bg-[#0B0D0E] px-3 py-2"><span class="font-mono text-[10px] text-[#4A4D4E]">CC1.4</span><span class="truncate text-xs text-[#6A6D6E]">Commitment to Competence</span></div>
+            <div class="flex items-center gap-2.5 rounded-lg border border-[#1A1D1E] bg-[#0B0D0E] px-3 py-2"><span class="font-mono text-[10px] text-[#4A4D4E]">CC1.5</span><span class="truncate text-xs text-[#6A6D6E]">Accountability</span></div>
+            <div class="flex items-center gap-2.5 rounded-lg border border-[#1A1D1E] bg-[#0B0D0E] px-3 py-2"><span class="font-mono text-[10px] text-[#4A4D4E]">CC2.1</span><span class="truncate text-xs text-[#6A6D6E]">Communication &amp; Information</span></div>
+            <div class="flex items-center gap-2.5 rounded-lg border border-[#1A1D1E] bg-[#0B0D0E] px-3 py-2"><span class="font-mono text-[10px] text-[#4A4D4E]">CC2.2</span><span class="truncate text-xs text-[#6A6D6E]">Internal Communication</span></div>
+            <div class="flex items-center gap-2.5 rounded-lg border border-[#1A1D1E] bg-[#0B0D0E] px-3 py-2"><span class="font-mono text-[10px] text-[#4A4D4E]">CC2.3</span><span class="truncate text-xs text-[#6A6D6E]">External Communication</span></div>
+            <div class="flex items-center gap-2.5 rounded-lg border border-[#1A1D1E] bg-[#0B0D0E] px-3 py-2"><span class="font-mono text-[10px] text-[#4A4D4E]">CC3.1</span><span class="truncate text-xs text-[#6A6D6E]">Risk Assessment</span></div>
+            <div class="flex items-center gap-2.5 rounded-lg border border-[#1A1D1E] bg-[#0B0D0E] px-3 py-2"><span class="font-mono text-[10px] text-[#4A4D4E]">CC3.2</span><span class="truncate text-xs text-[#6A6D6E]">Fraud Risk</span></div>
+            <div class="flex items-center gap-2.5 rounded-lg border border-[#1A1D1E] bg-[#0B0D0E] px-3 py-2"><span class="font-mono text-[10px] text-[#4A4D4E]">CC3.3</span><span class="truncate text-xs text-[#6A6D6E]">Significant Change</span></div>
+            <div class="flex items-center gap-2.5 rounded-lg border border-[#1A1D1E] bg-[#0B0D0E] px-3 py-2"><span class="font-mono text-[10px] text-[#4A4D4E]">CC4.1</span><span class="truncate text-xs text-[#6A6D6E]">Monitoring Activities</span></div>
+          </div>
+          <div class="mt-3 text-center text-xs text-[#4A4D4E]">+44 more controls</div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>
