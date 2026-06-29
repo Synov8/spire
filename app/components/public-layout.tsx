@@ -147,17 +147,15 @@ export function PublicFooter() {
         <div className="mt-10 border-t border-[#1C1C24] pt-8 text-center">
           <div className="flex flex-wrap items-center justify-center gap-4 mb-6">
             <a href="https://www.tinystartups.com/startup/spire" target="_blank" rel="noopener"
-               style="display:inline-flex;align-items:center;gap:14px;padding:14px 22px 14px 18px;border-radius:14px;text-decoration:none;font-family:'Inter',system-ui,sans-serif;background:linear-gradient(#0E0B1F,#0E0B1F) padding-box,linear-gradient(90deg,#3525E6,#D81FE0,#22B8F0) border-box;border:2px solid transparent;color:#fff">
+               style={{display:"inline-flex",alignItems:"center",gap:"14px",padding:"14px 22px 14px 18px",borderRadius:"14px",textDecoration:"none",fontFamily:"'Inter',system-ui,sans-serif",background:"linear-gradient(#0E0B1F,#0E0B1F) padding-box,linear-gradient(90deg,#3525E6,#D81FE0,#22B8F0) border-box",border:"2px solid transparent",color:"#fff"}}>
               <svg width="56" height="56" viewBox="0 0 100 100">
-                <defs><linearGradient id="tsg" x1=".1" y1="0" x2=".9" y2="1">
-                  <stop offset="0%" stop-color="#3525E6"/><stop offset="55%" stop-color="#D81FE0"/><stop offset="100%" stop-color="#22B8F0"/>
-                </linearGradient></defs>
+                <defs><linearGradient id="tsg" x1=".1" y1="0" x2=".9" y2="1"><stop offset="0%" stopColor="#3525E6"/><stop offset="55%" stopColor="#D81FE0"/><stop offset="100%" stopColor="#22B8F0"/></linearGradient></defs>
                 <path d="M50 6C52 32 68 48 94 50C68 52 52 68 50 94C48 68 32 52 6 50C32 48 48 32 50 6Z" fill="url(#tsg)"/>
               </svg>
-              <span style="display:flex;flex-direction:column;line-height:1.15">
-                <span style="font-family:monospace;font-size:9px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.55)">Launched on</span>
-                <span style="font-size:22px;font-weight:800;letter-spacing:-0.025em;color:#fff">Tiny Startups</span>
-                <span style="font-size:11px;color:rgba(255,255,255,0.55);margin-top:4px">tinystartups.com</span>
+              <span style={{display:"flex",flexDirection:"column",lineHeight:"1.15"}}>
+                <span style={{fontFamily:"monospace",fontSize:"9px",fontWeight:600,letterSpacing:"0.18em",textTransform:"uppercase",color:"rgba(255,255,255,0.55)"}}>Launched on</span>
+                <span style={{fontSize:"22px",fontWeight:800,letterSpacing:"-0.025em",color:"#fff"}}>Tiny Startups</span>
+                <span style={{fontSize:"11px",color:"rgba(255,255,255,0.55)",marginTop:"4px"}}>tinystartups.com</span>
               </span>
             </a>
             <a href="https://www.producthunt.com/products/spire-6?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-spire-6" target="_blank" rel="noopener noreferrer">
