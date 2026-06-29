@@ -1,8 +1,0 @@
-[    3511ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=2306d865:14335
-[  228050ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=2306d865:14335
-[  240550ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=2306d865:14335
-[  259788ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=2306d865:14335
-[  387892ms] Error: [react-router:hmr] No module update found for route routes/dashboard.index
-    at http://localhost:5173/@id/__x00__virtual:react-router/hmr-runtime:246:11
-[  387971ms] Error: [react-router:hmr] No module update found for route routes/dashboard.index
-    at http://localhost:5173/@id/__x00__virtual:react-router/hmr-runtime:246:11

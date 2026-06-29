@@ -1,7 +1,0 @@
-- generic [ref=e3]:
-  - heading "Spire" [level=1] [ref=e4]
-  - paragraph [ref=e5]: You're signed in.
-  - link "Go to Dashboard" [ref=e6] [cursor=pointer]:
-    - /url: /dashboard
-    - text: Go to Dashboard
-    - img [ref=e7]
