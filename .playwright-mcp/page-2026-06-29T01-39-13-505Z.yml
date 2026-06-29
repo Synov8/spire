@@ -1,0 +1,13 @@
+- generic [ref=e2]:
+  - banner [ref=e3]:
+    - link "Spire" [ref=e4] [cursor=pointer]:
+      - /url: /
+  - generic [ref=e6]:
+    - generic [ref=e7]:
+      - heading "Sign in to Spire" [level=1] [ref=e8]
+      - paragraph [ref=e9]: Enter your email to receive a magic link
+    - generic [ref=e10]:
+      - generic [ref=e11]:
+        - generic [ref=e12]: Email
+        - textbox "you@company.com" [ref=e13]
+      - button "Send magic link" [ref=e14]

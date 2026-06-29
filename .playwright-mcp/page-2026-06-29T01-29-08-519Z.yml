@@ -1,0 +1,134 @@
+- generic [ref=e2]:
+  - banner [ref=e3]:
+    - link "Spire" [ref=e4] [cursor=pointer]:
+      - /url: /
+    - generic [ref=e5]:
+      - link "Features" [ref=e6] [cursor=pointer]:
+        - /url: /features
+      - link "Integrations" [ref=e7] [cursor=pointer]:
+        - /url: /integrations
+      - link "Pricing" [ref=e8] [cursor=pointer]:
+        - /url: /pricing
+      - link "Security" [ref=e9] [cursor=pointer]:
+        - /url: /security
+      - link "Blog" [ref=e10] [cursor=pointer]:
+        - /url: /blog
+      - link "Sign in" [ref=e11] [cursor=pointer]:
+        - /url: /login
+  - article [ref=e12]:
+    - link "← Back to blog" [ref=e13] [cursor=pointer]:
+      - /url: /blog
+    - generic [ref=e14]:
+      - time [ref=e15]: 28 June 2026
+      - generic [ref=e16]: ·
+      - generic [ref=e17]: Spire Team
+    - 'heading "Spire vs Vanta: SOC 2 Compliance Platform Comparison for B2B SaaS" [level=1] [ref=e18]'
+    - paragraph [ref=e19]: "Spire vs Vanta comparison: Vanta has 400+ integrations and 500+ CPA firm auditor network at $10K–$12K/year. Spire has an AI compliance agent for on-demand audits, native EU AI Act coverage, AI questionnaire automation, and starts at $6,000/year."
+    - generic [ref=e20]:
+      - generic [ref=e21]: Comparison
+      - generic [ref=e22]: Vanta
+      - generic [ref=e23]: SOC 2
+      - generic [ref=e24]: Compliance Tools
+      - generic [ref=e25]: Spire
+    - generic [ref=e26]:
+      - paragraph [ref=e28]: Spire and Vanta both automate SOC 2 evidence collection and control monitoring, but they diverge sharply on AI capabilities, pricing, and framework coverage. Vanta has the largest integration library (400+) and auditor network (500+ CPA firms) in the compliance automation space. Spire includes an AI compliance agent that performs on-demand SOC 2 and EU AI Act audits, includes AI-powered security questionnaire automation at every tier, and starts at $6,000 per year — approximately 40% less than Vanta's entry tier.
+      - heading "What Does Vanta Do Well?" [level=2] [ref=e29]
+      - paragraph [ref=e30]: Vanta is the market leader in compliance automation with the largest ecosystem. Its 400+ native integrations cover virtually every common infrastructure combination — AWS, GCP, Azure, Okta, GitHub, Google Workspace, and hundreds more. Setup takes 2 to 3 days for a standard cloud stack, making it the fastest path to active evidence collection for most teams.
+      - paragraph [ref=e31]: Vanta's auditor network of 500+ integrated CPA firms is the largest in the industry. This gives teams maximum flexibility when choosing an auditor and simplifies the evidence handoff process during fieldwork. For companies that anticipate switching auditors or need auditor flexibility, Vanta's network breadth is a genuine advantage.
+      - paragraph [ref=e32]: Vanta's SOC 2 workflow is the most refined in the category, according to a 2026 analysis by SOC2Scout. The platform has processed more SOC 2 engagements than any competitor, and the control mapping, evidence organization, and auditor collaboration tools are battle-tested across tens of thousands of audits.
+      - heading "What Does Vanta Lack That Spire Provides?" [level=2] [ref=e33]
+      - paragraph [ref=e34]: Vanta does not include an AI compliance agent. Its AI features are limited to Vanta AI for questionnaire automation, which is a paid add-on and does not perform independent audit readiness assessments. Vanta cannot run an on-demand SOC 2 or EU AI Act audit against your collected evidence and produce structured pass/fail verdicts per control.
+      - paragraph [ref=e35]: Vanta's EU AI Act coverage is in its 2026 roadmap, not currently available. For B2B SaaS companies selling to European customers who request AI Act compliance documentation, this is a meaningful gap. Vanta also lacks native security questionnaire automation at the entry tier — the AI questionnaire add-on increases total cost.
+      - paragraph [ref=e36]: Spire addresses all three gaps. The AI compliance agent connects to your integrated services, evaluates collected evidence against SOC 2 and EU AI Act controls simultaneously, and produces structured audit reports with verdicts, evidence citations, and remediation recommendations — all on demand, not annually.
+      - 'heading "Pricing Comparison: Spire vs Vanta" [level=2] [ref=e37]'
+      - paragraph [ref=e38]: Vanta's entry tier for SOC 2 Type II with fewer than 50 employees starts at approximately $10,000 to $12,000 per year. Multi-framework plans that include ISO 27001 or HIPAA add significantly to the base price. Vanta charges per additional framework, and pricing is opaque — no public pricing is listed, and a sales call is required for a quote.
+      - paragraph [ref=e39]: Spire starts at $6,000 per year ($500 per month) for SOC 2 compliance with the AI compliance agent. This includes AI-powered questionnaire automation at every tier, which Vanta charges as a separate add-on. Spire's pricing is transparent and published on the pricing page.
+      - paragraph [ref=e40]: The total first-year cost including the compliance platform, audit fees, and penetration testing averages $25,000 to $50,000 with Spire, compared to $35,000 to $70,000 with Vanta for similar scope, according to published cost ranges from both platforms.
+      - heading "Which Platform Is Right for Your Team?" [level=2] [ref=e41]
+      - paragraph [ref=e42]: Choose Vanta if you need the widest integration library for a non-standard tech stack, want maximum auditor flexibility through the largest CPA network, or are pursuing SOC 2 plus multiple additional frameworks (ISO 27001, HIPAA, PCI DSS) simultaneously.
+      - paragraph [ref=e43]: Choose Spire if you want an AI compliance agent that runs on-demand SOC 2 and EU AI Act audits, need AI-powered security questionnaire automation included without a paid add-on, want transparent starting pricing at $6,000/year, or are a B2B SaaS company under 50 employees that needs SOC 2 and EU AI Act coverage for European enterprise sales.
+      - paragraph [ref=e44]: The Princeton GEO-BENCH research found that content containing statistics and specific data points received 40% higher visibility in AI-generated answers — and the compliance platform decision follows the same pattern. The platform with the strongest evidence-based evaluation (AI agent-driven audit) produces better outcomes than the platform with the broadest feature list.
+      - heading "FAQ" [level=2] [ref=e45]
+      - heading "Can I switch from Vanta to Spire?" [level=3] [ref=e46]
+      - paragraph [ref=e47]: Yes. Evidence collected on Vanta can be exported and imported into Spire. Most teams complete the migration within one week. Switching between audit cycles is recommended — do not switch mid-observation period.
+      - heading "Does Spire integrate with my existing auditor?" [level=3] [ref=e48]
+      - paragraph [ref=e49]: Spire works with any licensed CPA firm. Evidence export is compatible with standard auditor tools. If you already have an auditor relationship established through Vanta, you can maintain it while using Spire for evidence collection.
+      - heading "Does Vanta support EU AI Act compliance?" [level=3] [ref=e50]
+      - paragraph [ref=e51]: Vanta announced EU AI Act readiness as part of its 2026 roadmap. As of mid-2026, EU AI Act-specific controls and evidence mappings are not yet available in the platform. Spire includes native EU AI Act coverage today.
+      - heading "Which platform has faster setup?" [level=3] [ref=e52]
+      - paragraph [ref=e53]: Vanta reports 2 to 3 days for initial integration setup. Spire reports configuration in under one hour for standard stacks including AWS, GitHub, and Google Workspace. Full audit readiness including policy documentation takes 6 to 10 weeks on either platform.
+    - generic [ref=e54]:
+      - heading "Related posts" [level=2] [ref=e55]
+      - generic [ref=e56]:
+        - link "18 Jun 2026 AI-Powered Security Questionnaire Automation for B2B SaaS Enterprise Procurement How AI automation transforms security questionnaire response from a 40-hour manual process to minutes. Includes SOC 2 evidence integration, EU AI Act response templates, and enterprise procurement velocity metrics." [ref=e57] [cursor=pointer]:
+          - /url: /blog/ai-security-questionnaire-automation-guide
+          - time [ref=e59]: 18 Jun 2026
+          - heading "AI-Powered Security Questionnaire Automation for B2B SaaS Enterprise Procurement" [level=3] [ref=e60]
+          - paragraph [ref=e61]: How AI automation transforms security questionnaire response from a 40-hour manual process to minutes. Includes SOC 2 evidence integration, EU AI Act response templates, and enterprise procurement velocity metrics.
+        - 'link "22 Jun 2026 Automated Evidence Collection for SOC 2 Audits: Complete Guide for B2B SaaS How automated evidence collection works for SOC 2 audits — AWS, GitHub, GCP, and identity provider integrations that continuously collect control evidence. Includes integration setup checklist and control mapping guide." [ref=e62] [cursor=pointer]':
+          - /url: /blog/automated-evidence-collection-soc2-guide
+          - time [ref=e64]: 22 Jun 2026
+          - 'heading "Automated Evidence Collection for SOC 2 Audits: Complete Guide for B2B SaaS" [level=3] [ref=e65]'
+          - paragraph [ref=e66]: How automated evidence collection works for SOC 2 audits — AWS, GitHub, GCP, and identity provider integrations that continuously collect control evidence. Includes integration setup checklist and control mapping guide.
+        - 'link "4 Jun 2026 How to Choose a SOC 2 Auditor for B2B SaaS: Selection Guide for Startups SOC 2 auditor selection guide for B2B SaaS startups: boutique firm ($8K–$18K Type I) vs Big Four ($30K–$100K+), fixed-fee engagement letters, auditor specialization, and the 5 questions to ask before signing." [ref=e67] [cursor=pointer]':
+          - /url: /blog/how-to-choose-soc2-auditor-b2b-saas
+          - time [ref=e69]: 4 Jun 2026
+          - 'heading "How to Choose a SOC 2 Auditor for B2B SaaS: Selection Guide for Startups" [level=3] [ref=e70]'
+          - paragraph [ref=e71]: "SOC 2 auditor selection guide for B2B SaaS startups: boutique firm ($8K–$18K Type I) vs Big Four ($30K–$100K+), fixed-fee engagement letters, auditor specialization, and the 5 questions to ask before signing."
+  - contentinfo [ref=e72]:
+    - generic [ref=e73]:
+      - generic [ref=e74]:
+        - generic [ref=e75]:
+          - text: Spire
+          - paragraph [ref=e76]: AI-powered SOC 2 and EU AI Act compliance automation for B2B SaaS.
+          - generic [ref=e77]:
+            - link "Features" [ref=e78] [cursor=pointer]:
+              - /url: /features
+            - link "Integrations" [ref=e79] [cursor=pointer]:
+              - /url: /integrations
+            - link "Pricing" [ref=e80] [cursor=pointer]:
+              - /url: /pricing
+            - link "Security" [ref=e81] [cursor=pointer]:
+              - /url: /security
+            - link "Glossary" [ref=e82] [cursor=pointer]:
+              - /url: /glossary
+        - generic [ref=e83]:
+          - text: Guides
+          - generic [ref=e84]:
+            - link "SOC 2 automation guide" [ref=e85] [cursor=pointer]:
+              - /url: /blog/soc2-compliance-automation-guide-2026
+            - link "EU AI Act checklist" [ref=e86] [cursor=pointer]:
+              - /url: /blog/eu-ai-act-compliance-checklist-us-saas-2026
+            - link "SOC 2 cost breakdown" [ref=e87] [cursor=pointer]:
+              - /url: /blog/soc2-cost-breakdown-startups-2026
+            - link "SOC 2 vs ISO 27001" [ref=e88] [cursor=pointer]:
+              - /url: /blog/soc2-vs-iso27001-comparison-which-first
+            - link "Evidence collection guide" [ref=e89] [cursor=pointer]:
+              - /url: /blog/automated-evidence-collection-soc2-guide
+        - generic [ref=e90]:
+          - text: Compare
+          - generic [ref=e91]:
+            - link "vs SOC 2 Type II vs Type I" [ref=e92] [cursor=pointer]:
+              - /url: /blog/soc2-type2-vs-type1-comparison-b2b-saas
+            - link "vs SOC 2 vs ISO 27001" [ref=e93] [cursor=pointer]:
+              - /url: /blog/soc2-vs-iso27001-comparison-which-first
+            - link "vs Drata" [ref=e94] [cursor=pointer]:
+              - /url: /blog/spire-vs-drata-comparison
+            - link "vs Manual SOC 2" [ref=e95] [cursor=pointer]:
+              - /url: /blog/spire-vs-manual-soc2-comparison
+            - link "vs Secureframe" [ref=e96] [cursor=pointer]:
+              - /url: /blog/spire-vs-secureframe-comparison
+        - generic [ref=e97]:
+          - text: Company
+          - generic [ref=e98]:
+            - link "Blog" [ref=e99] [cursor=pointer]:
+              - /url: /blog
+            - link "FAQ" [ref=e100] [cursor=pointer]:
+              - /url: /faq
+            - link "Contact" [ref=e101] [cursor=pointer]:
+              - /url: /contact
+            - link "Privacy" [ref=e102] [cursor=pointer]:
+              - /url: /privacy
+            - link "Terms" [ref=e103] [cursor=pointer]:
+              - /url: /terms
+      - generic [ref=e104]: © 2026 Synov8 Ltd.

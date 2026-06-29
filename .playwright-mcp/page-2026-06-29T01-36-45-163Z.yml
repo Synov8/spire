@@ -1,0 +1,51 @@
+- generic [ref=e2]:
+  - complementary [ref=e3]:
+    - generic [ref=e4]:
+      - link "Spire" [ref=e5] [cursor=pointer]:
+        - /url: /dashboard
+      - paragraph [ref=e6]: demo@synov8studio.com
+    - navigation [ref=e7]:
+      - link "Overview" [ref=e8] [cursor=pointer]:
+        - /url: /dashboard
+        - generic [ref=e9]: Overview
+      - link "Integrations" [ref=e10] [cursor=pointer]:
+        - /url: /dashboard/integrations
+        - generic [ref=e11]: Integrations
+      - link "Questionnaires" [ref=e12] [cursor=pointer]:
+        - /url: /dashboard/questionnaires
+        - generic [ref=e13]: Questionnaires
+      - link "Review" [ref=e14] [cursor=pointer]:
+        - /url: /dashboard/review
+        - generic [ref=e15]: Review
+      - link "Billing" [ref=e16] [cursor=pointer]:
+        - /url: /dashboard/billing
+        - generic [ref=e17]: Billing
+      - link "Settings" [ref=e18] [cursor=pointer]:
+        - /url: /dashboard/settings
+        - generic [ref=e19]: Settings
+    - button "Sign out" [ref=e21]
+  - main [ref=e22]:
+    - generic [ref=e23]:
+      - generic [ref=e24]:
+        - heading "Overview" [level=1] [ref=e25]
+        - button "Run AI audit" [ref=e26]
+        - link "Export report" [ref=e27] [cursor=pointer]:
+          - /url: /dashboard/export
+      - generic [ref=e28]:
+        - generic [ref=e29]:
+          - paragraph [ref=e30]: SOC 2 Controls
+          - paragraph [ref=e31]: "56"
+        - generic [ref=e32]:
+          - paragraph [ref=e33]: Verified
+          - paragraph [ref=e34]: "0"
+        - generic [ref=e35]:
+          - paragraph [ref=e36]: Failed
+          - paragraph [ref=e37]: "0"
+        - generic [ref=e38]:
+          - paragraph [ref=e39]: Unchecked
+          - paragraph [ref=e40]: "56"
+      - generic [ref=e41]:
+        - generic [ref=e42]:
+          - generic [ref=e43]: AI
+          - heading "Compliance Summary" [level=2] [ref=e44]
+        - paragraph [ref=e45]: "Here is the compliance summary based on the current state of your live infrastructure evidence: --- ### 1) Readiness Assessment (Based on Actual Evidence Coverage) **Current State: Greenfield / Pre-Audit.** The organization is at the highest possible level of audit risk. While a control framework has been defined (56 controls), it has been completely isolated from the live tech stack. With **0 integrations** and **no audit run conducted**, the evidence coverage is effectively **0%**. In its current state, the organization cannot satisfy a single Trust Services Criteria point for a SOC 2 examination. The infrastructure is completely blind from an audit perspective. ### 2) Top 3 Evidence Gaps to Address - **Gap 1: Evidence Pipeline & Infrastructure Connectivity (Universal Gap).** The absence of data source integrations prevents all system-generated evidence (logs, user lists, configuration snapshots) from being captured. This is the root cause blocking all 56 controls. - **Gap 2: Logical & Physical Access Controls (CC6).** This is the highest-scrutiny area for SOC 2. Currently, there is zero evidence of user access reviews, provisioning/deprovisioning logs, MFA enforcement, or network segmentation rules from the production environment. - **Gap 3: System Monitoring & Vulnerability Management (CC7).** The environment lacks any evidence stream showing vulnerability scans, intrusion detection alerts, security incident response records, or system monitoring dashboards. These are critical non-negotiables for any SOC 2 opinion. ### 3) Recommended Next Steps (Prioritized by Impact) 1. **Deploy Infrastructure Connectors (Urgent / Highest Impact).** Immediately integrate your core tech stack (cloud provider/SSO, HRIS, monitoring tools, code repos) into the compliance platform. Without this, no automation is possible, and evidence collection is stalled. 2. **Run a \"Triage\" Manual Evidence Sprint (High Impact).** While integrations are building, manually compile the highest-risk artifacts: current security policies, a completed risk assessment, the last 90 days of termination reports, and your incident response plan. This establishes a baseline to partially cover point-in-time requirements. 3. **Conduct a Control Rationalization & Scoping Exercise (Medium Impact).** Validate that the 56 defined controls directly map to your specific technology stack and SOC 2 Trust Services Criteria. Tight scoping prevents \"evidence sprawl\" and focuses engineering effort on controls that actually map to your live environment."

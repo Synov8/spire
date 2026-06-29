@@ -7,6 +7,11 @@ import { eq } from "drizzle-orm";
 import { hasActiveSubscription } from "~/lib/subscription-check";
 import type { Route } from "./+types/dashboard.index";
 import { generateComplianceSummary } from "~/lib/ai";
+import { unified } from "unified";
+import remarkParse from "remark-parse";
+import remarkHtml from "remark-html";
+
+const mdToHtml = unified().use(remarkParse).use(remarkHtml);
 
 export async function loader({ request }: Route.LoaderArgs) {
   const session = await auth.api.getSession({ headers: request.headers });
@@ -26,11 +31,14 @@ export async function loader({ request }: Route.LoaderArgs) {
     const evidenceDetail = verdicts.length > 0
       ? `${verdicts.length} controls checked (${verified} pass, ${failed} fail, ${warned} warnings)`
       : "No audit run yet";
-    summary = await generateComplianceSummary(
+    const raw = await generateComplianceSummary(
       { name: session.user.name, industry: "tech" },
       { totalControls: allControls.length, satisfied: verified, partial: warned, missing: unchecked, integrations: 0 },
       evidenceDetail,
     );
+    if (raw) {
+      summary = String(mdToHtml.processSync(raw));
+    }
   } catch {}
 
   return { controls: allControls, total: allControls.length, verified, failed, warned, unchecked, summary, orgId, hasAudit: verdicts.length > 0 };
@@ -114,7 +122,7 @@ export default function DashboardHome({ loaderData }: Route.ComponentProps) {
             <span className="flex h-5 w-5 items-center justify-center rounded bg-[#00D4AA]/10 text-[10px] font-bold text-[#00D4AA]">AI</span>
             <h2 className="text-sm font-semibold text-[#F1F1F3]">Compliance Summary</h2>
           </div>
-          <p className="whitespace-pre-wrap text-sm leading-relaxed text-[#8B8B93]">{summary}</p>
+          <div className="prose prose-invert prose-sm max-w-none prose-a:text-[#00D4AA] prose-strong:text-[#F1F1F3] prose-p:text-[#8B8B93] prose-headings:text-[#F1F1F3] prose-li:text-[#8B8B93] prose-hr:border-[#1C1C24]" dangerouslySetInnerHTML={{ __html: summary }} />
         </div>
       )}
 

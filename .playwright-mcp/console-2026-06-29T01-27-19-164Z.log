@@ -1,0 +1,11 @@
+[    3534ms] Error: Minified React error #418; visit https://react.dev/errors/418?args[]=text&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings.
+    at qi (https://spire.synov8studio.com/assets/entry.client-BXw9TqsR.js:8:31210)
+    at Ji (https://spire.synov8studio.com/assets/entry.client-BXw9TqsR.js:8:32215)
+    at Hc (https://spire.synov8studio.com/assets/entry.client-BXw9TqsR.js:8:85644)
+    at Fu (https://spire.synov8studio.com/assets/entry.client-BXw9TqsR.js:8:116315)
+    at Mu (https://spire.synov8studio.com/assets/entry.client-BXw9TqsR.js:8:115588)
+    at ju (https://spire.synov8studio.com/assets/entry.client-BXw9TqsR.js:8:115500)
+    at Au (https://spire.synov8studio.com/assets/entry.client-BXw9TqsR.js:8:115362)
+    at gu (https://spire.synov8studio.com/assets/entry.client-BXw9TqsR.js:8:110962)
+    at cd (https://spire.synov8studio.com/assets/entry.client-BXw9TqsR.js:8:122814)
+    at MessagePort.S (https://spire.synov8studio.com/assets/entry.client-BXw9TqsR.js:1:1759)

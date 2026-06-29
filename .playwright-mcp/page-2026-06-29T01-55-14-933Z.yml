@@ -1,0 +1,40 @@
+- generic [ref=e2]:
+  - complementary [ref=e3]:
+    - generic [ref=e4]:
+      - link "Spire" [ref=e5] [cursor=pointer]:
+        - /url: /dashboard
+      - paragraph [ref=e6]: demo@synov8studio.com
+    - navigation [ref=e7]:
+      - link "Overview" [ref=e8] [cursor=pointer]:
+        - /url: /dashboard
+        - generic [ref=e9]: Overview
+      - link "Integrations" [ref=e10] [cursor=pointer]:
+        - /url: /dashboard/integrations
+        - generic [ref=e11]: Integrations
+      - link "Questionnaires" [ref=e12] [cursor=pointer]:
+        - /url: /dashboard/questionnaires
+        - generic [ref=e13]: Questionnaires
+      - link "Review 1" [ref=e14] [cursor=pointer]:
+        - /url: /dashboard/review
+        - generic [ref=e15]: Review
+        - generic [ref=e16]: "1"
+      - link "Billing" [ref=e17] [cursor=pointer]:
+        - /url: /dashboard/billing
+        - generic [ref=e18]: Billing
+      - link "Settings" [ref=e19] [cursor=pointer]:
+        - /url: /dashboard/settings
+        - generic [ref=e20]: Settings
+    - button "Sign out" [ref=e22]
+  - main [ref=e23]:
+    - generic [ref=e24]:
+      - generic [ref=e25]:
+        - heading "Questionnaires" [level=1] [ref=e26]
+        - link "Upload new" [ref=e27] [cursor=pointer]:
+          - /url: /dashboard/questionnaires/upload
+      - link "Enterprise Security Review - Acme Corp 0 questions · 6/25/2026 completed" [ref=e29] [cursor=pointer]:
+        - /url: /dashboard/questionnaires/q-001
+        - generic [ref=e30]:
+          - generic [ref=e31]:
+            - heading "Enterprise Security Review - Acme Corp" [level=3] [ref=e32]
+            - paragraph [ref=e33]: 0 questions · 6/25/2026
+          - generic [ref=e34]: completed
