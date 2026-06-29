@@ -145,7 +145,7 @@ export function PublicFooter() {
           </div>
         </div>
         <div className="mt-10 border-t border-[#1C1C24] pt-6 text-center text-xs text-[#5C5C66]">
-          &copy; {new Date().getFullYear()} Synov8 Ltd.
+          &copy; {new Date().getFullYear()} Synov8 Ltd. &mdash; <a href="https://saascubes.com" rel="noopener" title="Listed on SaaS Cubes" className="hover:text-[#8B8B93] transition-colors">Listed on SaaS Cubes</a>
         </div>
       </div>
     </footer>
