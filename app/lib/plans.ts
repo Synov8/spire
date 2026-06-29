@@ -14,11 +14,11 @@ export interface Plan {
 }
 
 export const plans: Plan[] = [
-  { name: "Starter", slug: "starter", monthly: 200, annual: 2000, cta: "Start free trial", href: "/login",
+  { name: "Starter", slug: "starter", monthly: 200, annual: 2000, cta: "Get started", href: "/login",
     desc: "For seed-stage SaaS companies getting started with SOC 2.",
     features: ["Up to 3 connected integrations", "Up to 5 questionnaire auto-fills per month", "Email support"],
     limits: { integrations: 3, questionnaires: 5 } },
-  { name: "Growth", slug: "growth", monthly: 1200, annual: 12000, popular: true, cta: "Start free trial", href: "/login",
+  { name: "Growth", slug: "growth", monthly: 1200, annual: 12000, popular: true, cta: "Get started", href: "/login",
     desc: "For Series A–C SaaS teams closing enterprise deals.",
     features: ["Up to 10 connected integrations", "Unlimited questionnaire auto-fills", "Team member invitations", "Priority support"],
     limits: { integrations: 10, questionnaires: -1 } },

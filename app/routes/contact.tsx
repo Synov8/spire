@@ -69,7 +69,7 @@ export default function ContactPage() {
               <h3 className="text-sm font-semibold text-[#F1F1F3]">Try it yourself</h3>
               <p className="mt-1 text-sm text-[#8B8B93]">Connect your first integration in under 5 minutes.</p>
               <Link to="/login" className="mt-3 inline-block rounded-lg bg-[#00D4AA] px-4 py-2 text-sm font-medium text-black hover:bg-[#00B894] transition-colors">
-                Get started free
+                Get started
               </Link>
             </div>
           </div>

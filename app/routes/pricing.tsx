@@ -57,7 +57,7 @@ export default function Pricing() {
         <div className="text-center">
           <span className="text-xs font-semibold uppercase tracking-[0.15em] text-[#00D4AA]">Pricing</span>
           <h1 className="mt-3 text-4xl font-bold tracking-tight text-[#F1F1F3] md:text-5xl">Simple, transparent pricing</h1>
-          <p className="mx-auto mt-4 max-w-xl text-lg text-[#8B8B93]">Start with a free trial. No credit card required.</p>
+           <p className="mx-auto mt-4 max-w-xl text-lg text-[#8B8B93]">Connect integrations for free. Subscribe when you need to run audits or fill questionnaires.</p>
         </div>
 
         <div className="mx-auto mt-12 max-w-2xl rounded-xl border border-[#1C1C24] bg-[#111116] p-5">
