@@ -1,0 +1,37 @@
+# Spire
+
+**Tagline:** AI-powered SOC 2 and EU AI Act compliance automation for B2B SaaS.
+
+**One-liner:** Spire connects to your infrastructure, continuously collects audit evidence across 66 SOC 2 + EU AI Act controls, runs on-demand AI compliance audits with pass/fail verdicts per control, and auto-fills enterprise security questionnaires in minutes — so you stop losing deals to procurement delays.
+
+Spire is an AI-driven compliance platform that replaces manual, spreadsheet-driven audit prep with continuous evidence collection, automated policy monitoring, and AI-powered control verification. Built for B2B SaaS companies selling to enterprise customers, it solves the three biggest compliance bottlenecks: evidence gathering, audit readiness, and security questionnaire responses.
+
+**How it works:**
+
+Spire connects via read-only API integrations to the infrastructure your engineering team already uses — AWS, GitHub, Google Cloud, Vercel, Cloudflare, Clerk, Supabase, Stripe, and Resend. Each integration collects evidence mapped to specific SOC 2 trust service criteria and EU AI Act articles. The GitHub integration automatically retrieves branch protection rules (CC6.1), pull request review requirements (CC6.1), secret scanning alerts (CC7.2), and membership changes (CC6.3). All evidence is time-stamped, cryptographically verified, and stored in an auditor-ready library.
+
+**AI Compliance Agent:**
+
+Unlike traditional platforms that only collect evidence, Spire includes an AI agent that performs on-demand audit readiness assessments. It evaluates evidence against all 66 SOC 2 Common Criteria and EU AI Act Articles 4, 50, 52, 53, and 55, producing a structured audit report with pass/fail verdicts per control, evidence citations, and remediation recommendations.
+
+**Security Questionnaire Automation:**
+
+Spire uses its compliance knowledge base to auto-fill enterprise security questionnaires. Upload any format (PDF, Excel, Word, markdown, web form) and the AI maps each question to relevant evidence and generates a response. Each answer is confidence-scored; only uncertain ones need human review. A 200-question questionnaire drops from 40 engineering hours to under 4.
+
+**Audit-Ready Export:** Generate structured evidence packs for SOC 2 and EU AI Act in one click. Organized by control, time-stamped, ready for auditor review.
+
+**Supported frameworks:** SOC 2 Type II (five trust service criteria), EU AI Act (Articles 4, 50, high-risk classification, GPAI Code), ISO 42001.
+
+**Integrations:** AWS, GitHub, Google Cloud, Vercel, Cloudflare, Clerk, Supabase, Stripe, Resend.
+
+**Spire's own security:** SOC 2 Type II certified, EU AI Act aligned, AES-256 + TLS 1.3, zero data retention with AI providers, annual pen testing, Cloudflare Workers + Neon PostgreSQL.
+
+**Transparent pricing:** Starter $500/mo (3 integrations, core evidence + AI agent), Growth $1,000/mo (10 integrations, all features, questionnaire automation), Enterprise $2,500/mo (unlimited integrations, dedicated support, custom controls).
+
+**Target customers:** B2B SaaS companies with 10–200 employees preparing for SOC 2 or closing enterprise deals slowed by procurement.
+
+**Differentiation:** AI audit agent (no other platform offers this), native EU AI Act + SOC 2 together (competitors have roadmap only), questionnaire automation included at every tier, 60-second setup, transparent pricing with no sales call.
+
+**Company:** Synov8 Studio, UK.
+
+**URL:** https://spire.synov8studio.com
