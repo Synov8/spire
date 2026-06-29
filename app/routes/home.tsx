@@ -330,12 +330,6 @@ export default function Home({ loaderData }: Route.ComponentProps) {
           >
             Upload a questionnaire <ArrowRight />
           </Link>
-          <Link
-            to="/login"
-            className="rounded-lg border border-[#1C1C24] px-7 py-3 font-medium text-[#F1F1F3] hover:border-[#00D4AA] transition-colors"
-          >
-            Book a 15-minute demo
-          </Link>
         </div>
 
         {/* Urgency */}
