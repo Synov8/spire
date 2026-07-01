@@ -398,6 +398,41 @@ export const INTEGRATION_NAMES: readonly string[] = Object.freeze(
   INTEGRATIONS.map((i) => i.name),
 );
 
+// Categorisation for surfaces that group integrations by category
+// (currently the ControlExplorer filter chips on the homepage and the
+// /integrations hub directory). Slugs match INTEGRATIONS_BY_SLUG keys;
+// render order encodes the canonical hierarchy — broad infra first,
+// per-engineering-discipline groupings second.
+export const INTEGRATION_CATEGORIES: ReadonlyArray<{
+  label: string;
+  slugs: ReadonlyArray<string>;
+}> = [
+  { label: "Cloud", slugs: ["aws", "azure", "vercel", "cloudflare", "digitalocean"] },
+  { label: "Source", slugs: ["github", "gitlab"] },
+  { label: "Identity", slugs: ["google-workspace", "microsoft-365", "okta", "clerk"] },
+  { label: "HR", slugs: ["bamboohr", "workday", "gusto", "rippling", "personio"] },
+  { label: "Observability", slugs: ["datadog", "sentry", "pagerduty", "snyk"] },
+  { label: "Tickets", slugs: ["jira", "linear", "slack"] },
+  { label: "Payment / CRM", slugs: ["stripe", "salesforce", "hubspot", "resend"] },
+  { label: "Docs", slugs: ["notion", "confluence"] },
+];
+
+// Dev-time safety check: every INTEGRATIONS slug should appear in some
+// INTEGRATION_CATEGORIES bucket, otherwise consumers that iterate the
+// categories (homepage ControlExplorer filter chips, /integrations hub
+// directory) silently drop the integration via defensive null-checks.
+// Logs at module init so the gap is loud during dev runs; silent in
+// production builds.
+if (typeof process !== "undefined" && process.env.NODE_ENV !== "production") {
+  const bucketed = new Set(INTEGRATION_CATEGORIES.flatMap((c) => c.slugs));
+  const missing = INTEGRATIONS.filter((i) => !bucketed.has(i.slug));
+  if (missing.length > 0) {
+    console.warn(
+      `[integration-data] ${missing.length} integration(s) not bucketed in INTEGRATION_CATEGORIES — invisible to grouped consumers: ${missing.map((i) => i.name).join(", ")}`,
+    );
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Dashboard integration list — derived from the canonical INTEGRATIONS.
 // Used in dashboard.integrations.tsx (previously a hand-kept inline array).

@@ -34,7 +34,11 @@
 import { motion, AnimatePresence } from "motion/react";
 import { Fragment, useMemo, useState } from "react";
 import { Link } from "react-router";
-import { INTEGRATIONS, INTEGRATIONS_BY_SLUG } from "~/lib/integration-data";
+import {
+  INTEGRATIONS,
+  INTEGRATIONS_BY_SLUG,
+  INTEGRATION_CATEGORIES,
+} from "~/lib/integration-data";
 
 type Framework = "soc2" | "ai-act";
 
@@ -66,37 +70,10 @@ type Soc2Row = {
   integrations: Array<{ slug: string; name: string }>;
 };
 
-// Categorisation for the filter chip row (30 integrations grouped into 8
-// subspaces). Slugs match INTEGRATIONS_BY_SLUG keys; the slugs[] arrays are
-// the canonical render order within each category.
-const INTEGRATION_CATEGORIES: ReadonlyArray<{
-  label: string;
-  slugs: ReadonlyArray<string>;
-}> = [
-  { label: "Cloud", slugs: ["aws", "azure", "vercel", "cloudflare", "digitalocean"] },
-  { label: "Source", slugs: ["github", "gitlab"] },
-  { label: "Identity", slugs: ["google-workspace", "microsoft-365", "okta", "clerk"] },
-  { label: "HR", slugs: ["bamboohr", "workday", "gusto", "rippling", "personio"] },
-  { label: "Observability", slugs: ["datadog", "sentry", "pagerduty", "snyk"] },
-  { label: "Tickets", slugs: ["jira", "linear", "slack"] },
-  { label: "Payment / CRM", slugs: ["stripe", "salesforce", "hubspot", "resend"] },
-  { label: "Docs", slugs: ["notion", "confluence"] },
-];
-
-// Dev-time safety check: every INTEGRATIONS slug should appear in some
-// INTEGRATION_CATEGORIES bucket, otherwise the landing-page filter silently
-// drops it via the `if (!int) return null;` guard inside the chip loop.
-// Logs a warning at module init so the gap is loud during dev runs; silent
-// in production builds.
-if (typeof process !== "undefined" && process.env.NODE_ENV !== "production") {
-  const bucketed = new Set(INTEGRATION_CATEGORIES.flatMap((c) => c.slugs));
-  const missing = INTEGRATIONS.filter((i) => !bucketed.has(i.slug));
-  if (missing.length > 0) {
-    console.warn(
-      `[ControlExplorer] ${missing.length} integration(s) not bucketed in INTEGRATION_CATEGORIES — invisible to landing-page filter: ${missing.map((i) => i.name).join(", ")}`,
-    );
-  }
-}
+// INTEGRATION_CATEGORIES is imported from ~/lib/integration-data — single
+// source of truth shared with the /integrations hub directory. Dev-time
+// missing-slug safety check lives alongside the export so it fires
+// regardless of which surface first imports the data module.
 
 function buildSoc2Rows(): Soc2Row[] {
   // Per-control entries hold both the full evidence list (preserved for
