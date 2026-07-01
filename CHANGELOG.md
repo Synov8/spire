@@ -27,3 +27,14 @@
 - `npm run typecheck` exit 0 — no TS/JSX changes; pure content-collections markdown updates.
 
 ---
+
+### Changed
+
+- **`app/components/control-explorer.tsx` — landing-page coverage-table bloat reduction.** Two compounding wins, both surfaced in the user-visible SSR HTML of `<ControlExplorer />`:
+  - **Dedupe integration column.** Added `integrations: Array<{ slug: string; name: string }>` to the `Soc2Row` type, populated from a `Map<slug, {…}>` inside `buildSoc2Rows()` so each contributing integration appears once per control regardless of how many evidence bullets it provides. The collapsed-row TD switched from `row.items.map(name).join(" · ")` to `row.integrations.map(name).join(" · ")`. Right-column summary now reads e.g. `30 integrations · 53 items` instead of just `53 items`. Visible result: the CC6 row goes from ~2 KB of repeated "AWS · GitHub · GitHub · Clerk · Clerk · Clerk · Supabase · Supabase · …" text down to a single ordered list with each integration appearing once.
+  - **Filter chips grouped by category.** New module-level `INTEGRATION_CATEGORIES` const (8 subspaces — Cloud, Source control, Identity, HR systems, Observability, Ticketing & on-call, Payment & CRM, Docs) drives the chip row. Each chip's inactive-className dropped from ~200 chars to ~80 chars (~3.6 KB SSR weight reduction across the 30 chips); padding tightened (`px-3 py-1 text-xs` to `px-2.5 py-0.5 text-[11px]`); 10px-uppercase category labels act as visual anchors and are `w-24` so "Observability" and "Payment / CRM" don't break gutter alignment. Each group wrapper carries `role="group"` + `aria-label` for screen readers. Dev-time `console.warn` at module init catches any `INTEGRATIONS` slug missing from a category — fires in HMR / dev only, silent in production.
+  - **Filter predicate correctness.** Both `Soc2Panel` and `AiActPanel` switched from `r.items.some(...)` to `r.integrations.some(...)` so the filter actually uses the new deduped field. Left `items` field in place since the expanded row still uses it to render the full evidence bullet list per integration.
+- **Typecheck fix.** Annotated the `??` fallback's `[]` and `new Map()` literals with explicit element types so TS doesn't widen them to `never[]` / `Map<never, never>` (the prior blocker was TS2345 exit-1 on the inline-literal fallback path).
+- `npm run typecheck` exit 0; reviewer round 2 confirmed dedupe correctness, both filter predicates consistent, and panel aria semantics (`tablist` / `tab` / `aria-controls` / `tabpanel` / `aria-labelledby`) intact.
+
+---
