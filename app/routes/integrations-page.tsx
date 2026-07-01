@@ -30,7 +30,7 @@ export function meta() {
     { title: `Integrations | Spire — ${TOTAL_COUNT} read-only OAuth integrations` },
     {
       name: "description",
-      content: `Spire connects to ${TOTAL_COUNT} production systems via read-only OAuth — AWS, GitHub, Google Workspace, Microsoft 365, Stripe, Okta, PagerDuty, and more — for automated SOC 2 and EU AI Act evidence collection.`,
+      content: `Spire connects to ${TOTAL_COUNT} production systems via read-only OAuth — AWS, GitHub, Stripe, Okta, Datadog, and more — for automated SOC 2 and EU AI Act evidence collection.`,
     },
     { property: "og:title", content: "Integrations | Spire" },
     { property: "og:type", content: "website" },

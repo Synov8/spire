@@ -131,7 +131,6 @@ export function PublicFooter() {
             <div className="mt-4 space-y-1.5">
               <Link to="/integrations/aws" className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">AWS</Link>
               <Link to="/integrations/github" className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">GitHub</Link>
-              <Link to="/integrations/google-workspace" className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">Google Workspace</Link>
               <Link to="/integrations/stripe" className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">Stripe</Link>
               <Link to="/integrations/okta" className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">Okta</Link>
               <Link to="/integrations/datadog" className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">Datadog</Link>

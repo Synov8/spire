@@ -179,7 +179,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
               </Link>
             </div>
             <p className="mt-9 text-[10px] font-semibold uppercase tracking-[0.15em] text-[#5C5C66]">
-              AWS · GitHub · Google Workspace · Vercel · Cloudflare · +{INTEGRATION_NAMES.length - 5} more
+              AWS · GitHub · Stripe · Vercel · Cloudflare · +{INTEGRATION_NAMES.length - 5} more
             </p>
           </div>
           <div className="w-full">

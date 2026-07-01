@@ -21,7 +21,7 @@ const features = [
     items: [
       "Cloud & infra — AWS, Microsoft Azure, Vercel, Cloudflare, DigitalOcean",
       "Source code — GitHub, GitLab",
-      "Identity — Google Workspace, Microsoft 365, Okta, Clerk",
+      "Identity — Okta, Clerk, 1Password",
       "HR / HCM — BambooHR, Workday, Gusto, Rippling, Personio",
       "Observability — Datadog, Sentry, PagerDuty",
       "Security & tickets — Snyk, Jira, Linear, Slack",

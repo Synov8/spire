@@ -1,5 +1,5 @@
 /**
- * Single source of truth for the 9 Spire integrations.
+ * Single source of truth for Spire's integration catalogue.
  *
  * Powers:
  *   - /integrations        (hub)              — list of integrations with evidence
@@ -31,9 +31,11 @@ export type Integration = {
   /** One-line short description. */
   description: string;
   /**
-   * Composio OAuth app name, if different from `slug`.
-   * Only set when the Composio integration key diverges from the canonical slug
-   * (e.g. slug="google-workspace" → composioApp="google").
+   * Composio toolkit name, if different from `slug`.
+   * Set when the Composio tool key diverges from the canonical slug
+   * (e.g. slug "1password" → toolkit "_1password",
+   *      slug "digitalocean" → toolkit "digital_ocean",
+   *      slug "anthropic" → toolkit "anthropic_administrator").
    */
   composioApp?: string;
   /** Evidence items Spire collects from this integration, mapped to controls. */
@@ -53,18 +55,6 @@ function parseEvidence(raw: string): IntegrationEvidenceItem {
 
 export const INTEGRATIONS: Integration[] = [
   {
-    slug: "aws",
-    name: "AWS",
-    description: "Cloud infrastructure, IAM, monitoring, storage.",
-    evidence: [
-      "CloudTrail event history (CC7)",
-      "IAM user permissions (CC6)",
-      "S3 encryption status (C1)",
-      "EC2 instance inventory (A1)",
-      "Security group review",
-    ].map(parseEvidence),
-  },
-  {
     slug: "github",
     name: "GitHub",
     description: "Source code, PRs, deployments, access control.",
@@ -74,28 +64,6 @@ export const INTEGRATIONS: Integration[] = [
       "Collaborator access (CC6)",
       "Pull request audit trails (CC8)",
       "Secret scanning",
-    ].map(parseEvidence),
-  },
-  {
-    slug: "google-workspace",
-    name: "Google Workspace",
-    description: "Admin audit logs, directory, OAuth.",
-    composioApp: "google",
-    evidence: [
-      "Admin activity reports (CC7)",
-      "User directory with admin status (CC6)",
-      "Login audit events",
-      "OAuth token scope review",
-    ].map(parseEvidence),
-  },
-  {
-    slug: "vercel",
-    name: "Vercel",
-    description: "Deployments, environment variables, team access.",
-    evidence: [
-      "Deployment protection (CC8)",
-      "Environment variable scoping (C1)",
-      "Team member access (CC6)",
     ].map(parseEvidence),
   },
   {
@@ -109,13 +77,14 @@ export const INTEGRATIONS: Integration[] = [
     ].map(parseEvidence),
   },
   {
-    slug: "clerk",
-    name: "Clerk",
-    description: "Authentication, user management, MFA.",
+    slug: "vercel",
+    name: "Vercel",
+    description: "Deployments, domains, environment variables, serverless functions.",
     evidence: [
-      "MFA enforcement (CC6)",
-      "SSO configuration (CC6)",
-      "Session management (CC6)",
+      "Deployment audit log (CC8)",
+      "Team member permissions (CC6)",
+      "Environment variable scoping (CC6)",
+      "Domain DNS configuration (C1)",
     ].map(parseEvidence),
   },
   {
@@ -165,17 +134,6 @@ export const INTEGRATIONS: Integration[] = [
     ].map(parseEvidence),
   },
   {
-    slug: "workday",
-    name: "Workday",
-    description: "Enterprise HRIS — workforce, hire-to-retire lifecycle.",
-    evidence: [
-      "Worker records with hire dates and departments (CC6)",
-      "Termination events with effective dates (CC6)",
-      "Job profile change history (CC6)",
-      "Background check completion (CC1)",
-    ].map(parseEvidence),
-  },
-  {
     slug: "gusto",
     name: "Gusto",
     description: "Payroll, benefits, contractor records for SMB.",
@@ -187,56 +145,21 @@ export const INTEGRATIONS: Integration[] = [
     ].map(parseEvidence),
   },
   {
-    slug: "rippling",
-    name: "Rippling",
-    description: "Unified HR + IT — employee directory and app access provisioning.",
-    evidence: [
-      "Employee directory with role assignments (CC6)",
-      "App access provisioning events (CC6)",
-      "Department and level changes (CC6)",
-      "Termination records (CC6)",
-    ].map(parseEvidence),
-  },
-  {
-    slug: "personio",
-    name: "Personio",
-    description: "European HRIS — employee management and time-off.",
+    slug: "workday",
+    name: "Workday",
+    description: "Enterprise HRIS, hire-to-retire lifecycle, HCM.",
     evidence: [
       "Employee directory with employment status (CC6)",
-      "Document storage audit (C1)",
-      "Onboarding checklists (CC6)",
-      "Time-off and attendance records (CC1)",
+      "Hire-to-termination lifecycle events (CC6)",
+      "Role and supervisory org changes (CC6)",
+      "Access certification reports (CC6)",
     ].map(parseEvidence),
   },
-  // ── Enterprise platform + ops integrations ─────────────────────────────
+  // ── Enterprise platform + ops integrations
   // Sized-for-SaaS catalog from the integration-coverage research this
-  // sprint. OAuth-Compositio: every entry has slug === composio app key
-  // EXCEPT Microsoft 365 (composioApp="microsoft_365", composio underscorces
-  // the slug). Each carries 4 evidence bullets mapped to the specific SOC 2
-  // common-criterion control(s) their API actually exposes.
-  {
-    slug: "microsoft-365",
-    name: "Microsoft 365",
-    description: "Office suite, Entra ID, Exchange, SharePoint, OneDrive.",
-    composioApp: "microsoft_365",
-    evidence: [
-      "User directory with MFA status (CC6)",
-      "Exchange admin action log (CC7)",
-      "Entra ID conditional access policies (CC6)",
-      "SharePoint permissions review (CC6)",
-    ].map(parseEvidence),
-  },
-  {
-    slug: "azure",
-    name: "Microsoft Azure",
-    description: "Cloud infrastructure, Azure AD, App Services, monitoring.",
-    evidence: [
-      "Activity log event history (CC7)",
-      "Azure AD role assignments (CC6)",
-      "Storage encryption status (C1)",
-      "Virtual machine inventory (A1)",
-    ].map(parseEvidence),
-  },
+  // sprint. Every entry has slug === composio app key. Each carries 4
+  // evidence bullets mapped to the specific SOC 2 common-criterion
+  // control(s) their API actually exposes.
   {
     slug: "gitlab",
     name: "GitLab",
@@ -282,17 +205,6 @@ export const INTEGRATIONS: Integration[] = [
     ].map(parseEvidence),
   },
   {
-    slug: "okta",
-    name: "Okta",
-    description: "SSO, MFA, user lifecycle, directory sync.",
-    evidence: [
-      "User lifecycle events (CC6)",
-      "MFA policy enforcement (CC6)",
-      "SSO application inventory (CC6)",
-      "Admin action log (CC7)",
-    ].map(parseEvidence),
-  },
-  {
     slug: "datadog",
     name: "Datadog",
     description: "Infrastructure monitoring, APM, log management.",
@@ -326,17 +238,6 @@ export const INTEGRATIONS: Integration[] = [
     ].map(parseEvidence),
   },
   {
-    slug: "snyk",
-    name: "Snyk",
-    description: "Vulnerability scanning, dependency analysis, license compliance.",
-    evidence: [
-      "Vulnerability scan results (C1)",
-      "Dependency tree review (C1)",
-      "License compliance findings (CC8)",
-      "Fix PR tracking (CC8)",
-    ].map(parseEvidence),
-  },
-  {
     slug: "salesforce",
     name: "Salesforce",
     description: "CRM, customer pipeline, vendor relationships.",
@@ -360,6 +261,7 @@ export const INTEGRATIONS: Integration[] = [
   },
   {
     slug: "digitalocean",
+    composioApp: "digital_ocean",
     name: "DigitalOcean",
     description: "Cloud infrastructure, droplets, Kubernetes, spaces.",
     evidence: [
@@ -410,6 +312,7 @@ export const INTEGRATIONS: Integration[] = [
   },
   {
     slug: "1password",
+    composioApp: "_1password",
     name: "1Password",
     description: "Business vault, SCIM bridge, events API.",
     evidence: [
@@ -432,6 +335,7 @@ export const INTEGRATIONS: Integration[] = [
   },
   {
     slug: "anthropic",
+    composioApp: "anthropic_administrator",
     name: "Anthropic",
     description: "Workspace access, API lifecycle, retention audit.",
     evidence: [
@@ -462,11 +366,11 @@ export const INTEGRATION_CATEGORIES: ReadonlyArray<{
   // surfaces (homepage ControlExplorer filter chip row + /integrations
   // directory) show established categories first and reserved-by-source-
   // truth buckets last — easier for buyers to scan than mid-list reshuffles.
-  { label: "Cloud", slugs: ["aws", "azure", "vercel", "cloudflare", "digitalocean"] },
+  { label: "Cloud", slugs: ["cloudflare", "vercel", "digitalocean"] },
   { label: "Source", slugs: ["github", "gitlab"] },
-  { label: "Identity", slugs: ["google-workspace", "microsoft-365", "okta", "clerk", "1password"] },
-  { label: "HR", slugs: ["bamboohr", "workday", "gusto", "rippling", "personio"] },
-  { label: "Observability", slugs: ["datadog", "sentry", "pagerduty", "snyk"] },
+  { label: "Identity", slugs: ["1password"] },
+  { label: "HR", slugs: ["bamboohr", "gusto", "workday"] },
+  { label: "Observability", slugs: ["datadog", "sentry", "pagerduty"] },
   { label: "Tickets", slugs: ["jira", "linear", "slack"] },
   { label: "Payment / CRM", slugs: ["stripe", "salesforce", "hubspot", "resend"] },
   { label: "Docs", slugs: ["notion", "confluence"] },
@@ -517,39 +421,30 @@ export type DashboardIntegration = {
 export const DASHBOARD_INTEGRATIONS: readonly DashboardIntegration[] =
   Object.freeze([
     { app: "github", label: "GitHub", desc: "Source code, PRs, deployments, access control.", initial: "GH" },
-    { app: "aws", label: "AWS", desc: "Cloud infrastructure, IAM, monitoring, storage.", initial: "AW" },
-    { app: "google", label: "Google Workspace", desc: "Admin audit logs, directory, OAuth.", initial: "GW" },
-    { app: "vercel", label: "Vercel", desc: "Deployments, domains, environment variables.", initial: "VC" },
     { app: "cloudflare", label: "Cloudflare", desc: "DNS, CDN, WAF, DDoS protection.", initial: "CF" },
-    { app: "clerk", label: "Clerk", desc: "Authentication, user management, MFA.", initial: "CK" },
+    { app: "vercel", label: "Vercel", desc: "Deployments, domains, environment variables.", initial: "VC" },
     { app: "supabase", label: "Supabase", desc: "Database, auth, storage, realtime.", initial: "SB" },
     { app: "stripe", label: "Stripe", desc: "Payments, billing, subscriptions.", initial: "ST" },
     { app: "resend", label: "Resend", desc: "Transactional email, deliverability.", initial: "RS" },
     { app: "bamboohr", label: "BambooHR", desc: "HRIS, employee directory, onboarding.", initial: "BH" },
-    { app: "workday", label: "Workday", desc: "Enterprise HRIS, hire-to-retire lifecycle.", initial: "WD" },
     { app: "gusto", label: "Gusto", desc: "Payroll, benefits, contractor records.", initial: "GS" },
-    { app: "rippling", label: "Rippling", desc: "Unified HR + IT, app access provisioning.", initial: "RP" },
-    { app: "personio", label: "Personio", desc: "European HRIS, employee + time-off.", initial: "PE" },
-    { app: "microsoft_365", label: "Microsoft 365", desc: "Office suite, Entra ID, Exchange, SharePoint.", initial: "M3" },
-    { app: "azure", label: "Microsoft Azure", desc: "Cloud infrastructure, Azure AD, App Services.", initial: "AZ" },
+    { app: "workday", label: "Workday", desc: "Enterprise HRIS, hire-to-retire lifecycle.", initial: "WD" },
     { app: "gitlab", label: "GitLab", desc: "Source code, CI/CD, merge requests.", initial: "GL" },
     { app: "slack", label: "Slack", desc: "Team messaging, channel access, retention.", initial: "SC" },
     { app: "jira", label: "Jira", desc: "Issue tracking, project workflows.", initial: "JR" },
     { app: "linear", label: "Linear", desc: "Issue tracking, roadmaps.", initial: "LN" },
-    { app: "okta", label: "Okta", desc: "SSO, MFA, user lifecycle, directory sync.", initial: "OK" },
     { app: "datadog", label: "Datadog", desc: "Infrastructure monitoring, APM, logs.", initial: "DD" },
     { app: "sentry", label: "Sentry", desc: "Error tracking, performance monitoring.", initial: "SN" },
     { app: "pagerduty", label: "PagerDuty", desc: "Incident response, on-call scheduling.", initial: "PD" },
-    { app: "snyk", label: "Snyk", desc: "Vulnerability scanning, dependency analysis.", initial: "SK" },
     { app: "salesforce", label: "Salesforce", desc: "CRM, customer pipeline, vendor relationships.", initial: "SF" },
     { app: "hubspot", label: "HubSpot", desc: "Marketing automation, CRM, engagement.", initial: "HS" },
-    { app: "digitalocean", label: "DigitalOcean", desc: "Cloud infrastructure, droplets, Kubernetes.", initial: "DO" },
+    { app: "digital_ocean", label: "DigitalOcean", desc: "Cloud infrastructure, droplets, Kubernetes.", initial: "DO" },
     { app: "notion", label: "Notion", desc: "Knowledge base, docs, project wiki.", initial: "NO" },
     { app: "confluence", label: "Confluence", desc: "Team wiki, documentation, knowledge sharing.", initial: "CO" },
     { app: "neon", label: "Neon", desc: "Serverless Postgres, branching, compute API.", initial: "NE" },
-    { app: "1password", label: "1Password", desc: "Business vault, SCIM bridge, events API.", initial: "OP" },
+    { app: "_1password", label: "1Password", desc: "Business vault, SCIM bridge, events API.", initial: "OP" },
     { app: "openai", label: "OpenAI", desc: "Org-level API key, member, and usage audit.", initial: "OA" },
-    { app: "anthropic", label: "Anthropic", desc: "Workspace access, API lifecycle, retention audit.", initial: "AN" },
+    { app: "anthropic_administrator", label: "Anthropic", desc: "Workspace access, API lifecycle, retention audit.", initial: "AN" },
   ]);
 
 /** O(1) lookup for /integrations/:slug loader. */
