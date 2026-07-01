@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { useLoaderData, Link, redirect } from "react-router";
 import { db } from "~/db";
 import { control, policyCheck } from "~/db/schema";
@@ -95,30 +95,39 @@ export default function DashboardHome({ loaderData }: Route.ComponentProps) {
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold tracking-tight text-[#F1F1F3]">Overview</h1>
-        <button onClick={runAudit} disabled={running}
-          className="rounded-lg bg-[#00D4AA] px-4 py-2 text-sm font-medium text-black hover:bg-[#00B894] transition-colors disabled:opacity-50">
-          {running ? "Auditing..." : "Run AI audit"}
-        </button>
-        <a href="/dashboard/export" download
-          className="rounded-lg border border-[#1C1C24] px-4 py-2 text-sm font-medium text-[#8B8B93] hover:border-[#00D4AA] hover:text-[#00D4AA] transition-colors">
-          Export report
-        </a>
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-[#F1F1F3]">Overview</h1>
+          <p className="mt-1 text-sm text-[#6A6D6E]">Monitor your compliance posture and audit readiness</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <a href="/dashboard/export" download
+            className="rounded-lg border border-[#1A1D1E] px-4 py-2 text-sm font-medium text-[#8B8B93] hover:border-[#00D4AA] hover:text-[#00D4AA] transition-all duration-200">
+            Export report
+          </a>
+          <button onClick={runAudit} disabled={running}
+            className="rounded-lg bg-[#00D4AA] px-4 py-2 text-sm font-medium text-black hover:bg-[#00B894] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_2px_12px_-2px_rgba(0,212,170,0.3)]">
+            {running ? "Auditing…" : "Run AI audit"}
+          </button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-4 gap-4">
-        <StatCard label="SOC 2 Controls" value={total} />
-        <StatCard label="Verified" value={verified} accent />
-        <StatCard label="Failed" value={failed} accent="red" />
-        <StatCard label="Unchecked" value={unchecked} accent="muted" />
+      {/* Stat cards with icon badges */}
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <StatCard label="SOC 2 Controls" value={total} icon={<svg className="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M8 1.5l5.5 2v4c0 3.5-2.5 6-5.5 7-3-1-5.5-3.5-5.5-7v-4l5.5-2z"/></svg>} />
+        <StatCard label="Verified" value={verified} accent="green" icon={<svg className="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3.5 8.5l3 3 6-7"/></svg>} />
+        <StatCard label="Failed" value={failed} accent="red" icon={<svg className="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg>} />
+        <StatCard label="Unchecked" value={unchecked} accent="muted" icon={<svg className="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><circle cx="8" cy="8" r="6"/><path d="M8 5v3.5M8 11h.01"/></svg>} />
       </div>
 
       {running && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0A0A0C]/80">
-          <div className="w-full max-w-2xl rounded-xl border border-[#1C1C24] bg-[#111116] p-6">
-            <h2 className="text-sm font-semibold text-[#00D4AA]">AI Audit in progress</h2>
-            <div className="mt-4 h-64 overflow-y-auto rounded-lg bg-[#0A0A0C] p-3 font-mono text-xs leading-relaxed text-[#8B8B93]">
-              {logs.length === 0 && <span className="animate-pulse text-[#5C5C66]">Initializing audit...</span>}
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#07080A]/80 backdrop-blur-sm">
+          <div className="w-full max-w-2xl rounded-2xl border border-[#1A1D1E] bg-[#0B0D0E] p-6 shadow-[0_20px_70px_-15px_rgba(0,212,170,0.15)]">
+            <div className="flex items-center gap-2">
+              <span className="h-2 w-2 animate-pulse rounded-full bg-[#00D4AA]" />
+              <h2 className="text-sm font-semibold text-[#00D4AA]">AI Audit in progress</h2>
+            </div>
+            <div className="mt-4 h-64 overflow-y-auto rounded-lg border border-[#1A1D1E] bg-[#07080A] p-3 font-mono text-xs leading-relaxed text-[#8B8B93]">
+              {logs.length === 0 && <span className="animate-pulse text-[#5C5C66]">Initializing audit…</span>}
               {logs.map((line, i) => <div key={i}>{line}</div>)}
             </div>
           </div>
@@ -126,42 +135,51 @@ export default function DashboardHome({ loaderData }: Route.ComponentProps) {
       )}
 
       {!hasAudit && !summary && (
-        <div className="rounded-xl border border-dashed border-[#1C1C24] p-8 text-center">
-          <p className="text-sm text-[#5C5C66]">No audit run yet.</p>
+        <div className="rounded-2xl border border-dashed border-[#1A1D1E] bg-[#0B0D0E]/50 p-12 text-center">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-[#1A1D1E] bg-[#141718]">
+            <svg className="h-6 w-6 text-[#4A4D4E]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"/><path d="M9 12l2 2 4-4"/></svg>
+          </div>
+          <p className="mt-4 text-sm font-medium text-[#8B8B93]">No audit run yet</p>
           <p className="mt-1 text-xs text-[#5C5C66]">Connect integrations via Composio, then run an audit.</p>
-          <Link to="/dashboard/integrations" className="mt-4 inline-block rounded-lg bg-[#00D4AA] px-4 py-2 text-sm font-medium text-black hover:bg-[#00B894] transition-colors">
+          <Link to="/dashboard/integrations" className="mt-5 inline-flex items-center gap-2 rounded-lg bg-[#00D4AA] px-4 py-2 text-sm font-medium text-black hover:bg-[#00B894] transition-all duration-200 shadow-[0_2px_12px_-2px_rgba(0,212,170,0.3)]">
+            <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M8 2v12M2 8h12"/></svg>
             Connect integrations
           </Link>
         </div>
       )}
 
       {summary && (
-        <div className="rounded-xl border border-[#1C1C24] bg-[#111116] p-5">
-          <div className="mb-2 flex items-center gap-2">
-            <span className="flex h-5 w-5 items-center justify-center rounded bg-[#00D4AA]/10 text-[10px] font-bold text-[#00D4AA]">AI</span>
+        <div className="overflow-hidden rounded-2xl border border-[#1A1D1E] bg-[#0B0D0E]">
+          <div className="flex items-center gap-2 border-b border-[#1A1D1E] bg-gradient-to-r from-[#00D4AA]/[0.05] to-transparent px-5 py-3">
+            <span className="flex h-5 w-5 items-center justify-center rounded-md bg-[#00D4AA]/15 text-[10px] font-bold text-[#00D4AA]">AI</span>
             <h2 className="text-sm font-semibold text-[#F1F1F3]">Compliance Summary</h2>
           </div>
-          <div className="prose prose-invert prose-sm max-w-none prose-a:text-[#00D4AA] prose-strong:text-[#E8E8E8] prose-p:text-[#6A6D6E] prose-headings:text-[#E8E8E8] prose-li:text-[#6A6D6E] prose-hr:border-[#1A1D1E] prose-code:text-[#00D4AA] prose-table:border-collapse prose-table:w-full prose-th:text-[#E8E8E8] prose-th:border prose-th:border-[#1A1D1E] prose-th:px-3 prose-th:py-2 prose-td:text-[#6A6D6E] prose-td:border prose-td:border-[#1A1D1E] prose-td:px-3 prose-td:py-2 prose-th:bg-[#141718]" dangerouslySetInnerHTML={{ __html: summary }} />
+          <div className="prose prose-invert prose-sm max-w-none px-5 py-4 prose-a:text-[#00D4AA] prose-strong:text-[#E8E8E8] prose-p:text-[#6A6D6E] prose-headings:text-[#E8E8E8] prose-li:text-[#6A6D6E] prose-hr:border-[#1A1D1E] prose-code:text-[#00D4AA] prose-table:border-collapse prose-table:w-full prose-th:text-[#E8E8E8] prose-th:border prose-th:border-[#1A1D1E] prose-th:px-3 prose-th:py-2 prose-td:text-[#6A6D6E] prose-td:border prose-td:border-[#1A1D1E] prose-td:px-3 prose-td:py-2 prose-th:bg-[#141718]" dangerouslySetInnerHTML={{ __html: summary }} />
         </div>
       )}
 
       {hasAudit && (
         <section>
-          <div className="mb-3 flex items-center justify-between">
+          <div className="mb-4 flex items-center justify-between">
             <h2 className="text-sm font-semibold uppercase tracking-wider text-[#5C5C66]">
               Controls ({verified + failed + warned} of {total} checked)
             </h2>
+            <div className="flex items-center gap-4 text-xs text-[#5C5C66]">
+              <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-sm bg-[#00D4AA]" />Verified</span>
+              <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-sm bg-[#EF4444]" />Failed</span>
+              <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-sm bg-[#F59E0B]" />Warning</span>
+            </div>
           </div>
-          <div className="mb-4 h-2 w-full overflow-hidden rounded-full bg-[#1C1C24]">
+          <div className="mb-4 h-2.5 w-full overflow-hidden rounded-full bg-[#1A1D1E]">
             <div className="flex h-full">
-              <div className="bg-[#00D4AA] transition-all" style={{ width: `${total > 0 ? (verified / total) * 100 : 0}%` }} />
-              <div className="bg-[#EF4444] transition-all" style={{ width: `${total > 0 ? (failed / total) * 100 : 0}%` }} />
-              <div className="bg-[#F59E0B] transition-all" style={{ width: `${total > 0 ? (warned / total) * 100 : 0}%` }} />
+              <div className="bg-[#00D4AA] transition-all duration-500" style={{ width: `${total > 0 ? (verified / total) * 100 : 0}%` }} />
+              <div className="bg-[#EF4444] transition-all duration-500" style={{ width: `${total > 0 ? (failed / total) * 100 : 0}%` }} />
+              <div className="bg-[#F59E0B] transition-all duration-500" style={{ width: `${total > 0 ? (warned / total) * 100 : 0}%` }} />
             </div>
           </div>
           <div className="grid grid-cols-3 gap-2">
             {controls.slice(0, 12).map((c) => (
-              <div key={c.id} className="flex items-center gap-2 rounded-lg border border-[#1C1C24] bg-[#111116]/50 px-2.5 py-1.5 text-xs">
+              <div key={c.id} className="flex items-center gap-2 rounded-lg border border-[#1A1D1E] bg-[#0B0D0E]/50 px-2.5 py-1.5 text-xs transition-colors hover:border-[#1C1C24]">
                 <span className="font-mono text-[#5C5C66]">{c.controlId}</span>
                 <span className="truncate text-[#8B8B93]">{c.title}</span>
               </div>
@@ -174,12 +192,16 @@ export default function DashboardHome({ loaderData }: Route.ComponentProps) {
   );
 }
 
-function StatCard({ label, value, accent }: { label: string; value: number; accent?: string | boolean }) {
+function StatCard({ label, value, accent, icon }: { label: string; value: number; accent?: string | boolean; icon?: ReactNode }) {
   const color = accent === "red" ? "text-[#EF4444]" : accent === "muted" ? "text-[#5C5C66]" : accent ? "text-[#00D4AA]" : "text-[#F1F1F3]";
+  const iconBg = accent === "red" ? "bg-[#EF4444]/10 text-[#EF4444]" : accent === "muted" ? "bg-[#1A1D1E] text-[#5C5C66]" : accent ? "bg-[#00D4AA]/10 text-[#00D4AA]" : "bg-[#1A1D1E] text-[#8B8B93]";
   return (
-    <div className="rounded-xl border border-[#1C1C24] bg-[#111116] p-4">
-      <p className="text-xs text-[#5C5C66] uppercase tracking-wider">{label}</p>
-      <p className={`mt-1 text-3xl font-bold ${color}`}>{value}</p>
+    <div className="rounded-2xl border border-[#1A1D1E] bg-[#0B0D0E] p-5 transition-all duration-200 hover:border-[#1C1C24]">
+      <div className="flex items-center justify-between">
+        <p className="text-xs text-[#5C5C66] uppercase tracking-wider">{label}</p>
+        {icon && <span className={`flex h-7 w-7 items-center justify-center rounded-lg ${iconBg}`}>{icon}</span>}
+      </div>
+      <p className={`mt-2 text-3xl font-bold ${color}`}>{value}</p>
     </div>
   );
 }

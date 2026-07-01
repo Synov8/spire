@@ -23,51 +23,70 @@ export default function QuestionnaireDetail({ loaderData }: Route.ComponentProps
   const questions = q.questions ? (q.questions as Array<{ question: string; answer: string; confidence: number; category: string }>) : [];
   const avgConfidence = questions.length > 0 ? questions.reduce((s, qa) => s + qa.confidence, 0) / questions.length : 0;
 
+  const statusConfig: Record<string, { dot: string; badge: string }> = {
+    completed: { dot: "bg-[#00D4AA]", badge: "bg-[#00D4AA]/10 text-[#00D4AA]" },
+    flagged: { dot: "bg-[#EF4444]", badge: "bg-[#EF4444]/10 text-[#EF4444]" },
+  };
+  const cfg = statusConfig[q.status] ?? { dot: "bg-[#5C5C66]", badge: "bg-[#1A1D1E] text-[#5C5C66]" };
+
   return (
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0 flex-1">
           <h1 className="text-2xl font-bold tracking-tight text-[#F1F1F3]">{q.title || "Untitled"}</h1>
-          <p className="mt-1 text-sm text-[#8B8B93]">
+          <p className="mt-1 flex items-center gap-2 text-sm text-[#6A6D6E]">
+            <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 1.5"/></svg>
             {questions.length} questions · Uploaded {new Date(q.createdAt).toLocaleDateString()}
             {q.completedAt && ` · Completed ${new Date(q.completedAt).toLocaleDateString()}`}
           </p>
         </div>
-        <span className={`shrink-0 text-sm px-3 py-1 rounded ${
-          q.status === "completed" ? "bg-[#00D4AA]/10 text-[#00D4AA]"
-          : q.status === "flagged" ? "bg-[#EF4444]/10 text-[#EF4444]"
-          : "bg-[#1C1C24] text-[#5C5C66]"
-        }`}>{q.status}</span>
+        <span className={`flex shrink-0 items-center gap-1.5 text-sm px-3 py-1 rounded-full ${cfg.badge}`}>
+          <span className={`h-1.5 w-1.5 rounded-full ${cfg.dot}`} />
+          {q.status}
+        </span>
       </div>
 
       {avgConfidence > 0 && (
-        <div className="rounded-xl border border-[#1C1C24] bg-[#111116] p-4">
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-[#8B8B93]">Overall AI confidence</span>
-            <span className="text-lg font-bold text-[#00D4AA]">{Math.round(avgConfidence * 100)}%</span>
+        <div className="overflow-hidden rounded-2xl border border-[#1A1D1E] bg-[#0B0D0E]">
+          <div className="flex items-center justify-between border-b border-[#1A1D1E] bg-gradient-to-r from-[#00D4AA]/[0.05] to-transparent px-5 py-3">
+            <span className="text-sm font-medium text-[#8B8B93]">Overall AI confidence</span>
+            <span className="text-xl font-bold text-[#00D4AA]">{Math.round(avgConfidence * 100)}%</span>
           </div>
-          <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-[#1C1C24]">
-            <div className="h-full rounded-full bg-[#00D4AA] transition-all" style={{ width: `${avgConfidence * 100}%` }} />
+          <div className="px-5 py-4">
+            <div className="h-2.5 w-full overflow-hidden rounded-full bg-[#1A1D1E]">
+              <div className="h-full rounded-full bg-gradient-to-r from-[#00D4AA] to-[#00B894] transition-all duration-500" style={{ width: `${avgConfidence * 100}%` }} />
+            </div>
           </div>
         </div>
       )}
 
       <div className="space-y-3">
         {questions.map((item, i) => (
-          <div key={i} className="rounded-xl border border-[#1C1C24] bg-[#111116] p-5">
+          <div key={i} className="rounded-2xl border border-[#1A1D1E] bg-[#0B0D0E] p-5 transition-all duration-200 hover:border-[#1C1C24]">
             <div className="flex items-start gap-3">
-              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded bg-[#1C1C24] text-xs text-[#5C5C66]">{i + 1}</span>
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-[#1A1D1E] bg-[#141718] text-xs font-bold text-[#8B8B93]">{i + 1}</span>
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
                   <h3 className="text-sm font-medium text-[#F1F1F3]">{item.question}</h3>
                   {item.category && (
-                    <span className="shrink-0 rounded bg-[#1C1C24] px-2 py-0.5 text-[10px] uppercase text-[#5C5C66]">{item.category.replace("_", " ")}</span>
+                    <span className="shrink-0 rounded-md bg-[#1A1D1E] px-2 py-0.5 text-[10px] uppercase tracking-wider text-[#5C5C66]">{item.category.replace("_", " ")}</span>
                   )}
                 </div>
-                <p className="mt-2 text-sm leading-relaxed text-[#8B8B93]">{item.answer}</p>
-                <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-[#5C5C66]">
-                  <span className={`flex items-center gap-1 ${item.confidence > 0.7 ? "text-[#00D4AA]" : item.confidence > 0.4 ? "text-[#F59E0B]" : "text-[#EF4444]"}`}>
-                    Confidence: {Math.round(item.confidence * 100)}%
+                <p className="mt-2.5 text-sm leading-relaxed text-[#8B8B93]">{item.answer}</p>
+                {/* Confidence bar */}
+                <div className="mt-3 flex items-center gap-3">
+                  <div className="h-1.5 w-20 overflow-hidden rounded-full bg-[#1A1D1E]">
+                    <div
+                      className={`h-full rounded-full transition-all duration-500 ${
+                        item.confidence > 0.7 ? "bg-[#00D4AA]" : item.confidence > 0.4 ? "bg-[#F59E0B]" : "bg-[#EF4444]"
+                      }`}
+                      style={{ width: `${item.confidence * 100}%` }}
+                    />
+                  </div>
+                  <span className={`text-xs font-medium ${
+                    item.confidence > 0.7 ? "text-[#00D4AA]" : item.confidence > 0.4 ? "text-[#F59E0B]" : "text-[#EF4444]"
+                  }`}>
+                    {Math.round(item.confidence * 100)}%
                   </span>
                 </div>
               </div>
