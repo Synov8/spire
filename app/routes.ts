@@ -21,7 +21,7 @@ export default [
   route("pricing", "routes/pricing.tsx"),
   route("features", "routes/features.tsx"),
   route("integrations", "routes/integrations-page.tsx"),
-  route("security", "routes/security.tsx"),
+  route("trust-center", "routes/trust-center.tsx"),
   route("glossary", "routes/glossary.tsx"),
   route("sitemap.xml", "routes/sitemap[.]xml.tsx"),
   route("robots.txt", "routes/robots[.]txt.tsx"),
