@@ -34,7 +34,7 @@
 import { motion, AnimatePresence } from "motion/react";
 import { Fragment, useMemo, useState } from "react";
 import { Link } from "react-router";
-import { INTEGRATIONS } from "~/lib/integration-data";
+import { INTEGRATIONS, INTEGRATIONS_BY_SLUG } from "~/lib/integration-data";
 
 type Framework = "soc2" | "ai-act";
 
@@ -56,23 +56,91 @@ function ArrowRight() {
 
 type Soc2Row = {
   control: string;
+  /** Full evidence list — preserved for the expanded row state. */
   items: Array<{ slug: string; name: string; text: string }>;
+  /**
+   * Integrations providing evidence for this control, deduplicated by slug.
+   * Drives the collapsed-row display + filter predicate (was duplicating
+   * per-evidence-item before, ballooning CC6/CC7/C1 row widths).
+   */
+  integrations: Array<{ slug: string; name: string }>;
 };
 
+// Categorisation for the filter chip row (30 integrations grouped into 8
+// subspaces). Slugs match INTEGRATIONS_BY_SLUG keys; the slugs[] arrays are
+// the canonical render order within each category.
+const INTEGRATION_CATEGORIES: ReadonlyArray<{
+  label: string;
+  slugs: ReadonlyArray<string>;
+}> = [
+  { label: "Cloud", slugs: ["aws", "azure", "vercel", "cloudflare", "digitalocean"] },
+  { label: "Source", slugs: ["github", "gitlab"] },
+  { label: "Identity", slugs: ["google-workspace", "microsoft-365", "okta", "clerk"] },
+  { label: "HR", slugs: ["bamboohr", "workday", "gusto", "rippling", "personio"] },
+  { label: "Observability", slugs: ["datadog", "sentry", "pagerduty", "snyk"] },
+  { label: "Tickets", slugs: ["jira", "linear", "slack"] },
+  { label: "Payment / CRM", slugs: ["stripe", "salesforce", "hubspot", "resend"] },
+  { label: "Docs", slugs: ["notion", "confluence"] },
+];
+
+// Dev-time safety check: every INTEGRATIONS slug should appear in some
+// INTEGRATION_CATEGORIES bucket, otherwise the landing-page filter silently
+// drops it via the `if (!int) return null;` guard inside the chip loop.
+// Logs a warning at module init so the gap is loud during dev runs; silent
+// in production builds.
+if (typeof process !== "undefined" && process.env.NODE_ENV !== "production") {
+  const bucketed = new Set(INTEGRATION_CATEGORIES.flatMap((c) => c.slugs));
+  const missing = INTEGRATIONS.filter((i) => !bucketed.has(i.slug));
+  if (missing.length > 0) {
+    console.warn(
+      `[ControlExplorer] ${missing.length} integration(s) not bucketed in INTEGRATION_CATEGORIES — invisible to landing-page filter: ${missing.map((i) => i.name).join(", ")}`,
+    );
+  }
+}
+
 function buildSoc2Rows(): Soc2Row[] {
-  const grouped = new Map<string, Array<{ slug: string; name: string; text: string }>>();
+  // Per-control entries hold both the full evidence list (preserved for
+  // the expanded row state) AND a deduplicated integrations map (drives
+  // the collapsed display + filter predicate so CC6 shows "30 integrations
+  // · 53 items" rather than repeating each integration per evidence item).
+  // Per-control entries hold both the full evidence list (preserved for
+  // the expanded row state) AND a deduplicated integrations map (drives
+  // the collapsed display + filter predicate so CC6 shows "30 integrations
+  // · 53 items" rather than repeating each integration per evidence item).
+  const grouped = new Map<
+    string,
+    {
+      items: Array<{ slug: string; name: string; text: string }>;
+      integrations: Map<string, { slug: string; name: string }>;
+    }
+  >();
   for (const int of INTEGRATIONS) {
     for (const ev of int.evidence) {
       if (!ev.control || !SOC2_CONTROL_PATTERN.test(ev.control)) continue;
-      const list = grouped.get(ev.control) ?? [];
-      list.push({ slug: int.slug, name: int.name, text: ev.text });
-      grouped.set(ev.control, list);
+      // Type-annotated fallback. TypeScript widens an inline `{ items: [],
+      // integrations: new Map() }` literal to `never`-typed arrays/maps
+      // since the literal has no inferred element types — the cast below
+      // keeps the downstream `push` / `set` calls type-checkable.
+      const existing = grouped.get(ev.control);
+      const entry = existing ?? {
+        items: [] as Array<{ slug: string; name: string; text: string }>,
+        integrations: new Map<string, { slug: string; name: string }>(),
+      };
+      entry.items.push({ slug: int.slug, name: int.name, text: ev.text });
+      if (!entry.integrations.has(int.slug)) {
+        entry.integrations.set(int.slug, { slug: int.slug, name: int.name });
+      }
+      if (!existing) grouped.set(ev.control, entry);
     }
   }
-  // Sort by control ref using natural ordering (CC6 < CC7 < CC8 < CC9 < CC10).
   return [...grouped.entries()]
+    // Numeric ordering so CC6 < CC7 < CC8 < CC9 < CC10 < CC11.
     .sort(([a], [b]) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }))
-    .map(([control, items]) => ({ control, items }));
+    .map(([control, { items, integrations }]) => ({
+      control,
+      items,
+      integrations: [...integrations.values()],
+    }));
 }
 
 const AI_ACT_ROWS: ReadonlyArray<{
@@ -99,10 +167,9 @@ export function ControlExplorer() {
 
   const soc2Rows = useMemo(() => buildSoc2Rows(), []);
 
-  const visibleIntegrations = useMemo(
-    () => INTEGRATIONS.map((i) => ({ slug: i.slug, name: i.name })),
-    [],
-  );
+  // (Removed: visibleIntegrations — Filter chips now resolve directly from
+  // INTEGRATION_CATEGORIES → INTEGRATIONS_BY_SLUG, removing a redundant pass
+  // over all INTEGRATIONS.)
 
   return (
     <div>
@@ -141,38 +208,61 @@ export function ControlExplorer() {
         })}
       </div>
 
-      {/* Filter chips (single integration) */}
-      <div className="mt-6 flex flex-wrap items-center gap-2">
-        <span className="text-xs uppercase tracking-[0.12em] text-[#5C5C66]">
-          Filter by integration
-        </span>
-        {visibleIntegrations.map((int) => {
-          const active = filterSlug === int.slug;
-          return (
+      {/* Filter chips grouped by category. Bloat reduction:
+            • Inactive chips drop the bordered + heavy class strings (~120 chars
+              each × 30 = ~3.6 KB removed from the SSR output).
+            • Tighter padding (px-2.5 py-0.5) + smaller text (11px).
+            • Category labels at 10px uppercase act as visual anchors so the
+              30-chip surface goes from a flat 5-line strip to a labeled grid. */}
+      <div className="mt-5">
+        <div className="mb-3 flex items-center justify-between">
+          <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#5C5C66]">
+            Filter by integration
+          </span>
+          {filterSlug && (
             <button
-              key={int.slug}
               type="button"
-              onClick={() => setFilterSlug(active ? null : int.slug)}
-              aria-pressed={active}
-              className={`rounded-full border px-3 py-1 text-xs transition-colors ${
-                active
-                  ? "border-[#00D4AA] bg-[#00D4AA]/10 text-[#00D4AA]"
-                  : "border-[#1C1C24] bg-[#0A0A0C] text-[#8B8B93] hover:border-[#2C2C36] hover:text-[#F1F1F3]"
-              }`}
+              onClick={() => setFilterSlug(null)}
+              className="text-[10px] uppercase tracking-[0.12em] text-[#00D4AA] hover:text-[#00B894]"
             >
-              {int.name}
+              Clear filter
             </button>
-          );
-        })}
-        {filterSlug && (
-          <button
-            type="button"
-            onClick={() => setFilterSlug(null)}
-            className="rounded-full border border-[#1C1C24] px-3 py-1 text-xs text-[#5C5C66] hover:text-[#F1F1F3] transition-colors"
-          >
-            Clear
-          </button>
-        )}
+          )}
+        </div>
+        <div className="space-y-1.5">
+          {INTEGRATION_CATEGORIES.map((cat) => (
+            <div
+              key={cat.label}
+              role="group"
+              aria-label={`${cat.label} integrations`}
+              className="flex flex-wrap items-baseline gap-x-1.5 gap-y-1"
+            >
+              <span className="w-24 shrink-0 text-[10px] uppercase tracking-[0.12em] text-[#4A4D4E]">
+                {cat.label}
+              </span>
+              {cat.slugs.map((slug) => {
+                const int = INTEGRATIONS_BY_SLUG[slug];
+                if (!int) return null;
+                const active = filterSlug === slug;
+                return (
+                  <button
+                    key={slug}
+                    type="button"
+                    onClick={() => setFilterSlug(active ? null : slug)}
+                    aria-pressed={active}
+                    className={`rounded-full px-2.5 py-0.5 text-[11px] transition-colors ${
+                      active
+                        ? "bg-[#00D4AA]/15 text-[#00D4AA]"
+                        : "text-[#8B8B93] hover:text-[#F1F1F3]"
+                    }`}
+                  >
+                    {int.name}
+                  </button>
+                );
+              })}
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Control list */}
@@ -227,7 +317,12 @@ function Soc2Panel({
   expanded: string | null;
   onToggle: (control: string) => void;
 }) {
-  const filtered = filterSlug ? rows.filter((r) => r.items.some((i) => i.slug === filterSlug)) : rows;
+  // Use the deduplicated `integrations` list for filtering so a single
+  // integration matched once → row visible (was duplication-sensitive
+  // when one integration emitted multiple evidence items for the row).
+  const filtered = filterSlug
+    ? rows.filter((r) => r.integrations.some((i) => i.slug === filterSlug))
+    : rows;
   return (
     <table className="w-full text-left">
       <caption className="sr-only">
@@ -278,14 +373,20 @@ function Soc2RowComponent({
         aria-expanded={isOpen}
       >
         <td className="px-5 py-3 font-mono text-sm text-[#F1F1F3]">{row.control}</td>
+        {/* Collapsed state: UNIQUE integration names only (was duplicating
+            per evidence item). Expanded state reveals the full evidence
+            list below with attribution. */}
         <td className="px-5 py-3 text-sm text-[#8B8B93]">
-          {row.items.map((i) => i.name).join(" · ")}
+          {row.integrations.map((i) => i.name).join(" · ")}
         </td>
         <td className="px-5 py-3 text-right text-sm">
           <span className={`inline-block transition-transform ${isOpen ? "rotate-90" : ""}`} aria-hidden>
             ›
           </span>
-          <span className="ml-2 text-[#5C5C66]">{row.items.length} item{row.items.length === 1 ? "" : "s"}</span>
+          <span className="ml-2 whitespace-nowrap text-[#5C5C66]">
+            {row.integrations.length} integration{row.integrations.length === 1 ? "" : "s"} ·{" "}
+            {row.items.length} item{row.items.length === 1 ? "" : "s"}
+          </span>
         </td>
       </tr>
       <AnimatePresence initial={false}>
@@ -338,7 +439,7 @@ function AiActPanel({
     ? rows.filter((r) => {
         const integrationCovers = r.derivedFrom.some((ctrl) => {
           const soc2 = soc2Rows.find((s) => s.control === ctrl);
-          return soc2?.items.some((i) => i.slug === filterSlug);
+          return soc2?.integrations.some((i) => i.slug === filterSlug);
         });
         return integrationCovers;
       })
