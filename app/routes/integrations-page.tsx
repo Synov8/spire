@@ -8,16 +8,6 @@ import {
   INTEGRATIONS_BY_SLUG,
 } from "~/lib/integration-data";
 
-// "Coming soon" — small honest subset. We list only the integrations we
-// have publicly committed to delivering in the near term roadmap; the
-// broader pipeline is on the Trust Center.
-const comingSoon = [
-  "Neon",
-  "1Password",
-  "OpenAI",
-  "Anthropic",
-];
-
 // Build the categorized directory. Each category iterates its slug list,
 // resolving to the canonical Integration record via INTEGRATIONS_BY_SLUG.
 // Missing slugs are silently skipped against the dev-time warning at
@@ -121,16 +111,18 @@ export default function IntegrationsPage() {
           ))}
         </div>
 
-        <div className="mt-20">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold tracking-tight text-[#F1F1F3]">Coming soon</h2>
-            <p className="mt-2 text-sm text-[#8B8B93]">We're adding new integrations every month.</p>
-          </div>
-          <div className="mt-8 flex flex-wrap justify-center gap-3">
-            {comingSoon.map((name) => (
-              <span key={name} className="rounded-lg border border-[#1C1C24] bg-[#111116] px-4 py-2 text-sm text-[#5C5C66]">{name}</span>
-            ))}
-          </div>
+        <div className="mt-20 text-center">
+          <h2 className="text-2xl font-bold tracking-tight text-[#F1F1F3]">Don't see what you need?</h2>
+          <p className="mt-2 text-sm text-[#8B8B93]">Tell us which tool is blocking your audit and we'll prioritise it.</p>
+          <Link
+            to="/contact"
+            className="mt-6 inline-flex items-center rounded-lg border border-[#1A1D1E] bg-transparent px-6 py-3 text-sm font-medium text-[#8B8B93] hover:border-[#00D4AA]/40 hover:text-[#00D4AA] transition-colors"
+          >
+            Suggest an integration
+            <svg className="ml-1 inline-block h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+              <path d="M3 8h10m-3-4 4 4-4 4" />
+            </svg>
+          </Link>
         </div>
       </section>
 

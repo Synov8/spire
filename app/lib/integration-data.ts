@@ -391,6 +391,56 @@ export const INTEGRATIONS: Integration[] = [
       "SSO and access controls (CC6)",
     ].map(parseEvidence),
   },
+  // ── Q4 2026 catalogue additions ───────────────────────────────────────
+  // Four integrations graduating from the previously public "coming soon"
+  // placeholder list. Each maps to real API surface that supports a SOC 2
+  // common-criterion. The AI integrations (OpenAI / Anthropic) read
+  // per-org API key + usage metadata only — they do NOT capture prompts or
+  // completions, which would compromise customer data scope.
+  {
+    slug: "neon",
+    name: "Neon",
+    description: "Serverless Postgres, branching, compute API.",
+    evidence: [
+      "Database access roster (CC6)",
+      "Compute resource inventory (A1)",
+      "Encryption at rest configuration (C1)",
+      "Admin activity log (CC7)",
+    ].map(parseEvidence),
+  },
+  {
+    slug: "1password",
+    name: "1Password",
+    description: "Business vault, SCIM bridge, events API.",
+    evidence: [
+      "Vault access roster (CC6)",
+      "MFA policy enforcement (CC6)",
+      "Service account key inventory (CC6)",
+      "Service account auth events (CC7)",
+    ].map(parseEvidence),
+  },
+  {
+    slug: "openai",
+    name: "OpenAI",
+    description: "Org-level API key, member, and usage audit.",
+    evidence: [
+      "Organization member roster (CC6)",
+      "API key inventory and scoping (CC6)",
+      "Model usage audit logs (CC7)",
+      "Data retention configuration (C1)",
+    ].map(parseEvidence),
+  },
+  {
+    slug: "anthropic",
+    name: "Anthropic",
+    description: "Workspace access, API lifecycle, retention audit.",
+    evidence: [
+      "Workspace access permissions (CC6)",
+      "API key lifecycle events (CC6)",
+      "Audit activity log (CC7)",
+      "Data retention settings (C1)",
+    ].map(parseEvidence),
+  },
 ];
 
 /** Display-name order matches INTEGRATIONS above. */
@@ -407,14 +457,21 @@ export const INTEGRATION_CATEGORIES: ReadonlyArray<{
   label: string;
   slugs: ReadonlyArray<string>;
 }> = [
+  // Established buckets render in canonical order. The two newest buckets
+  // (Database, AI) sit at the end of the directory so the existing hub
+  // surfaces (homepage ControlExplorer filter chip row + /integrations
+  // directory) show established categories first and reserved-by-source-
+  // truth buckets last — easier for buyers to scan than mid-list reshuffles.
   { label: "Cloud", slugs: ["aws", "azure", "vercel", "cloudflare", "digitalocean"] },
   { label: "Source", slugs: ["github", "gitlab"] },
-  { label: "Identity", slugs: ["google-workspace", "microsoft-365", "okta", "clerk"] },
+  { label: "Identity", slugs: ["google-workspace", "microsoft-365", "okta", "clerk", "1password"] },
   { label: "HR", slugs: ["bamboohr", "workday", "gusto", "rippling", "personio"] },
   { label: "Observability", slugs: ["datadog", "sentry", "pagerduty", "snyk"] },
   { label: "Tickets", slugs: ["jira", "linear", "slack"] },
   { label: "Payment / CRM", slugs: ["stripe", "salesforce", "hubspot", "resend"] },
   { label: "Docs", slugs: ["notion", "confluence"] },
+  { label: "Database", slugs: ["supabase", "neon"] },
+  { label: "AI", slugs: ["openai", "anthropic"] },
 ];
 
 // Dev-time safety check: every INTEGRATIONS slug should appear in some
@@ -489,6 +546,10 @@ export const DASHBOARD_INTEGRATIONS: readonly DashboardIntegration[] =
     { app: "digitalocean", label: "DigitalOcean", desc: "Cloud infrastructure, droplets, Kubernetes.", initial: "DO" },
     { app: "notion", label: "Notion", desc: "Knowledge base, docs, project wiki.", initial: "NO" },
     { app: "confluence", label: "Confluence", desc: "Team wiki, documentation, knowledge sharing.", initial: "CO" },
+    { app: "neon", label: "Neon", desc: "Serverless Postgres, branching, compute API.", initial: "NE" },
+    { app: "1password", label: "1Password", desc: "Business vault, SCIM bridge, events API.", initial: "OP" },
+    { app: "openai", label: "OpenAI", desc: "Org-level API key, member, and usage audit.", initial: "OA" },
+    { app: "anthropic", label: "Anthropic", desc: "Workspace access, API lifecycle, retention audit.", initial: "AN" },
   ]);
 
 /** O(1) lookup for /integrations/:slug loader. */

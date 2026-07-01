@@ -64,3 +64,21 @@
   - JSON-LD featureList + SoftwareApplication description strings scoped to "via read-only OAuth" instead of "via Composio" (structured-data.ts, two locations)
 - **Internal surfaces keep Composio identifiers** (deliberate): `app/lib/integration-data.ts` comments + `composioApp` field stay (routing keys, not user copy). `app/routes/api/composio.connect.ts`, `api.audit.stream.ts`, `app/agents/compliance-runner.ts`, `app/agents/compliance-agent.ts` use the SDK directly (not user-facing). `app/routes.ts` registers `/api/composio/connect` as an internal API route. `package.json` / `package-lock.json` keep `@composio/core` and `@composio/vercel` dependency pins. `home-overhaul-spec.md` stays as historical record.
 - `npm run typecheck` exit 0. Two-step fix order: 12 files patched first via parallel `str_replace`; reviewer round 1 surfaced two leftover leaks where indentation differed (one `serviceType:` in `structured-data.ts`, one body line in `dashboard.index.tsx`) — both patched via `sed -i` before commit.
+
+---
+
+### Changed
+
+- **`app/lib/integration-data.ts` — 4 new integrations added (Neon, 1Password, OpenAI, Anthropic).** All four were previously listed in the `/integrations` page's "Coming soon" placeholder block and have now been promoted to live entries with real SOC 2 evidence mappings. Per integration:
+  - **Neon**: DB access roster CC6, compute resource inventory A1, encryption at rest C1, admin activity log CC7.
+  - **1Password**: vault access roster CC6, MFA policy enforcement CC6, service account key inventory CC6, service account auth events CC7. Bullet rephrased from the round-1 placeholder `Audit event history CC7` (which referenced the Events API add-on tier) to one available out-of-the-box to any 1Password Business customer.
+  - **OpenAI** (org-level metadata-only): org member roster CC6, API key inventory + scoping CC6, model usage audit logs CC7, data retention configuration C1. Reads metadata only — does NOT capture prompts or completions.
+  - **Anthropic**: workspace access permissions CC6, API key lifecycle events CC6, audit activity log CC7, data retention settings C1. Same scope discipline as OpenAI.
+- **`INTEGRATION_CATEGORIES` expanded from 8 buckets to 10.** Two additive buckets appended at the end of canonical order so the established eight stay undisturbed and the new ones read as additive infrastructure:
+  - **Database** `[supabase, neon]` — slotted at end. Side-effect fix: Supabase was previously unbucketed (recurring dev-mode console warning at module init); that warning is now silenced.
+  - **AI** `[openai, anthropic]` — slotted at end after Database.
+  - **Identity** extended with `[..., 1password]` (now 5 slugs total).
+- **`DASHBOARD_INTEGRATIONS` array** appended with 4 new rows: neon NE, 1password OP, openai OA, anthropic AN. Dashboard renders the full 34-integration set without further code changes.
+- **`app/routes/integrations-page.tsx` — "Coming soon" section reframed as an honest growth CTA.** Removed the `comingSoon` placeholder const + the 4 named badges. Replaced with: "Don't see what you need? — Tell us which tool is blocking your audit and we'll prioritise it." + a `→ /contact` CTA. Removed the prior `every month` cadence claim (mild overstatement); new copy carries no quantitative cadence.
+- **`app/components/public-layout.tsx` — added "Integrations" 5th footer column.** Grid updated `md:grid-cols-4` → `sm:grid-cols-2 lg:grid-cols-5` (single breakpoint ladder; sm renders 2-2-1, lg+ renders the full 5 columns). New column slotted between the Spire product column and Guides, listing 6 most-recognized deep-dive names `AWS GitHub Google Workspace Stripe Okta Datadog` + a "Browse all {INTEGRATION_NAMES.length} →" footer link (34 at runtime, auto-tracks as the catalogue grows). Arrow uses Unicode `→` literal matching the rest of the codebase; new column imports `INTEGRATION_NAMES` from `~/lib/integration-data` and re-uses the trust-strip's brand-safe plain-text convention.
+- `npm run typecheck` exit 0. `INTEGRATIONS.length` = 34; `INTEGRATION_CATEGORIES` flatMap sum = 34 — dev-time bucketing warning silenced.

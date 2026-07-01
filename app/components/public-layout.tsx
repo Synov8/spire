@@ -1,6 +1,7 @@
 import { Link, useLocation } from "react-router";
 import { useState, type ReactNode } from "react";
 import { allPosts } from "content-collections";
+import { INTEGRATION_NAMES } from "~/lib/integration-data";
 
 const navLinks = [
   { to: "/features", label: "Features" },
@@ -98,7 +99,7 @@ export function PublicFooter() {
   return (
     <footer className="border-t border-[#1C1C24]">
       <div className="mx-auto max-w-6xl px-6 py-12">
-        <div className="grid gap-10 md:grid-cols-4">
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-5">
           <div>
             <span className="text-sm font-bold tracking-tight text-[#F1F1F3]">Spire</span>
             <p className="mt-2 text-xs text-[#5C5C66] leading-relaxed">AI-powered SOC&nbsp;2 and EU&nbsp;AI&nbsp;Act compliance automation for B2B SaaS.</p>
@@ -108,6 +109,18 @@ export function PublicFooter() {
               <Link to="/pricing" className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">Pricing</Link>
               <Link to="/trust-center" className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">Trust Center</Link>
               <Link to="/glossary" className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">Glossary</Link>
+            </div>
+          </div>
+          <div>
+            <span className="text-xs font-semibold uppercase tracking-[0.1em] text-[#5C5C66]">Integrations</span>
+            <div className="mt-4 space-y-1.5">
+              <Link to="/integrations/aws" className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">AWS</Link>
+              <Link to="/integrations/github" className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">GitHub</Link>
+              <Link to="/integrations/google-workspace" className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">Google Workspace</Link>
+              <Link to="/integrations/stripe" className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">Stripe</Link>
+              <Link to="/integrations/okta" className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">Okta</Link>
+              <Link to="/integrations/datadog" className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">Datadog</Link>
+              <Link to="/integrations" className="mt-2 block text-xs text-[#00D4AA] hover:text-[#00B894] transition-colors">Browse all {INTEGRATION_NAMES.length} →</Link>
             </div>
           </div>
           <div>
