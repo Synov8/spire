@@ -148,6 +148,66 @@ export const INTEGRATIONS: Integration[] = [
       "API key scoping (CC6)",
     ].map(parseEvidence),
   },
+  // ── HR / HCM integrations ───────────────────────────────────────────────
+  // SPEC §6.1 lists "HR systems (optional)" as a data ingestion source. The
+  // primary SOC 2 control these map to is CC6 (logical access): Spire uses
+  // HRIS records to PROVE timely removal of access when an employee leaves
+  // (CC6.2), role changes mid-tenure (CC6.1), and onboarding completeness.
+  {
+    slug: "bamboohr",
+    name: "BambooHR",
+    description: "HRIS, employee directory, onboarding.",
+    evidence: [
+      "Employee directory with employment status (CC6)",
+      "Hire records with start dates (CC6)",
+      "Termination events with last-day timestamps (CC6)",
+      "Time-off and PTO tracking (CC1)",
+    ].map(parseEvidence),
+  },
+  {
+    slug: "workday",
+    name: "Workday",
+    description: "Enterprise HRIS — workforce, hire-to-retire lifecycle.",
+    evidence: [
+      "Worker records with hire dates and departments (CC6)",
+      "Termination events with effective dates (CC6)",
+      "Job profile change history (CC6)",
+      "Background check completion (CC1)",
+    ].map(parseEvidence),
+  },
+  {
+    slug: "gusto",
+    name: "Gusto",
+    description: "Payroll, benefits, contractor records for SMB.",
+    evidence: [
+      "Employee directory with employment status (CC6)",
+      "Contractor records (CC6)",
+      "Payroll admin action history (CC7)",
+      "New contractor onboarding events (CC6)",
+    ].map(parseEvidence),
+  },
+  {
+    slug: "rippling",
+    name: "Rippling",
+    description: "Unified HR + IT — employee directory and app access provisioning.",
+    evidence: [
+      "Employee directory with role assignments (CC6)",
+      "App access provisioning events (CC6)",
+      "Department and level changes (CC6)",
+      "Termination records (CC6)",
+    ].map(parseEvidence),
+  },
+  {
+    slug: "personio",
+    name: "Personio",
+    description: "European HRIS — employee management and time-off.",
+    evidence: [
+      "Employee directory with employment status (CC6)",
+      "Document storage audit (C1)",
+      "Onboarding checklists (CC6)",
+      "Time-off and attendance records (CC1)",
+    ].map(parseEvidence),
+  },
 ];
 
 /** Display-name order matches INTEGRATIONS above. */
@@ -190,6 +250,11 @@ export const DASHBOARD_INTEGRATIONS: readonly DashboardIntegration[] =
     { app: "supabase", label: "Supabase", desc: "Database, auth, storage, realtime.", initial: "SB" },
     { app: "stripe", label: "Stripe", desc: "Payments, billing, subscriptions.", initial: "ST" },
     { app: "resend", label: "Resend", desc: "Transactional email, deliverability.", initial: "RS" },
+    { app: "bamboohr", label: "BambooHR", desc: "HRIS, employee directory, onboarding.", initial: "BH" },
+    { app: "workday", label: "Workday", desc: "Enterprise HRIS, hire-to-retire lifecycle.", initial: "WD" },
+    { app: "gusto", label: "Gusto", desc: "Payroll, benefits, contractor records.", initial: "GS" },
+    { app: "rippling", label: "Rippling", desc: "Unified HR + IT, app access provisioning.", initial: "RP" },
+    { app: "personio", label: "Personio", desc: "European HRIS, employee + time-off.", initial: "PE" },
   ]);
 
 /** O(1) lookup for /integrations/:slug loader. */

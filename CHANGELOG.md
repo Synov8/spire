@@ -195,6 +195,53 @@ release milestone.
 Items tracked here have landed in the codebase but are not yet tagged
 into a release. They will be folded into the next semver bump.
 
+### Added
+
+- **`HR/HCM integrations` (`app/lib/integration-data.ts`)** — Closes
+  the gap called out in `SPEC.md §6.1` ("HR systems (optional)") and
+  the corresponding `home-overhaul-spec.md` integration coverage
+  criterion. Adds 5 HRIS integrations to both `INTEGRATIONS` and
+  `DASHBOARD_INTEGRATIONS` so the hero demo scene 1, `/integrations`
+  hub, `/integrations/:slug` per-integration pages, and the control
+  explorer's integration filter chips all pick them up automatically:
+  - **BambooHR** — SMB HRIS, employee directory, onboarding. Slug
+    `bamboohr`, dashboard initial `BH`. Evidence (4): Employee
+    directory with employment status (CC6), hire records with start
+    dates (CC6), termination events with last-day timestamps (CC6),
+    time-off and PTO tracking (CC1).
+  - **Workday** — Enterprise HRIS, workforce / hire-to-retire
+    lifecycle. Slug `workday`, initial `WD`. Evidence (4): Worker
+    records with hire dates and departments (CC6), termination
+    events with effective dates (CC6), job profile change history
+    (CC6), background check completion (CC1).
+  - **Gusto** — Payroll, benefits, contractor records for SMB. Slug
+    `gusto`, initial `GS`. Evidence (4): Employee directory with
+    employment status (CC6), contractor records (CC6), payroll admin
+    action history (CC7), new contractor onboarding events (CC6).
+  - **Rippling** — Unified HR + IT with app access provisioning.
+    Slug `rippling`, initial `RP`. Evidence (4): Employee directory
+    with role assignments (CC6), app access provisioning events
+    (CC6), department and level changes (CC6), termination records
+    (CC6).
+  - **Personio** — European HRIS, employee + time-off. Slug
+    `personio`, initial `PE`. Evidence (4): Employee directory with
+    employment status (CC6), document storage audit (C1), onboarding
+    checklists (CC6), time-off and attendance records (CC1).
+- **Hardcoded referral counts refreshed** — hero subhead, hero
+  eyebrow trust-strip line, and "Connect your systems" step card in
+  `app/routes/home.tsx` now list all 14 integrations by name
+  (including the 5 HR systems above) with the eyebrow rollover
+  marker adjusted from `+4 more` to `+9 more` (since 14 total - 5
+  visible = 9 hidden).
+- **Dynamic integration names everywhere** — `app/components/hero-demo.tsx`
+  Scene 1 footer counters (`{connectedCount}/{INTEGRATION_NAMES.length} connected`
+  and `{INTEGRATION_NAMES.length}/{INTEGRATION_NAMES.length} connected`)
+  and `app/lib/structured-data.ts` `softwareApplicationSchema()`
+  description + `featureList` first bullet now interpolate
+  `INTEGRATIONS.length` and the live integration-name list instead
+  of the prior hardcoded `9`. Adding or removing an integration
+  from `INTEGRATIONS` will propagate to all surfaces automatically.
+
 ### Changed
 
 - **`app/components/hero-demo.tsx`** — Massive visual quality

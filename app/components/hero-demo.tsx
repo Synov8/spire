@@ -229,7 +229,7 @@ function Scene1Animated() {
       {/* Footer summary */}
       <div className="mt-auto pt-2">
         <div className="flex items-center justify-between text-[10px]">
-          <span className="font-mono text-[#5C5C66]">{connectedCount}/9 connected</span>
+          <span className="font-mono text-[#5C5C66]">{connectedCount}/{INTEGRATION_NAMES.length} connected</span>
           <span className="text-[#5C5C66]">Read-only</span>
         </div>
       </div>
@@ -261,7 +261,7 @@ function Scene1Static() {
       </ul>
       <div className="mt-auto pt-2">
         <div className="flex items-center justify-between text-[10px]">
-          <span className="font-mono text-[#5C5C66]">9/9 connected</span>
+          <span className="font-mono text-[#5C5C66]">{INTEGRATION_NAMES.length}/{INTEGRATION_NAMES.length} connected</span>
           <span className="text-[#5C5C66]">Read-only</span>
         </div>
       </div>
