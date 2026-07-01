@@ -22,7 +22,7 @@ Drata offers 140+ integrations with a focus on depth rather than breadth. Its Co
 
 Secureframe supports 300+ integrations with strong multi-framework cross-mapping. A single piece of evidence can satisfy controls across SOC 2, ISO 27001, HIPAA, and GDPR simultaneously, reducing duplicated work for teams pursuing multiple certifications.
 
-Spire integrates with 9 infrastructure services — AWS, GitHub, Google Cloud, Vercel, Cloudflare, Clerk, Supabase, Stripe, and Resend — and adds a unique AI compliance agent that performs on-demand internal audits against SOC 2 and EU AI Act controls. The agent evaluates collected evidence against control requirements and produces structured audit reports, a capability not available on Vanta, Drata, or Secureframe.
+Spire integrates with 30 production systems via read-only Composio OAuth — covering cloud (AWS, Azure, Vercel, Cloudflare, DigitalOcean), source code (GitHub, GitLab), identity (Google Workspace, Microsoft 365, Okta, Clerk), HR/HCM (BambooHR, Workday, Gusto, Rippling, Personio), observability (Datadog, Sentry, PagerDuty), security (Snyk), payments (Stripe), CRM (Salesforce, HubSpot), comms (Slack), tickets (Jira, Linear), and docs (Notion, Confluence) — and layers a unique AI compliance agent on top. The agent actually runs on-demand internal audits against SOC 2 and EU AI Act controls, evaluates collected evidence, and produces structured audit reports with pass/fail/warning verdicts per control. This is a capability not available on Vanta, Drata, or Secureframe today.
 
 ## Which Platform Has the Best Auditor Network?
 
@@ -76,4 +76,4 @@ Yes, but with some friction. Evidence collected on one platform must be exported
 
 ### Which platform supports EU AI Act compliance?
 
-Vanta, Drata, and Secureframe all add EU AI Act readiness modules in their 2026 roadmaps. Spire includes native EU AI Act compliance coverage alongside SOC 2, with the same AI compliance agent evaluating controls against both frameworks simultaneously.
+Vanta, Drata, and Secureframe all add EU AI Act readiness modules in their 2026 roadmaps. Spire ships native EU AI Act compliance coverage alongside SOC 2 (10 articles: risk management, data governance, logging, transparency, human oversight, accuracy, and more) — the same AI compliance agent evaluates controls against both frameworks in a single audit run.

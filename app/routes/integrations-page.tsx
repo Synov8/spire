@@ -6,8 +6,11 @@ import { INTEGRATIONS } from "~/lib/integration-data";
 
 export function meta() {
   return [
-    { title: "Integrations | Spire — AWS, GitHub, GCP & More" },
-    { name: "description", content: "Spire connects to AWS, GitHub, Google Cloud, Vercel, Cloudflare, Clerk, Supabase, Stripe, and Resend for automated SOC 2 and EU AI Act evidence collection." },
+    { title: `Integrations | Spire — ${INTEGRATIONS.length} read-only OAuth integrations` },
+    {
+      name: "description",
+      content: `Spire connects to ${INTEGRATIONS.length} production systems via read-only Composio OAuth — AWS, GitHub, Google Workspace, Microsoft 365, Stripe, Okta, PagerDuty, and more — for automated SOC 2 and EU AI Act evidence collection.`,
+    },
     { property: "og:title", content: "Integrations | Spire" },
     { property: "og:type", content: "website" },
   ];
@@ -34,7 +37,7 @@ export default function IntegrationsPage() {
   return (
     <PublicLayout>
 
-      {/* JSON-LD: ItemList of 9 integrations (each ListItem embeds nested Service) */}
+      {/* JSON-LD: ItemList of all integrations (each ListItem embeds nested Service) */}
       <StructuredData schemas={integrationsItemListSchema()} />
 
       <section className="mx-auto max-w-6xl px-6 pt-20 pb-24">
@@ -45,7 +48,7 @@ export default function IntegrationsPage() {
             <span className="text-[#00D4AA]">read-only and risk-free</span>
           </h1>
           <p className="mt-4 text-lg text-[#8B8B93]">
-            We connect to your existing tools via read-only APIs via Composio. {INTEGRATIONS.length} integrations and growing.
+            We connect to your existing tools via read-only APIs through Composio. {INTEGRATIONS.length} integrations and growing.
           </p>
         </div>
 

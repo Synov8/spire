@@ -4,10 +4,15 @@ import { StructuredData } from "~/components/structured-data";
 import { pricingProductSchemas } from "~/lib/structured-data";
 import { useState, useEffect } from "react";
 
+import { INTEGRATION_NAMES } from "~/lib/integration-data";
+
 export function meta() {
   return [
-    { title: "Pricing | Spire — SOC 2 Compliance Starting at $6,000/Year" },
-    { name: "description", content: "Spire pricing: Starter $500/mo, Growth $1,000/mo, Enterprise $2,500/mo. All plans include AI compliance agent, continuous evidence collection, and AI questionnaire automation. Transparent pricing, no sales call required." },
+    { title: "Pricing | Spire — SOC 2 & EU AI Act compliance from £200/mo" },
+    {
+      name: "description",
+      content: `Spire pricing: Starter £200/mo, Growth £1,200/mo, Enterprise £3,000/mo. All plans include the AI compliance agent, continuous evidence collection across ${INTEGRATION_NAMES.length} integrations, and AI questionnaire autofill. Annual billing saves ~17%. Live currency conversion (USD/EUR) on this page. No sales call, no setup fee, no per-auditor charge.`,
+    },
     { property: "og:title", content: "Pricing | Spire" },
     { property: "og:type", content: "website" },
   ];
@@ -29,10 +34,10 @@ async function fetchRates(): Promise<Record<string, number>> {
 import { plans } from "~/lib/plans";
 
 const core = [
-  "Continuous evidence collection via Composio (9+ integrations)",
-  "Full SOC 2 and EU AI Act control mapping",
-  "AI-powered security questionnaire autofill",
-  "Audit-ready evidence pack export",
+  `Continuous evidence collection via Composio (${INTEGRATION_NAMES.length} integrations and growing)`,
+  "Full SOC 2 common-criteria and EU AI Act article mapping",
+  "AI-driven security questionnaire autofill with per-answer confidence scores",
+  "Audit-ready evidence pack export (JSON, structured by framework)",
 ];
 
 export default function Pricing() {
