@@ -1,8 +1,9 @@
 /**
  * Hero demo — animated 4-scene loop per home-overhaul-spec.md §4.2 + §7.
  *
- * Scenes (60 s total, ~15 s each):
- *   1. Connections  — 9 integrations connecting → connected (staggered)
+ * Scenes (48 s total, ~12 s each — tightened from the spec's 60 s so the
+ * Scene 1 → Scene 2 transition feels snappier):
+ *   1. Connections  — 14 integrations connecting → connected (staggered)
  *   2. Evidence     — real evidence rows streaming in + counter 0 → 247
  *   3. Questionnaire — 3 questions with AI typewriter answers + confidence bars
  *   4. Export       — audit pack file-list assembly + gradient progress + success
@@ -19,18 +20,22 @@
  *   • Viewport < md (mobile) → static scene 1 only.
  *   • Off-screen → pauses rotation (IntersectionObserver).
  *   • Always-visible label "Representative · not live data".
+ *   • Scene 1 connecting → connected stagger plays on EVERY mount,
+ *     including the first page load (the previous `hasMountedScene1`
+ *     SSR-gate that suppressed the stagger on first render was a UX
+ *     regression; removed). A <noscript><style> block in HeroDemo
+ *     covers the no-JS edge case.
  *
  * Implementation:
  *   • Single active scene mounted at a time via `<AnimatePresence mode="wait">`
  *     keyed by `sceneIdx`. Scene remount on each rotation re-runs internal
  *     timers cleanly.
+ *   • Scene 1 stagger runs unconditionally in useEffect; per-row setTimeout
+ *     flips row i from connecting → connected at 200 + i * 350 ms.
  *   • useReducedMotion() returns null on SSR; branch is `=== true` only,
  *     so SSR + first client render match.
  *   • Desktop breakpoint and reduced-motion are detected post-mount, so the
  *     initial HTML is identical on server and client.
- *   • Module-level `hasMountedScene1` flag gates the Scene 1 entrance +
- *     connecting animation: first visit shows fully-connected state (SSR-safe);
- *     rotation remounts play the connecting → connected stagger.
  *
  * Trademark guard (home-overhaul-spec.md §16) — text-only, no marks.
  */
@@ -39,7 +44,7 @@ import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import { forwardRef, useEffect, useRef, useState, type ReactNode } from "react";
 import { INTEGRATION_NAMES } from "~/lib/integration-data";
 
-const SCENE_MS = 15_000;
+const SCENE_MS = 12_000;
 
 const SCENE_URLS = [
   "spire.app/connections",
@@ -62,19 +67,16 @@ const HERO_DEMO_INTEGRATION_NAMES: readonly string[] = Object.freeze(
   INTEGRATION_NAMES.slice(0, HERO_DEMO_INTEGRATION_LIMIT),
 );
 
-// ─── Scene 1 SSR gate (module-level) ─────────────────────────────────────────
+// ─── Scene 1 stagger (formerly gated by `hasMountedScene1` SSR flag) ─────────
 //
-// `hasMountedScene1` flips to `true` on the first client useEffect tick of
-// any Scene1Animated instance. Because the variable lives at module scope,
-// it persists across AnimatePresence-driven remounts.
-//
-//   • SSR + first client render (before useEffect) → flag = false
-//     → Scene1Animated renders all integrations as "connected" with no
-//     entrance animation. Pre-hydration users see a complete, visible list.
-//   • First useEffect tick → flag = true
-//   • Next rotation remount → flag = true → plays connecting → connected
-//     staggered animation.
-let hasMountedScene1 = false;
+// Previous behaviour: a module-level `hasMountedScene1` flag was initialised
+// to `false`, captured into a ref on first render, and used to early-return
+// from the useEffect timer chain AND skip the motion-library `initial` and
+// `transition` props. This meant the first page-load visit saw all
+// integrations already "connected" with no spinner animation, and the
+// connecting → connected flow only played on ROTATION remounts (after the
+// full 60 s loop had run once). That was a UX regression. The flag is
+// removed; the stagger now plays on every mount.
 
 // ─── Scene 2 data (real evidence from integration-data.ts) ───────────────────
 
@@ -147,18 +149,17 @@ function FileIcon({ className }: { className?: string }) {
 // ─── Scene 1 (animated) ──────────────────────────────────────────────────────
 
 function Scene1Animated() {
-  // On first mount (hasMountedScene1 === false): all connected, no animation.
-  // On rotation remount (hasMountedScene1 === true): all connecting, animate.
+  // Connecting → connected flow plays on EVERY mount, including the first
+  // page load. Each row starts in the connecting state (spinner +
+  // "Connecting…" label); the useEffect below sets up the staggered
+  // setTimeout chain that flips row i to "connected" at 200 + i * 350 ms.
+  // Total stagger window: ~4.75 s for 14 integrations (vs the previous
+  // 15 s ~10 s of dead time before rotation).
   const [connected, setConnected] = useState<boolean[]>(() =>
-    hasMountedScene1
-      ? Array(HERO_DEMO_INTEGRATION_NAMES.length).fill(false)
-      : Array(HERO_DEMO_INTEGRATION_NAMES.length).fill(true),
+    Array(HERO_DEMO_INTEGRATION_NAMES.length).fill(false),
   );
-  const shouldAnimate = useRef(hasMountedScene1);
 
   useEffect(() => {
-    hasMountedScene1 = true;
-    if (!shouldAnimate.current) return; // first mount — already all connected
     const timers = HERO_DEMO_INTEGRATION_NAMES.map((_, i) =>
       setTimeout(() => {
         setConnected((prev) => {
@@ -194,20 +195,16 @@ function Scene1Animated() {
           return (
             <motion.li
               key={name}
-              initial={shouldAnimate.current ? { opacity: 0, x: -8 } : false}
+              initial={{ opacity: 0, x: -8 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={
-                shouldAnimate.current
-                  ? { delay: i * 0.06, duration: 0.3 }
-                  : { duration: 0 }
-              }
+              transition={{ delay: i * 0.06, duration: 0.3 }}
               className="flex items-center gap-3 rounded-md px-2 py-1.5"
             >
               {/* Status icon: spinner → checkmark */}
               <span className="flex h-4 w-4 shrink-0 items-center justify-center">
                 {isConn ? (
                   <motion.span
-                    initial={shouldAnimate.current ? { scale: 0 } : false}
+                    initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ type: "spring", stiffness: 300, damping: 20 }}
                   >
@@ -290,7 +287,9 @@ function Scene2Evidence() {
   const [displayCount, setDisplayCount] = useState(0);
 
   useEffect(() => {
-    const rowInterval = 1_500; // ms between rows
+    // rowInterval tightened from 1_500 to 1_100 to fit within the new
+    // 12 s SCENE_MS window (8 rows × 1100 + 400 lead = 9.2 s < 12 s).
+    const rowInterval = 1_100; // ms between rows
     const timers = EVIDENCE_STREAM.map((_, i) =>
       setTimeout(() => setVisibleCount(i + 1), 400 + i * rowInterval),
     );
@@ -511,11 +510,12 @@ function Scene4Export() {
       setTimeout(() => setAssembledCount(i + 1), 500 + i * fileInterval),
     );
 
-    // Progress bar fills continuously
+    // Progress bar fills continuously. Tightened from 14 s to 11 s so
+    // the bar reaches 100 % before the 12 s SCENE_MS rotation.
     const startedAt = Date.now();
     const progressId = setInterval(() => {
       const elapsed = Date.now() - startedAt;
-      const pct = Math.min(elapsed / 14_000, 1);
+      const pct = Math.min(elapsed / 11_000, 1);
       setProgress(Math.round(pct * 100));
     }, 60);
 
@@ -715,24 +715,44 @@ export function HeroDemo() {
     return () => clearInterval(id);
   }, [isStatic, isDesktop, inView]);
 
+  // No-JS fallback: a small inline stylesheet inside <noscript> overrides
+  // motion library's inline `opacity: 0` / `transform` styles so the
+  // hero integration rows are visible without scripting. Targeting via
+  // the `.hero-scene-1` class on this wrapper is more specific than
+  // motion library's class generation. JS-enabled browsers render this
+  // only as a <noscript> tag (its contents are hidden by browser
+  // default), so there's zero visual cost on the script-enabled path.
+  const noJsFallback = (
+    <noscript>
+      <style>{`
+        .hero-scene-1 li { opacity: 1 !important; transform: none !important; }
+      `}</style>
+    </noscript>
+  );
+
   // Reduced-motion OR mobile → static scene 1 only.
   if (isStatic || !isDesktop) {
     return (
-      <DemoFrame sceneIdx={0} showProgress={false} ariaLabel="Product demo (static preview)">
-        <Scene1Static />
-      </DemoFrame>
+      <div className="hero-scene-1">
+        {noJsFallback}
+        <DemoFrame sceneIdx={0} showProgress={false} ariaLabel="Product demo (static preview)">
+          <Scene1Static />
+        </DemoFrame>
+      </div>
     );
   }
 
   const Renderer = SCENE_RENDERERS[sceneIdx];
 
   return (
-    <DemoFrame
-      ref={containerRef}
-      sceneIdx={sceneIdx}
-      showProgress
-      ariaLabel="Animated product demo (60-second loop)"
-    >
+    <div className="hero-scene-1">
+      {noJsFallback}
+      <DemoFrame
+        ref={containerRef}
+        sceneIdx={sceneIdx}
+        showProgress
+        ariaLabel="Animated product demo (48-second loop)"
+      >
       <AnimatePresence mode="wait">
         <motion.div
           key={sceneIdx}
@@ -745,6 +765,7 @@ export function HeroDemo() {
           <Renderer />
         </motion.div>
       </AnimatePresence>
-    </DemoFrame>
+      </DemoFrame>
+    </div>
   );
 }

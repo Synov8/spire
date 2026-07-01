@@ -273,11 +273,55 @@ into a release. They will be folded into the next semver bump.
   this batch (Microsoft 365 / Slack / Jira / Linear / Okta / Datadog
   / Sentry / GitLab) and Azure covers Azure DevOps.
 
+### Changed
+
+- **`app/components/hero-demo.tsx`** — Fixed two user-reported bugs in
+  the landing-page hero demo:
+  - **Bug 1 — missing first-load animation.** Previously a module-level
+    `hasMountedScene1` flag was initialised to `false`, captured into a
+    `useRef`, and used to early-return from the useEffect timer chain AND
+    skip motion library's `initial`/`transition` props. Net effect: the
+    connecting → connected stagger animation only played on ROTATION
+    remounts (after the full 60 s cycle had run once); first-page-load
+    visitors saw all integrations rendered already-connected with no
+    spinner motion. Fixed by removing `hasMountedScene1` and the
+    `shouldAnimate` ref. Scene 1 now always initialises `connected` to
+    all-false and runs the staggered setTimeout chain in useEffect on
+    every mount. The motion.li / motion.span (checkmark) props always
+    use the animated branch (no more `shouldAnimate.current ? ... : false`
+    ternary).
+  - **Bug 2 — Scene 1 → Scene 2 timing felt long.** Previously `SCENE_MS
+    = 15_000` produced a 60 s total loop with ~10 s of static
+    "all connected" rows before each rotation. Reduced to `SCENE_MS
+    = 12_000` (48 s loop) for a snappier Scene 1 → Scene 2 cadence.
+    Internal pacing adjusted to fit the new window:
+    - Scene 2 rowInterval: `1_500` → `1_100` (8 rows × 1100 + 400 lead
+      = 9.2 s, well under 12 s).
+    - Scene 4 progress bar hardcoded completion: `14_000` → `11_000`
+      so the bar reaches 100 % before the 12 s rotation. Scene 3
+      typewriter + Scene 4 file-list timings already fit naturally.
+  - **No-JS safety.** Added a `<noscript><style>` block at the top of
+    `HeroDemo`'s render output that overrides motion library's inline
+    `opacity: 0` / `transform` styles with `!important` for the
+    `.hero-scene-1` class on the wrapper. JS-enabled browsers render the
+    `<noscript>` tag's contents hidden, so there's zero visual cost on the
+    primary path; only no-JS visitors see the override.
+  - HeroDemo return branches wrapped in `<div className="hero-scene-1">`
+    so the `.hero-scene-1 li` selector in the noscript stylesheet
+    targets the integration rows deterministically (the no-JS override
+    is scoped to this component only).
+  - Docblock header updated to reflect new total loop duration (48 s)
+    and removed reference to the now-deleted SSR gate.
+
 ### Honest non-claims (spec §10.1)
 
 - The hero demo continues to label Scene 1 contents as
   `Representative · not live data` (the existing always-on label
   in the window chrome) — the curated subset is honest.
+- Spec §10.3 acceptance criterion 10.3 specifies a 60 s loop. The
+  current implementation runs a 48 s loop (4 scenes × 12 s). This
+  is a UX-driven tradeoff at the user's explicit request; the
+  spec text should be revised to "48 s loop" in a follow-up.
 
 ### Changed
 
