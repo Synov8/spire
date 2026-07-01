@@ -82,3 +82,9 @@
 - **`app/routes/integrations-page.tsx` — "Coming soon" section reframed as an honest growth CTA.** Removed the `comingSoon` placeholder const + the 4 named badges. Replaced with: "Don't see what you need? — Tell us which tool is blocking your audit and we'll prioritise it." + a `→ /contact` CTA. Removed the prior `every month` cadence claim (mild overstatement); new copy carries no quantitative cadence.
 - **`app/components/public-layout.tsx` — added "Integrations" 5th footer column.** Grid updated `md:grid-cols-4` → `sm:grid-cols-2 lg:grid-cols-5` (single breakpoint ladder; sm renders 2-2-1, lg+ renders the full 5 columns). New column slotted between the Spire product column and Guides, listing 6 most-recognized deep-dive names `AWS GitHub Google Workspace Stripe Okta Datadog` + a "Browse all {INTEGRATION_NAMES.length} →" footer link (34 at runtime, auto-tracks as the catalogue grows). Arrow uses Unicode `→` literal matching the rest of the codebase; new column imports `INTEGRATION_NAMES` from `~/lib/integration-data` and re-uses the trust-strip's brand-safe plain-text convention.
 - `npm run typecheck` exit 0. `INTEGRATIONS.length` = 34; `INTEGRATION_CATEGORIES` flatMap sum = 34 — dev-time bucketing warning silenced.
+
+---
+
+### Changed
+
+- **`app/components/hero-demo.tsx` — SCENE_URLS domain updated to match production.** The four faux URL-bar strings rendered in the HeroDemo window chrome updated from the prior placeholder `spire.app/` host to the live production root `spire.synov8studio.com/`. Scene-URL strings now read `spire.synov8studio.com/connections`, `/evidence`, `/questionnaires`, `/audit-pack` across the 12-second scene rotation. No behavioural change; the rendered text in the faux URL bar is the only user-visible update. The honesty label `Representative · not live data` sits in the same chrome strip and discharges any visual ambiguity about whether the URL is real or staged. Typecheck exit 0.

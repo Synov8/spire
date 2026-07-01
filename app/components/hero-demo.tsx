@@ -47,10 +47,10 @@ import { INTEGRATION_NAMES } from "~/lib/integration-data";
 const SCENE_MS = 12_000;
 
 const SCENE_URLS = [
-  "spire.app/connections",
-  "spire.app/evidence",
-  "spire.app/questionnaires",
-  "spire.app/audit-pack",
+  "spire.synov8studio.com/connections",
+  "spire.synov8studio.com/evidence",
+  "spire.synov8studio.com/questionnaires",
+  "spire.synov8studio.com/audit-pack",
 ] as const;
 
 // ─── Scene 1 cap (visual density) ────────────────────────────────────────────
