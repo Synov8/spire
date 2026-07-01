@@ -7,6 +7,7 @@
     "dev": "node .content-collections/generate.mjs && react-router dev",
     "prebuild": "node .content-collections/generate.mjs",
     "typecheck": "wrangler types && react-router typegen && tsc -b",
+    "self-audit": "tsx scripts/self-audit.ts",
     "deploy": "npm run build && wrangler deploy",
     "preview": "npm run build && vite preview",
     "cf-typegen": "wrangler types",
@@ -47,6 +48,7 @@
     "@types/react-dom": "^19.2.3",
     "drizzle-kit": "^0.31.10",
     "tailwindcss": "^4.2.2",
+    "tsx": "^4.22.4",
     "typescript": "^5.9.3",
     "vite": "^8.0.3",
     "wrangler": "^4.105.0"

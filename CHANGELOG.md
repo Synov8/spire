@@ -94,3 +94,15 @@
 ### Changed
 
 - **`app/components/public-layout.tsx` — footer Compare column filter.** The user observed that the previous column included generic topic-vs-topic Comparison-tagged posts such as SOC 2 Type II vs Type I and SOC 2 vs ISO 27001 - these are NOT Spire-vs-competitor articles even though they share the Comparison tag. Added a second filter predicate to the comparisons array: keep only posts whose slug or title contains the literal spire. The footer now lists only genuine Spire-vs-competitor posts. The 3 generic topic-vs-topic comparisons stay on /blog but not in the footer. Five posts now pass the combined filter - Vanta, Drata, Secureframe, Sprinto, Manual-SOC 2. Six pass total - a sixth candidate vanta-drata-secureframe-spire-comparison-2026 also contains spire but is dropped by the existing slice-zero-five cap.
+
+---
+
+### Added
+
+- **`scripts/self-audit.ts` — Spire dogfooding auditor CLI.** A new standalone CLI invoked as `npm run self-audit` that runs the same compliance agent the webapp uses against a user-selected set of integrations. Walks the user through picking slugs from the canonical INTEGRATIONS catalogue, initiates Composio OAuth per chosen app, prints redirectUrl and auto-polls connectedAccounts ACTIVE status until completion or 90s timeout, then runs the same generateText agent loop with AuditReportSchema structured output, prints the formatted report, and saves a JSON snapshot to cwd. The CLI reuses AuditReportSchema from `app/agents/audit-schema.ts` and CONTROLS from `app/data/controls.ts` so it runs the same Spire agent rather than a parallel re-implementation. Typecheck exit 0. Dry-invoke exit 0. tsx added as a devDep.
+
+### Changed
+
+- **`app/data/controls.ts` — NEW canonical control catalogue.** Static SOC 2 plus EU AI Act control list extracted into a single source of truth that both the Drizzle seed and the new self-audit CLI import. 66 controls total — 56 SOC 2 spanning CC1 through P8 plus 10 EU AI Act articles. The id derivation logic moved here from db/seed.ts so callers do not duplicate the convention.
+- **`app/agents/audit-schema.ts` — NEW pure zod-only schema module.** AuditReportSchema and the AuditReport type extracted from compliance-agent.ts into a pure zod file so the CLI can import it without dragging in Drizzle plus the webapp DB at module-load time. compliance-agent.ts re-exports the schema from audit-schema and uses a type-only import for storeAuditReport parameter annotation.
+- **`app/db/seed.ts` — DRY refactor.** Inline 66-row control array replaced with `import { CONTROLS } from ../data/controls`. Seed behaviour identical — same Drizzle upsert, same onConflictDoNothing, same id derivation.
