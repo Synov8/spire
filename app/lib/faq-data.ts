@@ -17,7 +17,7 @@ export type FAQ = { q: string; a: string };
 export const FAQS: ReadonlyArray<FAQ> = [
   {
     q: "What is Spire?",
-    a: "Spire is a compliance automation platform that connects to 30 production systems via read-only Composio OAuth — AWS, GitHub, Google Workspace, Microsoft 365, Stripe, Okta, PagerDuty, BambooHR, and many more — and runs an AI compliance agent that evaluates the collected evidence against SOC 2 and EU AI Act controls. The same agent auto-fills enterprise security questionnaires with per-answer confidence scores.",
+    a: "Spire is a compliance automation platform that connects to 30 production systems via read-only OAuth — AWS, GitHub, Google Workspace, Microsoft 365, Stripe, Okta, PagerDuty, BambooHR, and many more — and runs an AI compliance agent that evaluates the collected evidence against SOC 2 and EU AI Act controls. The same agent auto-fills enterprise security questionnaires with per-answer confidence scores.",
   },
   {
     q: "How is this different from a compliance checklist or spreadsheet?",

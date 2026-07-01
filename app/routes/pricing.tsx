@@ -34,7 +34,7 @@ async function fetchRates(): Promise<Record<string, number>> {
 import { plans } from "~/lib/plans";
 
 const core = [
-  `Continuous evidence collection via Composio (${INTEGRATION_NAMES.length} integrations and growing)`,
+  `Continuous evidence collection via read-only OAuth (${INTEGRATION_NAMES.length} integrations and growing)`,
   "Full SOC 2 common-criteria and EU AI Act article mapping",
   "AI-driven security questionnaire autofill with per-answer confidence scores",
   "Audit-ready evidence pack export (JSON, structured by framework)",

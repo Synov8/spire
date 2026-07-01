@@ -61,4 +61,4 @@ Vanta announced EU AI Act readiness as part of its 2026 roadmap. As of mid-2026,
 
 ### Which platform has faster setup?
 
-Vanta reports 2 to 3 days for initial integration setup. Spire's Composio OAuth flow connects a single integration in seconds; full audit-readiness assessment including AI-agent diagnostics typically takes under one hour for a standard AWS + GitHub + identity-provider stack, though policy documentation and control design take 6 to 10 weeks on either platform.
+Vanta reports 2 to 3 days for initial integration setup. Spire's read-only OAuth flow connects a single integration in seconds; full audit-readiness assessment including AI-agent diagnostics typically takes under one hour for a standard AWS + GitHub + identity-provider stack, though policy documentation and control design take 6 to 10 weeks on either platform.

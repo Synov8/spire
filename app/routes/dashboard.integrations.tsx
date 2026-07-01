@@ -33,7 +33,7 @@ export default function IntegrationsPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-[#F1F1F3]">Integrations</h1>
-        <p className="mt-1 text-sm text-[#6A6D6E]">Connect your infrastructure via Composio. OAuth is managed for you — no tokens to handle.</p>
+        <p className="mt-1 text-sm text-[#6A6D6E]">Connect your infrastructure via read-only OAuth. No tokens to handle — we manage the broker.</p>
       </div>
       {error && <div className="rounded-xl border border-[#EF4444]/20 bg-[#EF4444]/[0.06] px-4 py-3 text-sm text-[#EF4444]">{error}</div>}
 

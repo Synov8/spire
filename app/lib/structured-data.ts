@@ -95,7 +95,7 @@ export function softwareApplicationSchema(): Schema {
     applicationCategory: "BusinessApplication",
     operatingSystem: "Web",
     description:
-      `AI-powered SOC 2 and EU AI Act compliance automation for B2B SaaS — continuous evidence collection across ${INTEGRATIONS.length} integrations via Composio, AI questionnaire autofill, and audit-ready exports.`,
+      `AI-powered SOC 2 and EU AI Act compliance automation for B2B SaaS — continuous evidence collection across ${INTEGRATIONS.length} integrations via read-only OAuth, AI questionnaire autofill, and audit-ready exports.`,
     url: SITE_URL,
     provider: { "@type": "Organization", name: "Spire", url: SITE_URL },
     offers: {
@@ -106,7 +106,7 @@ export function softwareApplicationSchema(): Schema {
       availability: "https://schema.org/InStock",
     },
     featureList: [
-      `Continuous evidence collection via Composio (${INTEGRATIONS.length} integrations: ${INTEGRATIONS.map((i) => i.name).join(", ")}).`,
+      `Continuous evidence collection via read-only OAuth (${INTEGRATIONS.length} integrations: ${INTEGRATIONS.map((i) => i.name).join(", ")}).`,
       "AI-powered auto-fill of enterprise security questionnaires with per-answer confidence scoring.",
       "SOC 2 controls mapping (56 common criteria, all five trust service criteria).",
       "EU AI Act controls mapping (10 articles covering transparency, logging, human oversight, risk management).",
@@ -255,7 +255,7 @@ export function integrationsItemListSchema(): Schema {
         description: int.description,
         url: `${SITE_URL}/integrations/${int.slug}`,
         provider: { "@type": "Organization", name: "Spire", url: SITE_URL },
-        serviceType: "Read-only API evidence collection (Composio)",
+        serviceType: "Read-only API evidence collection",
         areaServed: "Global",
       },
     })),
@@ -280,7 +280,7 @@ export function integrationServiceSchema(
     description,
     url: `${SITE_URL}/integrations/${slug}`,
     provider: { "@type": "Organization", name: "Spire", url: SITE_URL },
-    serviceType: "Read-only API evidence collection (Composio)",
+    serviceType: "Read-only API evidence collection ",
     areaServed: "Global",
   };
 }

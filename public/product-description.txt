@@ -2,13 +2,13 @@
 
 **Tagline:** AI-powered SOC 2 and EU AI Act compliance automation for B2B SaaS.
 
-**One-liner:** Spire connects to your infrastructure, continuously collects audit evidence across 30 integrations via Composio, runs an on-demand AI compliance audit against SOC 2 + EU AI Act controls (pass/fail verdicts per control), and auto-fills enterprise security questionnaires in minutes — so you stop losing deals to procurement delays.
+**One-liner:** Spire connects to your infrastructure, continuously collects audit evidence across 30 integrations, runs an on-demand AI compliance audit against SOC 2 + EU AI Act controls (pass/fail verdicts per control), and auto-fills enterprise security questionnaires in minutes — so you stop losing deals to procurement delays.
 
 Spire is an AI-driven compliance platform that replaces manual, spreadsheet-driven audit prep with continuous evidence collection, an AI agent that actually runs on-demand control audits (not just collects data), and AI questionnaire auto-fill. Built for B2B SaaS companies selling to enterprise, it closes three compliance bottlenecks: evidence gathering, ongoing audit readiness, and security questionnaire responses.
 
 **How it works:**
 
-Spire connects via read-only OAuth (no agents, no sidecars) through Composio to the infrastructure your engineering team already uses — AWS, GitHub, Stripe, Microsoft 365, Google Workspace, GitLab, Jira, Linear, Okta, Datadog, Sentry, PagerDuty, Snyk, Salesforce, HubSpot, and 15 more. Each integration's API is probed automatically and the results are mapped to specific SOC 2 trust service criteria and EU AI Act articles. For example, the GitHub integration surfaces branch protection rules (CC6.1), pull request review requirements (CC6.1), secret scanning alerts (CC7.2), and membership changes (CC6.3). All evidence is timestamped and stored in an auditor-ready library.
+Spire connects via read-only OAuth (no agents, no sidecars) to the infrastructure your engineering team already uses — AWS, GitHub, Stripe, Microsoft 365, Google Workspace, GitLab, Jira, Linear, Okta, Datadog, Sentry, PagerDuty, Snyk, Salesforce, HubSpot, and 15 more. Each integration's API is probed automatically and the results are mapped to specific SOC 2 trust service criteria and EU AI Act articles. For example, the GitHub integration surfaces branch protection rules (CC6.1), pull request review requirements (CC6.1), secret scanning alerts (CC7.2), and membership changes (CC6.3). All evidence is timestamped and stored in an auditor-ready library.
 
 **AI Compliance Agent:**
 
@@ -30,7 +30,7 @@ Spire uses its compliance knowledge base to auto-fill enterprise security questi
 
 **Target customers:** B2B SaaS companies with 10–200 employees preparing for SOC 2 or chasing AI Act coverage, and teams losing enterprise deals to procurement security reviews.
 
-**Differentiation:** AI compliance agent that runs on-demand audits (no other platform ships this today), native EU AI Act + SOC 2 together (competitors have roadmap only), questionnaire automation included at every tier, transparent pricing with no sales call, read-only Composio OAuth in seconds.
+**Differentiation:** AI compliance agent that runs on-demand audits (no other platform ships this today), native EU AI Act + SOC 2 together (competitors have roadmap only), questionnaire automation included at every tier, transparent pricing with no sales call, read-only OAuth in seconds.
 
 **Company:** Synov8 Ltd., UK.
 

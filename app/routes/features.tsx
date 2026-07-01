@@ -7,7 +7,7 @@ export function meta() {
     { title: `Features | Spire — ${INTEGRATION_NAMES.length} integrations, 66 mapped controls` },
     {
       name: "description",
-      content: `Spire connects to ${INTEGRATION_NAMES.length} production systems via read-only Composio OAuth. Collects SOC 2 and EU AI Act evidence continuously. AI compliance agent runs on-demand audits. Auto-fills security questionnaires. One-click evidence export.`,
+      content: `Spire connects to ${INTEGRATION_NAMES.length} production systems via read-only OAuth. Collects SOC 2 and EU AI Act evidence continuously. AI compliance agent runs on-demand audits. Auto-fills security questionnaires. One-click evidence export.`,
     },
     { property: "og:title", content: "Features | Spire" },
     { property: "og:type", content: "website" },
@@ -17,7 +17,7 @@ export function meta() {
 const features = [
   {
     title: "Continuous evidence from your stack",
-    desc: `Read-only OAuth via Composio — no agents, no sidecars, no config to maintain. ${INTEGRATION_NAMES.length} integrations spanning cloud, identity, source code, payment, email, HR, observability, security, CRM, and docs.`,
+    desc: `Read-only OAuth — no agents, no sidecars, no config to maintain. ${INTEGRATION_NAMES.length} integrations spanning cloud, identity, source code, payment, email, HR, observability, security, CRM, and docs.`,
     items: [
       "Cloud & infra — AWS, Microsoft Azure, Vercel, Cloudflare, DigitalOcean",
       "Source code — GitHub, GitLab",
@@ -36,7 +36,7 @@ const features = [
     items: [
       "Runs against all 56 SOC 2 common criteria — not just the subset you have integrations for",
       "Plus 10 EU AI Act articles (transparency, logging, human oversight, risk management, accuracy, governance)",
-      "Each verdict cites the specific evidence that backs it, with the Composio source API call recorded",
+      "Each verdict cites the specific evidence that backs it, with the source API call recorded",
       "Controls it can't verify automatically are flagged with a recommended next step for your team",
       "Re-run anytime — new evidence and new integrations are picked up on the next pass",
     ],
@@ -57,7 +57,7 @@ const features = [
     items: [
       "JSON export grouped by framework — SOC 2 and EU AI Act sections, side by side",
       "Each verdict includes the specific evidence, its last-checked timestamp, and the source API",
-      "No scraping, no manual screenshotting — every line was collected via Composio during the period",
+      "No scraping, no manual screenshotting — every line was collected live during the period",
       "Auditor-facing packs and prospect-facing packs share the same underlying evidence store",
     ],
   },

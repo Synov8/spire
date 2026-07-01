@@ -140,7 +140,7 @@ export default function DashboardHome({ loaderData }: Route.ComponentProps) {
             <svg className="h-6 w-6 text-[#4A4D4E]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"/><path d="M9 12l2 2 4-4"/></svg>
           </div>
           <p className="mt-4 text-sm font-medium text-[#8B8B93]">No audit run yet</p>
-          <p className="mt-1 text-xs text-[#5C5C66]">Connect integrations via Composio, then run an audit.</p>
+          <p className="mt-1 text-xs text-[#5C5C66]">Connect integrations, then run an audit.</p>
           <Link to="/dashboard/integrations" className="mt-5 inline-flex items-center gap-2 rounded-lg bg-[#00D4AA] px-4 py-2 text-sm font-medium text-black hover:bg-[#00B894] transition-all duration-200 shadow-[0_2px_12px_-2px_rgba(0,212,170,0.3)]">
             <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M8 2v12M2 8h12"/></svg>
             Connect integrations

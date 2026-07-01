@@ -34,7 +34,7 @@ export function meta({ params }: Route.MetaArgs) {
     { title: `${name} integration | Spire — automated SOC 2 & EU AI Act evidence` },
     {
       name: "description",
-      content: `Spire connects to ${name} via Composio and continuously collects audit-ready evidence mapped to SOC 2 and EU AI Act controls.`,
+      content: `Spire connects to ${name} via secure read-only OAuth and continuously collects audit-ready evidence mapped to SOC 2 and EU AI Act controls.`,
     },
     { property: "og:title", content: `${name} integration | Spire` },
     { property: "og:description", content: `Continuous ${name} evidence for SOC 2 and EU AI Act.` },
@@ -108,7 +108,7 @@ export default function IntegrationSlugPage({ loaderData }: Route.ComponentProps
           Why auditors care
         </h2>
         <p className="mt-4 text-lg leading-relaxed text-[#8B8B93]">
-          {integration.description} Spire probes its API on a continuous basis via Composio and synthesizes
+          {integration.description} Spire probes its API on a continuous basis, and synthesizes
           each call into an evidence object mapped to a specific SOC 2 control or EU AI Act article —
           auditors see timestamped, source-backed data, not screenshots or hand-curated exports.
         </p>
@@ -161,7 +161,7 @@ export default function IntegrationSlugPage({ loaderData }: Route.ComponentProps
           Read-only API access, scoped and revocable
         </h2>
         <p className="mt-4 text-lg leading-relaxed text-[#8B8B93]">
-          We connect to {integration.name} via a read-only API access token, brokered by Composio. Spire never writes to your{" "}
+          We connect to {integration.name} via a read-only API access token, brokered and managed on our side. Spire never writes to your{" "}
           {integration.name} account, and the credential can be revoked from the integration settings
           page at any time. The token is encrypted at rest with AES-256 and never logged.
         </p>

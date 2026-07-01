@@ -142,7 +142,7 @@ export default function TrustCenter() {
         </h1>
         <p className="mt-4 text-lg leading-relaxed text-[#8B8B93]">
           The same AI compliance agent your team would use, evaluating Spire's own controls.
-          Updated continuously via Composio-driven evidence collection. No third-party
+          Updated continuously via automated evidence collection. No third-party
           attestation theater — just timestamped, source-backed posture.
         </p>
       </section>

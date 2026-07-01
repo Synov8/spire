@@ -40,7 +40,7 @@ export function meta() {
     { title: `Integrations | Spire — ${TOTAL_COUNT} read-only OAuth integrations` },
     {
       name: "description",
-      content: `Spire connects to ${TOTAL_COUNT} production systems via read-only Composio OAuth — AWS, GitHub, Google Workspace, Microsoft 365, Stripe, Okta, PagerDuty, and more — for automated SOC 2 and EU AI Act evidence collection.`,
+      content: `Spire connects to ${TOTAL_COUNT} production systems via read-only OAuth — AWS, GitHub, Google Workspace, Microsoft 365, Stripe, Okta, PagerDuty, and more — for automated SOC 2 and EU AI Act evidence collection.`,
     },
     { property: "og:title", content: "Integrations | Spire" },
     { property: "og:type", content: "website" },
@@ -70,7 +70,7 @@ export default function IntegrationsPage() {
             <span className="text-[#00D4AA]">grouped by what they actually prove</span>
           </h1>
           <p className="mt-4 text-lg text-[#8B8B93]">
-            We connect to your existing tools via read-only APIs through Composio — no agents, no sidecars, no config to maintain. Each integration maps evidence to specific SOC 2 common criteria or EU AI Act articles; click any row to see the full evidence list.
+            We connect to your existing tools via read-only APIs — no agents, no sidecars, no config to maintain. Each integration maps evidence to specific SOC 2 common criteria or EU AI Act articles; click any row to see the full evidence list.
           </p>
         </div>
 
