@@ -13,9 +13,14 @@ export function meta() {
   ];
 }
 
+// "Coming soon" — small honest subset. The previous list of 10 was mostly
+// stale (we shipped GitLab, Slack, Jira, Linear, Microsoft 365, Okta, Datadog,
+// and Sentry in this batch; Azure is shipped so Azure DevOps is folded in).
 const comingSoon = [
-  "GitLab", "Azure DevOps", "Slack", "Jira", "Linear",
-  "Microsoft 365", "Okta", "Datadog", "Neon", "Sentry",
+  "Neon",
+  "1Password",
+  "OpenAI",
+  "Anthropic",
 ];
 
 // Render an evidence item as it was previously stored inline.

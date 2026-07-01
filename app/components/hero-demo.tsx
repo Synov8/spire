@@ -48,6 +48,20 @@ const SCENE_URLS = [
   "spire.app/audit-pack",
 ] as const;
 
+// ─── Scene 1 cap (visual density) ────────────────────────────────────────────
+//
+// The landing-page hero shows a representative SUBSET of integrations, not all
+// of them. With 30+ integrations the staggered connecting→connected animation
+// would exceed the 15 s scene rotation window AND each row would compress below
+// legible density inside the `aspect-[4/3]` container. We slice the first N
+// names — the canonical "headline" integrations that buyers ask about first.
+// The full catalog still appears on /integrations, the home trust strip, the
+// control explorer filter row, and per-slug landing pages; Scene 1 is a sample.
+const HERO_DEMO_INTEGRATION_LIMIT = 14;
+const HERO_DEMO_INTEGRATION_NAMES: readonly string[] = Object.freeze(
+  INTEGRATION_NAMES.slice(0, HERO_DEMO_INTEGRATION_LIMIT),
+);
+
 // ─── Scene 1 SSR gate (module-level) ─────────────────────────────────────────
 //
 // `hasMountedScene1` flips to `true` on the first client useEffect tick of
@@ -137,15 +151,15 @@ function Scene1Animated() {
   // On rotation remount (hasMountedScene1 === true): all connecting, animate.
   const [connected, setConnected] = useState<boolean[]>(() =>
     hasMountedScene1
-      ? Array(INTEGRATION_NAMES.length).fill(false)
-      : Array(INTEGRATION_NAMES.length).fill(true),
+      ? Array(HERO_DEMO_INTEGRATION_NAMES.length).fill(false)
+      : Array(HERO_DEMO_INTEGRATION_NAMES.length).fill(true),
   );
   const shouldAnimate = useRef(hasMountedScene1);
 
   useEffect(() => {
     hasMountedScene1 = true;
     if (!shouldAnimate.current) return; // first mount — already all connected
-    const timers = INTEGRATION_NAMES.map((_, i) =>
+    const timers = HERO_DEMO_INTEGRATION_NAMES.map((_, i) =>
       setTimeout(() => {
         setConnected((prev) => {
           const next = [...prev];
@@ -175,7 +189,7 @@ function Scene1Animated() {
 
       {/* Integration rows */}
       <ul className="mt-3 space-y-1.5">
-        {INTEGRATION_NAMES.map((name, i) => {
+        {HERO_DEMO_INTEGRATION_NAMES.map((name, i) => {
           const isConn = connected[i];
           return (
             <motion.li
@@ -229,7 +243,7 @@ function Scene1Animated() {
       {/* Footer summary */}
       <div className="mt-auto pt-2">
         <div className="flex items-center justify-between text-[10px]">
-          <span className="font-mono text-[#5C5C66]">{connectedCount}/{INTEGRATION_NAMES.length} connected</span>
+          <span className="font-mono text-[#5C5C66]">{connectedCount}/{HERO_DEMO_INTEGRATION_NAMES.length} connected</span>
           <span className="text-[#5C5C66]">Read-only</span>
         </div>
       </div>
@@ -249,7 +263,7 @@ function Scene1Static() {
         </span>
       </div>
       <ul className="mt-3 space-y-1.5">
-        {INTEGRATION_NAMES.map((name) => (
+        {HERO_DEMO_INTEGRATION_NAMES.map((name) => (
           <li key={name} className="flex items-center gap-3 rounded-md px-2 py-1.5">
             <span className="flex h-4 w-4 shrink-0 items-center justify-center">
               <CheckIcon className="h-3.5 w-3.5 text-[#00D4AA]" />
@@ -261,7 +275,7 @@ function Scene1Static() {
       </ul>
       <div className="mt-auto pt-2">
         <div className="flex items-center justify-between text-[10px]">
-          <span className="font-mono text-[#5C5C66]">{INTEGRATION_NAMES.length}/{INTEGRATION_NAMES.length} connected</span>
+          <span className="font-mono text-[#5C5C66]">{HERO_DEMO_INTEGRATION_NAMES.length}/{HERO_DEMO_INTEGRATION_NAMES.length} connected</span>
           <span className="text-[#5C5C66]">Read-only</span>
         </div>
       </div>
