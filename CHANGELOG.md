@@ -88,3 +88,9 @@
 ### Changed
 
 - **`app/components/hero-demo.tsx` — SCENE_URLS domain updated to match production.** The four faux URL-bar strings rendered in the HeroDemo window chrome updated from the prior placeholder `spire.app/` host to the live production root `spire.synov8studio.com/`. Scene-URL strings now read `spire.synov8studio.com/connections`, `/evidence`, `/questionnaires`, `/audit-pack` across the 12-second scene rotation. No behavioural change; the rendered text in the faux URL bar is the only user-visible update. The honesty label `Representative · not live data` sits in the same chrome strip and discharges any visual ambiguity about whether the URL is real or staged. Typecheck exit 0.
+
+---
+
+### Changed
+
+- **`app/components/public-layout.tsx` — footer Compare column filter.** The user observed that the previous column included generic topic-vs-topic Comparison-tagged posts such as SOC 2 Type II vs Type I and SOC 2 vs ISO 27001 - these are NOT Spire-vs-competitor articles even though they share the Comparison tag. Added a second filter predicate to the comparisons array: keep only posts whose slug or title contains the literal spire. The footer now lists only genuine Spire-vs-competitor posts. The 3 generic topic-vs-topic comparisons stay on /blog but not in the footer. Five posts now pass the combined filter - Vanta, Drata, Secureframe, Sprinto, Manual-SOC 2. Six pass total - a sixth candidate vanta-drata-secureframe-spire-comparison-2026 also contains spire but is dropped by the existing slice-zero-five cap.

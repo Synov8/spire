@@ -94,7 +94,22 @@ export function PublicNav() {
 }
 
 export function PublicFooter() {
-  const comparisons = allPosts.filter((p) => p.tags?.includes("Comparison")).slice(0, 5);
+  // Footer "Compare" column is for Spire-vs-competitor comparisons only.
+  // Generic topic-vs-topic Comparison posts (e.g. SOC 2 Type I vs Type II,
+  // SOC 2 vs ISO 27001, ISO 42001 vs SOC 2) all carry the "Comparison" tag
+  // but their titles start with the topic name rather than "Spire vs ...".
+  // Filtering on "spire" in slug OR title cleanly separates the two groups
+  // so the footer renders competitor compare cards only — those are the
+  // ones whose rendered link reads as `vs Vanta`, `vs Drata`, etc.
+  // Generic comparisons stay on /blog.
+  const comparisons = allPosts
+    .filter(
+      (p) =>
+        p.tags?.includes("Comparison") &&
+        (p.slug.toLowerCase().includes("spire") ||
+          p.title.toLowerCase().includes("spire")),
+    )
+    .slice(0, 5);
 
   return (
     <footer className="border-t border-[#1C1C24]">
