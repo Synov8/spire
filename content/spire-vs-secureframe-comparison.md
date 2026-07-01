@@ -1,7 +1,7 @@
 ---
 title: "Spire vs Secureframe: SOC 2 Compliance Platform Comparison for First-Time Audits"
 published: "2026-06-26"
-description: "Spire vs Secureframe comparison: Secureframe has 300+ integrations and guided onboarding at $7.5K–$20K/year. Spire has an AI compliance agent for on-demand audits, native EU AI Act, AI questionnaire automation, and transparent $6K/year pricing."
+description: "Spire vs Secureframe comparison: Secureframe has 300+ integrations and guided onboarding at $7.5K–$20K/year. Spire has an AI compliance agent for on-demand audits, native EU AI Act, AI questionnaire automation, and transparent £200/month (£2,400/year Starter) pricing."
 author: "Spire Team"
 tags:
   - Comparison
@@ -11,7 +11,7 @@ tags:
   - Spire
 ---
 
-Spire and Secureframe both offer strong guided onboarding and multi-framework support, but their AI capabilities and pricing structures differ significantly. Secureframe provides 300+ integrations with hands-on implementation support and a compliance manager on higher-tier plans, making it a strong choice for teams that want a partner to guide their first SOC 2 audit. Spire replaces the compliance manager with an AI agent that performs on-demand audits, includes AI-powered questionnaire automation at every tier, and offers transparent $6,000 per year pricing.
+Spire and Secureframe both offer strong guided onboarding and multi-framework support, but their AI capabilities and pricing structures differ significantly. Secureframe provides 300+ integrations with hands-on implementation support and a compliance manager on higher-tier plans, making it a strong choice for teams that want a partner to guide their first SOC 2 audit. Spire replaces the compliance manager with an AI agent that performs on-demand audits, includes AI-powered questionnaire automation at every tier, and offers transparent £200/month (£2,400/year Starter plan) pricing with no sales call.
 
 ## What Does Secureframe Do Well?
 
@@ -33,7 +33,7 @@ Spire addresses both gaps. The AI compliance agent evaluates evidence against bo
 
 Secureframe's Fundamentals tier for SOC 2 Type II starts at $7,500 to $20,000 per year. The Complete tier with dedicated compliance manager support ranges from $20,000 to $45,000. Enterprise tier with full managed services is $55,000 to $80,000+. Pricing is not publicly listed and requires a sales call.
 
-Spire starts at $6,000 per year with all features included — AI compliance agent, evidence collection, AI questionnaire automation, and native EU AI Act coverage. Transparent pricing is published on the pricing page with no sales call required.
+Spire starts at £200/month (£2,400/year Starter plan) with all features included — AI compliance agent, evidence collection, AI questionnaire automation, and native EU AI Act coverage. Transparent pricing is published on the pricing page with no sales call required.
 
 The total first-year cost including platform, audit fees, and penetration testing averages $25,000 to $50,000 with Spire, compared to $30,000 to $70,000 with Secureframe for equivalent scope, based on published cost ranges from both platforms.
 
@@ -41,7 +41,7 @@ The total first-year cost including platform, audit fees, and penetration testin
 
 Choose Secureframe if you want a dedicated compliance manager to guide your first SOC 2 audit, need strong multi-framework support across 35+ frameworks from day one, or have a non-standard tech stack that benefits from hands-on integration support.
 
-Choose Spire if you want an AI compliance agent that performs on-demand SOC 2 and EU AI Act audits without a dedicated compliance manager, need transparent starting pricing at $6,000/year, or are a B2B SaaS company under 50 employees that needs AI-powered questionnaire automation included at every tier.
+Choose Spire if you want an AI compliance agent that performs on-demand SOC 2 and EU AI Act audits without a dedicated compliance manager, need transparent starting pricing from £200/month (£2,400/year Starter), or are a B2B SaaS company under 50 employees that needs AI-powered questionnaire automation included at every tier.
 
 Secureframe's compliance manager model is the most expensive of the three approaches — human-led, platform-augmented. Spire's AI agent model is the most automated — AI-led, human-verified. The right choice depends on whether your team values human guidance or AI autonomy.
 
