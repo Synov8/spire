@@ -6,13 +6,13 @@ const navLinks = [
   { to: "/features", label: "Features" },
   { to: "/integrations", label: "Integrations" },
   { to: "/pricing", label: "Pricing" },
-  { to: "/security", label: "Security" },
+  { to: "/trust-center", label: "Trust Center" },
   { to: "/blog", label: "Blog" },
 ];
 
 function isActive(pathname: string, to: string) {
   if (to === "/blog") return pathname.startsWith("/blog");
-  if (to === "/security") return pathname === "/security";
+  if (to === "/trust-center") return pathname === "/trust-center";
   if (to === "/integrations") return pathname === "/integrations";
   return pathname === to;
 }
@@ -106,7 +106,7 @@ export function PublicFooter() {
               <Link to="/features" className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">Features</Link>
               <Link to="/integrations" className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">Integrations</Link>
               <Link to="/pricing" className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">Pricing</Link>
-              <Link to="/security" className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">Security</Link>
+              <Link to="/trust-center" className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">Trust Center</Link>
               <Link to="/glossary" className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">Glossary</Link>
             </div>
           </div>

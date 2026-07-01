@@ -1,5 +1,7 @@
 import { Link } from "react-router";
 import { PublicLayout } from "~/components/public-layout";
+import { StructuredData } from "~/components/structured-data";
+import { pricingProductSchemas } from "~/lib/structured-data";
 import { useState, useEffect } from "react";
 
 export function meta() {
@@ -52,6 +54,9 @@ export default function Pricing() {
 
   return (
     <PublicLayout>
+
+      {/* JSON-LD: one Product per pricing tier (Starter / Growth / Enterprise) */}
+      <StructuredData schemas={pricingProductSchemas()} />
 
       <section className="mx-auto max-w-6xl px-6 pt-20 pb-24">
         <div className="text-center">

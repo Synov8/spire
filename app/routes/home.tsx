@@ -1,7 +1,57 @@
 import { Link } from "react-router";
+import { useEffect, useState } from "react";
 import { auth } from "~/lib/auth.server";
 import { PublicLayout } from "~/components/public-layout";
+import { TrustStrip } from "~/components/trust-strip";
+import { HeroDemo } from "~/components/hero-demo";
+import { ControlExplorer } from "~/components/control-explorer";
+import { HomeFaq } from "~/components/home-faq";
+import { StructuredData } from "~/components/structured-data";
+import {
+  softwareApplicationSchema,
+  homeFaqPageSchema,
+} from "~/lib/structured-data";
+import {
+  type BuyerRole,
+  readRoleFromCookie,
+  storeRoleCookie,
+  parseRoleFromUrl,
+} from "~/lib/buyer-role";
 import type { Route } from "./+types/home";
+
+/**
+ * Final CTA microcopy per inferred buyer role (spec §11 buyer-role
+ * segmentation — scaffold only; behavioural gating is intentionally NOT
+ * applied). The CTA target stays identical across variants — we are
+ * segmenting the *tone of conversation*, not paywalled features.
+ *
+ * Honesty rule (spec §10.1): the role is inferred from `?role=` URL
+ * params on landing pages from email campaigns. We do NOT silently
+ * classify visitors from referrers; the default role for an unannotated
+ * visit is `"unknown"`.
+ */
+const FINAL_CTA_BY_ROLE: Record<BuyerRole, { eyebrow: string; headlineTail: string; sub: string }> = {
+  cto: {
+    eyebrow: "For engineering leaders",
+    headlineTail: "your biggest audit delay?",
+    sub: "Replace manual evidence gathering with a CI-friendly pipeline that maps your AWS, GitHub, and Vercel activity to SOC 2 controls automatically.",
+  },
+  security: {
+    eyebrow: "For security leads",
+    headlineTail: "your continuous control map?",
+    sub: "Run a Spire-self-style audit on your own stack. Live evidence, no scramble before the next audit window.",
+  },
+  revops: {
+    eyebrow: "For revenue operations",
+    headlineTail: "your deal-velocity blocker?",
+    sub: "Stop letting security reviews stall procurement. Auto-filled questionnaires in hours, not weeks — wired directly into the deal cycle.",
+  },
+  unknown: {
+    eyebrow: "Ready when you are",
+    headlineTail: "to compliance delays?",
+    sub: "See how much of your SOC 2 and security questionnaire workload can be automated.",
+  },
+};
 
 export function meta() {
   return [
@@ -17,7 +67,22 @@ export function meta() {
 
 export async function loader({ request }: Route.LoaderArgs) {
   const session = await auth.api.getSession({ headers: request.headers });
-  return { loggedIn: !!session };
+  // SSR-side role resolution (spec §11 buyer-role): read the cookie only.
+  // The `?role=` URL param is honoured client-side via storeRoleCookie() so
+  // the same browser surfaces the right variant on the next non-JS render
+  // too. We deliberately do NOT trust the URL param server-side — anyone
+  // could craft it and the cookie is the durable signal.
+  const role = readRoleFromCookie(request);
+  // Also resolve the URL param once (without persisting) so a first-time
+  // visitor who landed with `?role=cto` and has JS enabled sees the
+  // variant on the SAME render — without waiting for hydration round-trip.
+  const url = new URL(request.url);
+  const urlRole = parseRoleFromUrl(url);
+  return {
+    loggedIn: !!session,
+    role,
+    initialRoleFromUrl: urlRole,
+  };
 }
 
 function Check({ className }: { className?: string }) {
@@ -28,7 +93,44 @@ function ArrowRight() {
   return <svg className="ml-1 inline-block h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 8h10m-3-4 4 4-4 4"/></svg>;
 }
 
+/**
+ * Client-only effect that promotes the URL-param `?role=` into the
+ * persisted cookie + localStorage. Strictly post-hydration so SSR HTML
+ * and the first client render stay byte-identical (no mismatch).
+ *
+ * React 19 StrictMode intentionally double-invokes effects in dev. The
+ * `persistedRef` ref below ensures we only WRITE the cookie once per
+ * mount, not twice — the cookie write itself is idempotent so a double
+ * write is harmless, but we keep the count to one for log cleanliness.
+ */
 export default function Home({ loaderData }: Route.ComponentProps) {
+  // SSR + first client render: role is the cookie-derived value ONLY.
+  // The URL `?role=` does NOT influence this render — that's what keeps
+  // hydration safe. After hydration completes (post-paint), the effect
+  // below updates `displayedRole` if a URL param was provided.
+  const cookieRole = loaderData.role;
+  const urlRole = loaderData.initialRoleFromUrl;
+  const effectiveRole = cookieRole;
+
+  const [persistedRoleOnce, setPersistedRoleOnce] = useState(false);
+  useEffect(() => {
+    if (persistedRoleOnce) return;
+    if (urlRole === "unknown") {
+      setPersistedRoleOnce(true);
+      return;
+    }
+    if (urlRole === cookieRole) {
+      setPersistedRoleOnce(true);
+      return;
+    }
+    try {
+      storeRoleCookie(urlRole);
+    } catch {
+      /* ignore — cookie write rejected (CSP, private mode, etc.) */
+    }
+    setPersistedRoleOnce(true);
+  }, [persistedRoleOnce, urlRole, cookieRole]);
+
   if (loaderData.loggedIn) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#0A0A0C]">
@@ -43,61 +145,49 @@ export default function Home({ loaderData }: Route.ComponentProps) {
     );
   }
 
+  const cta = FINAL_CTA_BY_ROLE[effectiveRole];
+
   return (
     <PublicLayout>
 
-      {/* HERO */}
-      <section className="mx-auto max-w-5xl px-6 pt-24 pb-16 text-center">
-        <h1 className="animate-fade-up text-5xl font-extrabold leading-[1.08] tracking-tight md:text-6xl lg:text-7xl">
-          Stop losing enterprise deals<br />
-          <span className="text-[#00D4AA]">to SOC 2, AI Act, and security questionnaires</span>
-        </h1>
-        <p className="animate-fade-up animate-fade-up-1 mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-[#8B8B93]">
-          We connect to your AWS, GitHub, Google Workspace, Vercel, Cloudflare, Clerk, Supabase, Stripe, and Resend — then automatically collect
-          audit-ready evidence and fill security questionnaires in hours instead of weeks.
-        </p>
+      {/* JSON-LD: SoftwareApplication + FAQPage (5-question spec subset) */}
+      <StructuredData
+        schemas={[softwareApplicationSchema(), homeFaqPageSchema()]}
+      />
 
-        {/* CTAs */}
-        <div className="animate-fade-up animate-fade-up-2 mt-10 flex items-center justify-center gap-4">
-          <Link
-            to="/dashboard/questionnaires/upload"
-            className="rounded-lg bg-[#00D4AA] px-6 py-3 font-semibold text-black hover:bg-[#00B894] transition-colors"
-          >
-            Upload a questionnaire <ArrowRight />
-          </Link>
-        </div>
-
-        {/* Integration badges */}
-        <div className="animate-fade-up animate-fade-up-3 mt-12 flex items-center justify-center gap-3 text-sm text-[#5C5C66]">
-          <span className="flex items-center gap-1.5 rounded-full border border-[#1C1C24] px-3.5 py-1.5 text-[#8B8B93]">
-            <span className="h-2 w-2 rounded-full bg-[#00D4AA]" />AWS
-          </span>
-          <span className="flex items-center gap-1.5 rounded-full border border-[#1C1C24] px-3.5 py-1.5 text-[#8B8B93]">
-            <span className="h-2 w-2 rounded-full bg-[#00D4AA]" />GitHub
-          </span>
-          <span className="flex items-center gap-1.5 rounded-full border border-[#1C1C24] px-3.5 py-1.5 text-[#8B8B93]">
-            <span className="h-2 w-2 rounded-full bg-[#00D4AA]" />Google Workspace
-          </span>
-        </div>
-
-        {/* Subtext */}
-        <p className="animate-fade-up animate-fade-up-3 mt-8 text-sm text-[#5C5C66]">
-          Built for B2B SaaS teams preparing for SOC 2 or selling into enterprise.
-        </p>
-      </section>
-
-      {/* SOCIAL PROOF */}
-      <section className="border-y border-[#1C1C24] bg-[#111116]/50 py-10">
-        <div className="mx-auto max-w-4xl px-6 text-center">
-          <p className="text-sm font-medium uppercase tracking-widest text-[#5C5C66]">Trusted by teams shipping to enterprise</p>
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-x-10 gap-y-3 text-sm text-[#5C5C66]">
-            <span className="text-[#8B8B93]">Series A–C SaaS</span>
-            <span className="text-[#8B8B93]">Fast-growing AI startups</span>
-            <span className="text-[#8B8B93]">SOC 2 candidates</span>
-            <span className="text-[#8B8B93]">ISO 27001 teams</span>
+      {/* HERO — §4.2: headline + subhead + CTA on left, animated demo on right at md+, stacked on mobile */}
+      <section className="mx-auto max-w-6xl px-6 pt-24 pb-16">
+        <div className="grid items-center gap-12 md:grid-cols-2 md:gap-10">
+          <div className="text-center md:text-left">
+            <h1 className="text-5xl font-extrabold leading-[1.08] tracking-tight md:text-6xl lg:text-7xl">
+              Stop losing enterprise deals<br />
+              <span className="text-[#00D4AA]">to SOC 2, AI Act, and security questionnaires</span>
+            </h1>
+            <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-[#8B8B93] md:mx-0">
+              Spire connects to your AWS, GitHub, Google Workspace, Vercel, Cloudflare, Clerk, Supabase,
+              Stripe, and Resend via Composio. We collect audit-ready evidence 24/7 and auto-fill enterprise
+              security questionnaires — typically in hours, not weeks.
+            </p>
+            <div className="mt-10 flex flex-wrap items-center justify-center gap-4 md:justify-start">
+              <Link
+                to="/dashboard/questionnaires/upload"
+                className="rounded-lg bg-[#00D4AA] px-6 py-3 font-semibold text-black hover:bg-[#00B894] transition-colors"
+              >
+                Upload a questionnaire <ArrowRight />
+              </Link>
+            </div>
+            <p className="mt-9 text-[10px] font-semibold uppercase tracking-[0.15em] text-[#5C5C66]">
+              AWS · GitHub · Google Workspace · Vercel · Cloudflare · +4 more
+            </p>
+          </div>
+          <div className="w-full">
+            <HeroDemo />
           </div>
         </div>
       </section>
+
+      {/* TRUST STRIP — 9 integration names + 4 listing-program badges (see home-overhaul-spec.md §4.3 + §16) */}
+      <TrustStrip />
 
       {/* PROBLEM */}
       <section className="mx-auto max-w-5xl px-6 py-24">
@@ -144,89 +234,50 @@ export default function Home({ loaderData }: Route.ComponentProps) {
         </div>
       </section>
 
-      {/* PRODUCT */}
-      <section className="mx-auto max-w-6xl px-6 py-24">
-        <span className="text-xs font-semibold uppercase tracking-[0.15em] text-[#00D4AA]">What it does</span>
+      {/* TRUST MARK — §4.5: thin band, 3 shield+text items between THE SHIFT and CONTROL EXPLORER */}
+      <section aria-label="Trust mark" className="mx-auto max-w-5xl px-6 py-10">
+        <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 text-sm text-[#8B8B93]">
+          <div className="flex items-center gap-2">
+            <svg className="h-4 w-4 text-[#00D4AA]" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true">
+              <path d="M8 1.5l5 2v4c0 3-2 5.5-5 6.5-3-1-5-3.5-5-6.5v-4l5-2z" strokeLinejoin="round" />
+              <path d="M5.5 8l2 2 3.5-3.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            <span>Read-only integrations</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <svg className="h-4 w-4 text-[#00D4AA]" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true">
+              <path d="M2.5 7V5a5.5 5.5 0 0 1 11 0v2" strokeLinecap="round" />
+              <rect x="2.5" y="7" width="11" height="7" rx="1.5" />
+              <circle cx="8" cy="10.5" r="1.25" fill="currentColor" stroke="none" />
+            </svg>
+            <span>AES-256 at rest, TLS 1.3 in transit</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <svg className="h-4 w-4 text-[#00D4AA]" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true">
+              <circle cx="7" cy="7" r="4.5" />
+              <path d="M10.5 10.5L14 14" strokeLinecap="round" />
+              <path d="M5 7h4M7 5v4" strokeLinecap="round" />
+            </svg>
+            <span>Full audit trail on every evidence item</span>
+          </div>
+        </div>
+      </section>
+
+      {/* CONTROL EXPLORER — §4.6: replaces the previous 4 PRODUCT cards with a tabbed, filterable control explorer */}
+      <section id="control-explorer" className="mx-auto max-w-6xl px-6 py-24">
+        <span className="text-xs font-semibold uppercase tracking-[0.15em] text-[#00D4AA]">What it covers</span>
         <h2 className="mt-3 text-4xl font-bold tracking-tight md:text-5xl">
-          Spire connects to your stack<br />
-          <span className="text-[#00D4AA]">and does the work for you</span>
+          Mapped to the controls<br />
+          <span className="text-[#00D4AA]">your auditor actually checks</span>
         </h2>
+        <p className="mt-4 max-w-3xl text-lg text-[#8B8B93]">
+          Pick a framework tab and an integration to see which controls Spire currently
+          collects evidence for. Click any row to expand the integrations and the
+          exact evidence name.
+        </p>
 
-        <div className="mt-14 grid gap-6 md:grid-cols-2">
-          {/* Card 1 */}
-          <div className="rounded-xl border border-[#1C1C24] bg-[#111116] p-8">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#00D4AA]/10 text-[#00D4AA] text-sm font-bold">01</div>
-            <h3 className="mt-5 text-xl font-bold">Continuous evidence collection</h3>
-            <ul className="mt-4 space-y-3">
-              {[
-                ["AWS / GitHub", "infra, code, access controls"],
-                ["Google / Vercel", "workspace audit, deployments"],
-                ["Cloudflare / Clerk", "WAF, SSL, MFA, sessions"],
-                ["Stripe / Supabase / Resend", "PCI, RLS, encryption — 9 total"],
-              ].map(([label, desc]) => (
-                <li key={label} className="flex items-start gap-3 text-sm text-[#8B8B93]">
-                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#00D4AA]" />
-                  <span><strong className="text-[#B0B0B8]">{label}</strong> — {desc}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Card 2 */}
-          <div className="rounded-xl border border-[#1C1C24] bg-[#111116] p-8">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#00D4AA]/10 text-[#00D4AA] text-sm font-bold">02</div>
-            <h3 className="mt-5 text-xl font-bold">Always-on compliance (SOC 2 + AI Act)</h3>
-            <ul className="mt-4 space-y-3">
-              {[
-                "Maps your live systems to SOC 2 controls and EU AI Act requirements",
-                "Identifies missing evidence with AI-powered gap analysis",
-                "Continuously updated via Composio — no quarterly manual reviews",
-              ].map((text) => (
-                <li key={text} className="flex items-start gap-3 text-sm text-[#8B8B93]">
-                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#00D4AA]" />
-                  <span>{text}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Card 3 */}
-          <div className="rounded-xl border border-[#1C1C24] bg-[#111116] p-8">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#00D4AA]/10 text-[#00D4AA] text-sm font-bold">03</div>
-            <h3 className="mt-5 text-xl font-bold">Security questionnaire autopilot</h3>
-            <ul className="mt-4 space-y-3">
-              {[
-                "Upload any vendor questionnaire (text, CSV, markdown, or PDF)",
-                "AI auto-fills answers using your live evidence — confidence scored per question",
-                "Attaches supporting evidence to every answer",
-                "Flags only uncertain answers for human review",
-              ].map((text) => (
-                <li key={text} className="flex items-start gap-3 text-sm text-[#8B8B93]">
-                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#00D4AA]" />
-                  <span>{text}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Card 4 */}
-          <div className="rounded-xl border border-[#1C1C24] bg-[#111116] p-8">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#00D4AA]/10 text-[#00D4AA] text-sm font-bold">04</div>
-            <h3 className="mt-5 text-xl font-bold">Audit-ready export</h3>
-            <ul className="mt-4 space-y-3">
-              {[
-                "Generate SOC 2 and AI Act compliance evidence packs in one click",
-                "Timestamped, structured evidence bundle",
-                "Share with auditors, prospects, or procurement",
-                "No more digging through Slack for audit evidence",
-              ].map((text) => (
-                <li key={text} className="flex items-start gap-3 text-sm text-[#8B8B93]">
-                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#00D4AA]" />
-                  <span>{text}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
+        <div className="mt-10">
+          <ControlExplorer />
         </div>
       </section>
 
@@ -314,14 +365,37 @@ export default function Home({ loaderData }: Route.ComponentProps) {
         </div>
       </section>
 
-      {/* FINAL CTA */}
+      {/* INLINE MICRO-FAQ — §4.8: 5 questions, motion-driven accordion, "See all FAQs → /faq" link */}
+      <section className="mx-auto max-w-6xl px-6 py-24">
+        <div className="mx-auto max-w-3xl text-center">
+          <span className="text-xs font-semibold uppercase tracking-[0.15em] text-[#00D4AA]">
+            FAQ
+          </span>
+          <h2 className="mt-3 text-4xl font-bold tracking-tight md:text-5xl">
+            Top questions,<br />
+            <span className="text-[#00D4AA]">answered upfront</span>
+          </h2>
+          <p className="mt-4 text-base text-[#8B8B93]">
+            Five things buyers ask before signing up. Pulled verbatim from our full FAQ.
+          </p>
+        </div>
+        <div className="mt-10">
+          <HomeFaq />
+        </div>
+      </section>
+
+      {/* FINAL CTA — microcopy variant from spec §11 buyer-role, hidden
+          until effectiveRole resolves (cookie or URL `?role=` param). */}
       <section className="mx-auto max-w-4xl px-6 py-24 text-center">
-        <h2 className="text-4xl font-bold tracking-tight md:text-5xl">
+        <span className="text-xs font-semibold uppercase tracking-[0.15em] text-[#8B8B93]">
+          {cta.eyebrow}
+        </span>
+        <h2 className="mt-3 text-4xl font-bold tracking-tight md:text-5xl">
           Ready to stop losing deals<br />
-          <span className="text-[#00D4AA]">to compliance delays?</span>
+          <span className="text-[#00D4AA]">{cta.headlineTail}</span>
         </h2>
         <p className="mx-auto mt-4 max-w-xl text-lg text-[#8B8B93]">
-          See how much of your SOC 2 and security questionnaire workload can be automated.
+          {cta.sub}
         </p>
         <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
           <Link
@@ -332,10 +406,9 @@ export default function Home({ loaderData }: Route.ComponentProps) {
           </Link>
         </div>
 
-        {/* Urgency */}
-        <div className="mx-auto mt-16 max-w-xl rounded-xl border border-[#F59E0B]/20 bg-[#F59E0B]/5 p-6 text-left">
-          <p className="text-sm font-medium text-[#F59E0B]">Teams typically see ROI within the first security review.</p>
-          <p className="mt-2 text-sm text-[#8B8B93]">
+        {/* Trimmed per §4.7: one sentence + neutral #1C1C24 surfaces (no F59E0B warning-yellow). */}
+        <div className="mx-auto mt-16 max-w-xl rounded-xl border border-[#1C1C24] bg-[#1C1C24] p-6 text-left">
+          <p className="text-sm leading-relaxed text-[#8B8B93]">
             If you're preparing for SOC 2, responding to enterprise security reviews, or closing B2B
             deals slowed by procurement — this is exactly where automation pays for itself immediately.
           </p>

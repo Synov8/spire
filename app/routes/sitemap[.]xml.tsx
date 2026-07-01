@@ -8,7 +8,7 @@ export async function loader({ request }: { request: Request }) {
     { url: "/", changefreq: "monthly", priority: 1.0 },
     { url: "/features", changefreq: "monthly", priority: 0.8 },
     { url: "/pricing", changefreq: "weekly", priority: 0.9 },
-    { url: "/security", changefreq: "monthly", priority: 0.8 },
+    { url: "/trust-center", changefreq: "monthly", priority: 0.8 },
     { url: "/glossary", changefreq: "monthly", priority: 0.7 },
     { url: "/blog", changefreq: "weekly", priority: 0.9 },
     { url: "/compare/vanta", changefreq: "monthly", priority: 0.7 },

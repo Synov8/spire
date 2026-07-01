@@ -1,7 +1,12 @@
 import { Link, useParams } from "react-router";
 import { allPosts } from "content-collections";
 import { PublicLayout } from "~/components/public-layout";
-import { ArticleSchema, OrganizationSchema, FAQSchema } from "~/components/geo-schema";
+import { StructuredData } from "~/components/structured-data";
+import {
+  articleSchema,
+  faqPageSchema,
+  organizationSchema,
+} from "~/lib/structured-data";
 
 export function meta({ params }: { params: { slug: string } }) {
   const post = allPosts.find((p) => p.slug === params.slug);
@@ -53,9 +58,20 @@ export default function BlogPost() {
 
   return (
     <PublicLayout>
-      <ArticleSchema meta={{ title: post.title, description: post.description, published: post.published.toISOString?.() ?? post.published, updated: post.updated?.toISOString?.(), author: post.author, tags: post.tags, slug: post.slug, url }} />
-      <FAQSchema faq={faqItems} />
-      <OrganizationSchema />
+      <StructuredData
+        schemas={articleSchema({
+          title: post.title,
+          description: post.description,
+          published: post.published.toISOString?.() ?? post.published,
+          updated: post.updated?.toISOString?.(),
+          author: post.author,
+          tags: post.tags,
+          slug: post.slug,
+          url,
+        })}
+      />
+      <StructuredData schemas={faqPageSchema(faqItems)} />
+      <StructuredData schemas={organizationSchema()} />
 
       <article className="mx-auto max-w-6xl px-6 pt-16 pb-24">
         <Link to="/blog" className="text-sm text-[#8B8B93] hover:text-[#00D4AA] transition-colors">&larr; Back to blog</Link>

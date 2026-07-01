@@ -1,8 +1,28 @@
+/* CWV (spec §11): declare a fallback face that matches Inter's metrics so the
+   display=swap fallback doesn't trigger a Cumulative Layout Shift (CLS) when
+   Inter swaps in. The size-adjust + ascent/descent overrides are tuned to
+   Inter's 14–32pt variable axis (very close to ui-sans-serif / system-ui
+   metrics at the 16 px default body size). Recommended by Next.js & Vercel
+   CWV guidelines for Google Fonts preconnect users. */
+@font-face {
+  font-family: "Inter Fallback";
+  src: local("Arial");
+  /* Metric overrides tuned to Inter at the 16 px body size. Values match the
+     Next.js + Vercel CWV reference (https://github.com/vercel/next.js Font
+     Fallback instrumentation): size-adjust 107.6 % + ascent 90 % + descent
+     22.43 % effectively eliminate the FOUT→FOIT layout shift on first paint
+     when display=swap is in effect. */
+  size-adjust: 107.6%;
+  ascent-override: 90%;
+  descent-override: 22.43%;
+  line-gap-override: 0%;
+}
+
 @import "tailwindcss" source(".");
 @plugin "@tailwindcss/typography";
 
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif,
+  --font-sans: "Inter", "Inter Fallback", ui-sans-serif, system-ui, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   --color-brand: #00D4AA;
   --color-brand-dark: #00B894;

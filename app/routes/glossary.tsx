@@ -1,6 +1,7 @@
 import { Link } from "react-router";
 import { PublicLayout } from "~/components/public-layout";
-import { OrganizationSchema } from "~/components/geo-schema";
+import { StructuredData } from "~/components/structured-data";
+import { organizationSchema, definedTermItemListSchema } from "~/lib/structured-data";
 
 export function meta() {
   return [
@@ -41,7 +42,7 @@ const entries = [
 export default function Glossary() {
   return (
     <PublicLayout>
-      <OrganizationSchema />
+      <StructuredData schemas={[organizationSchema(), definedTermItemListSchema(entries)]} />
 
       <section className="mx-auto max-w-4xl px-6 pt-16 pb-24">
         <span className="text-xs font-semibold uppercase tracking-[0.15em] text-[#00D4AA]">Glossary</span>
@@ -57,18 +58,7 @@ export default function Glossary() {
           ))}
         </dl>
 
-        <script type="application/ld+json" dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "ItemList",
-            itemListElement: entries.map((e, i) => ({
-              "@type": "DefinedTerm",
-              position: i + 1,
-              name: e.term,
-              description: e.definition,
-            })),
-          }),
-        }} />
+
       </section>
 
     </PublicLayout>

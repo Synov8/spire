@@ -1,7 +1,8 @@
 import { Link } from "react-router";
 import { allPosts } from "content-collections";
 import { PublicLayout } from "~/components/public-layout";
-import { OrganizationSchema } from "~/components/geo-schema";
+import { StructuredData } from "~/components/structured-data";
+import { organizationSchema } from "~/lib/structured-data";
 
 export function meta() {
   return [
@@ -22,7 +23,7 @@ export default function BlogIndex() {
 
   return (
     <PublicLayout>
-      <OrganizationSchema />
+      <StructuredData schemas={organizationSchema()} />
 
       <section className="mx-auto max-w-7xl px-4 sm:px-6 pt-16 sm:pt-20 pb-24">
         <div className="text-center">

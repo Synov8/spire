@@ -11,7 +11,7 @@ export function loader({ request }: { request: Request }) {
     `- ${domain}/ - Home`,
     `- ${domain}/features - Features`,
     `- ${domain}/pricing - Pricing`,
-    `- ${domain}/security - Security & Compliance`,
+    `- ${domain}/trust-center - Trust Center & Compliance Posture`,
     `- ${domain}/glossary - Compliance Glossary`,
     "",
     "## Blog (SOC 2, EU AI Act, compliance automation)",
