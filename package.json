@@ -10,6 +10,8 @@
     "self-audit": "tsx scripts/self-audit.ts",
     "deploy": "npm run build && wrangler deploy",
     "preview": "npm run build && vite preview",
+    "trigger:dev": "trigger.dev dev",
+    "trigger:deploy": "trigger.dev deploy",
     "cf-typegen": "wrangler types",
     "postinstall": "wrangler types"
   },
@@ -25,6 +27,8 @@
     "@neondatabase/serverless": "^1.1.0",
     "@openrouter/ai-sdk-provider": "^2.10.0",
     "@tailwindcss/typography": "^0.5.20",
+    "@trigger.dev/react-hooks": "^4.5.0",
+    "@trigger.dev/sdk": "^4.5.0",
     "ai": "^6.0.214",
     "better-auth": "^1.6.22",
     "drizzle-orm": "^0.45.2",

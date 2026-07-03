@@ -1,43 +1,40 @@
 /**
- * Pure zod schema for the compliance audit structured output.
+ * Pure zod schema factory for the compliance audit structured output.
+ *
+ * Exports `buildAuditSchema(controlIds)` which generates a z.object where every
+ * control ID is a **required** key. This produces JSON Schema with a `required`
+ * array — forcing the model to produce a verdict for every single control
+ * instead of cherry-picking a handful.
+ *
+ * The summary only contains the `overallAssessment` string; all numeric counts
+ * (verified, failed, warnings, gaps) are derived from the controls object.
  *
  * Shared by:
- *   - `app/agents/compliance-agent.ts` — server-side runtime: re-exports from
- *     here and uses the schema with the webapp's webapp-scoped
- *     `generateText`/`streamText` calls. The agent's `storeAuditReport` (which
- *     writes verdicts to the `policyCheck` Drizzle table) lives in that file
- *     and imports from `~/db`.
- *   - `scripts/self-audit.ts` — CLI dogfooding script. Imports ONLY this file
- *     so the script doesn't pull Drizzle / `~/db` into its module graph at
- *     startup (which would crash before env vars are loaded).
- *
- * Keeping this file's imports zod-only is what makes the CLI portable.
+ *   - `app/agents/compliance-agent.ts` — server-side runtime
+ *   - `scripts/self-audit.ts` — CLI dogfooding script (imports ONLY this file
+ *     so the script doesn't pull Drizzle / `~/db` at startup)
  */
 
 import { z } from "zod";
 
-export const AuditReportSchema = z.object({
-  summary: z.object({
-    totalVerified: z.number().describe("Number of controls that passed verification"),
-    totalFailed: z.number().describe("Number of controls that failed"),
-    totalWarnings: z.number().describe("Number of controls that could not be fully verified"),
-    overallAssessment: z.string().describe("One-sentence summary of the compliance posture"),
-  }),
-  verdicts: z.array(
-    z.object({
-      controlId: z.string().describe("The control ID from any framework, e.g. CC6-1, A1-2, AI-3"),
-      status: z.enum(["pass", "fail", "warning"]),
-      detail: z.string().describe("What was checked, what the APIs returned, and the verdict rationale"),
-      evidenceSources: z.array(z.string()).describe("The Composio tools/APIs used to check this control"),
-    }),
-  ).describe("Results for every SOC 2 control that was verifiable via infrastructure APIs"),
-  gapsNeedingHumanInput: z.array(
-    z.object({
-      controlId: z.string().optional(),
-      description: z.string().describe("What could not be verified automatically"),
-      suggestedAction: z.string().describe("What the user should do — upload a document, configure a tool, etc."),
-    }),
-  ).describe("Controls that need the user to provide documentation or manual evidence"),
+export const ControlVerdictSchema = z.object({
+  status: z.enum(["pass", "fail", "warning", "needs-human-input"]),
+  detail: z.string().describe("What was checked and the rationale"),
+  evidenceSources: z.array(z.string()).nullable().describe("APIs/tools used to check this control"),
+  suggestedAction: z.string().nullable().describe("What the user should do to close this gap"),
 });
 
-export type AuditReport = z.infer<typeof AuditReportSchema>;
+export type ControlVerdict = z.infer<typeof ControlVerdictSchema>;
+
+export function buildAuditSchema(controlIds: string[]) {
+  const controlShape: Record<string, z.ZodTypeAny> = {};
+  for (const id of controlIds) {
+    controlShape[id] = ControlVerdictSchema;
+  }
+  return z.object({
+    summary: z.string().describe("One-sentence compliance posture summary"),
+    controls: z.object(controlShape),
+  });
+}
+
+export type AuditReport = z.infer<ReturnType<typeof buildAuditSchema>>;

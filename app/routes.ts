@@ -2,7 +2,7 @@ import { type RouteConfig, route, index } from "@react-router/dev/routes";
 
 export default [
   route("api/auth/*", "routes/api/auth.ts"),
-  route("api/audit/stream", "routes/api.audit.stream.ts"),
+  route("api/trigger-audit", "routes/api.trigger-audit.ts"),
   route("api/composio/connect", "routes/api/composio.connect.ts"),
   route("login", "routes/login.tsx"),
   route("logout", "routes/logout.tsx"),
@@ -35,5 +35,7 @@ export default [
   route("contact", "routes/contact.tsx"),
   route("privacy", "routes/privacy.tsx"),
   route("terms", "routes/terms.tsx"),
+  route("ai", "routes/ai.tsx"),
+  route("health", "routes/health.tsx"),
   index("routes/home.tsx"),
 ] satisfies RouteConfig;

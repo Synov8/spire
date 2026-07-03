@@ -38,12 +38,10 @@
  * Run: `npm run self-audit` (alias) or `npx tsx scripts/self-audit.ts`
  */
 
-import { createInterface } from "node:readline";
-import { stdin as input, stdout as output } from "node:process";
 import { readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-import { AuditReportSchema, type AuditReport } from "../app/agents/audit-schema";
+import { buildAuditSchema, type AuditReport, type ControlVerdict } from "../app/agents/audit-schema";
 import {
   CONTROLS,
   SOC2_CONTROLS,
@@ -51,8 +49,8 @@ import {
   renderPromptLine,
   type ControlSeed,
 } from "../app/data/controls";
-import { INTEGRATIONS, INTEGRATION_CATEGORIES } from "../app/lib/integration-data";
-import { generateText, stepCountIs, Output } from "ai";
+import { INTEGRATIONS } from "../app/lib/integration-data";
+import { streamText, dynamicTool } from "ai";
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import { Composio } from "@composio/core";
 import { VercelProvider } from "@composio/vercel";
@@ -94,17 +92,7 @@ function loadDotEnv(path = ".env") {
 loadDotEnv();
 
 const COMPOSIO_USER_ID = "self-audit";
-const OAUTH_TIMEOUT_MS = 90_000;
-const POLL_INTERVAL_MS = 2_500;
 const MODEL_ID = "deepseek/deepseek-v4-flash";
-
-function authConfigIdFor(slug: string): string {
-  const integ = INTEGRATIONS.find((i) => i.slug === slug);
-  const base = integ?.composioApp ?? slug;
-  return `${base}_oauth`;
-}
-
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 function banner() {
   console.log();
@@ -123,146 +111,24 @@ function requireEnv(name: string): string {
   return v;
 }
 
-function renderIntegrationMenu(): string {
-  const lines: string[] = [];
-  lines.push(paint("bold", "  Available integrations (grouped by category):"));
-  lines.push("");
-  let idx = 1;
-  type Row = { idx: number; slug: string; name: string; category: string };
-  const rows: Row[] = [];
-  for (const cat of INTEGRATION_CATEGORIES) {
-    lines.push(paint("cyan", `  ${cat.label}`));
-    for (const slug of cat.slugs) {
-      const integ = INTEGRATIONS.find((i) => i.slug === slug)!;
-      const compat = authConfigIdFor(slug);
-      const compatNote = integ.composioApp && integ.composioApp !== slug
-        ? paint("dim", ` ↦ ${compat}`)
-        : "";
-      lines.push(
-        `    ${paint("yellow", String(idx).padStart(2))}. ${integ.name.padEnd(20)} ${paint("dim", integ.description)}${compatNote}`,
-      );
-      rows.push({ idx, slug, name: integ.name, category: cat.label });
-      idx++;
-    }
-    lines.push("");
-  }
-  return lines.join("\n") + `\n  ${rows.length} integrations total.\n`;
-}
-
-function ask(question: string): Promise<string> {
-  const rl = createInterface({ input, output });
-  return new Promise((resolvePrompt) => {
-    rl.question(question, (answer) => {
-      rl.close();
-      resolvePrompt(answer);
-    });
-  });
-}
-
-async function pickIntegrations(): Promise<string[]> {
-  console.log(renderIntegrationMenu());
-  const answer = await ask(
-    paint(
-      "bold",
-      "  Which integrations do you have? (comma-separated slugs, numbers, or 'all')\n  > ",
-    ),
-  );
-  const trimmed = answer.trim().toLowerCase();
-  if (!trimmed) return [];
-  if (trimmed === "all" || trimmed === "*") return INTEGRATIONS.map((i) => i.slug);
-
-  const allByIdx = INTEGRATION_CATEGORIES.flatMap((c) => c.slugs);
-  const wantedSlugs = new Set<string>();
-  for (const tok of trimmed.split(/[,\s]+/).filter(Boolean)) {
-    if (/^\d+$/.test(tok)) {
-      const n = Number(tok);
-      if (n >= 1 && n <= allByIdx.length) wantedSlugs.add(allByIdx[n - 1]);
-    } else {
-      wantedSlugs.add(tok);
-    }
-  }
-  const valid = [...wantedSlugs].filter((s) => INTEGRATIONS.some((i) => i.slug === s));
-  const dropped = [...wantedSlugs].filter((s) => !valid.includes(s));
-  if (dropped.length) {
-    console.log(paint("dim", `  (ignored unknown slugs: ${dropped.join(", ")})`));
-  }
-  return valid;
-}
-
-async function grantOne(
-  composio: Composio,
-  slug: string,
-  label: string,
-): Promise<{ ok: boolean; reason?: string }> {
-  const authConfig = authConfigIdFor(slug);
-  console.log();
-  console.log(`  ${paint("bold", label)} → ${paint("dim", authConfig)}`);
-
-  let redirectUrl: string;
-  try {
-    const req = await composio.connectedAccounts.link(COMPOSIO_USER_ID, authConfig);
-    redirectUrl = req.redirectUrl;
-    if (!redirectUrl) {
-      return { ok: false, reason: "no redirectUrl returned" };
-    }
-  } catch (e: unknown) {
-    const msg = e instanceof Error ? e.message : String(e);
-    return { ok: false, reason: `link() failed: ${msg}` };
-  }
-
-  console.log(paint("yellow", `    ↳ Open this URL in your browser within ${Math.round(OAUTH_TIMEOUT_MS / 1000)}s:`));
-  console.log(paint("cyan", `      ${redirectUrl}`));
-  console.log(paint("dim", `    ↳ Auto-polling Composio for ACTIVE status...`));
-
-  const start = Date.now();
-  while (Date.now() - start < OAUTH_TIMEOUT_MS) {
-    await sleep(POLL_INTERVAL_MS);
-    try {
-      const list = await composio.connectedAccounts.list({
-        userIds: [COMPOSIO_USER_ID],
-        statuses: ["ACTIVE"],
-      });
-      const items = (list as { items?: Array<Record<string, unknown>> }).items ?? [];
-      const matched = items.some((it) => {
-        const candidates = [
-          it.appName,
-          (it.toolkit as { slug?: string } | undefined)?.slug,
-          it.appUniqueId,
-        ].filter(Boolean) as string[];
-        return candidates.some(
-          (c) => c === slug || c === authConfig.replace(/_oauth$/, ""),
-        );
-      });
-      if (matched) {
-        console.log(paint("green", `    ✓ Connected ${label}`));
-        return { ok: true };
-      }
-    } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : String(e);
-      console.log(paint("dim", `    · poll failed (${msg.slice(0, 60)}), retrying...`));
-    }
-  }
-  return { ok: false, reason: `timed out after ${Math.round(OAUTH_TIMEOUT_MS / 1000)}s` };
-}
-
 function synthesizeAllGapsReport(pickedSlugs: string[]): AuditReport {
   const pickedLine = pickedSlugs.length === 0
     ? "You picked no integrations from the menu."
     : `You picked ${pickedSlugs.length} slug(s) (${pickedSlugs.join(", ")}), but none completed OAuth in this run.`;
 
-  return {
-    summary: {
-      totalVerified: 0,
-      totalFailed: 0,
-      totalWarnings: 0,
-      overallAssessment: `${pickedLine} The audit ran with zero live Composio integrations so no API surface could be probed. Each of the ${CONTROLS.length} canonical controls is surfaced below as a gap requiring either an integration OAuth grant or supporting documentation upload. This is a synthesized all-gaps stub — the OpenRouter call was deliberately skipped.`,
-    },
-    verdicts: [],
-    gapsNeedingHumanInput: CONTROLS.map((c) => ({
-      controlId: c.controlId,
-      description: `${c.controlId} (${c.title}) cannot be verified automatically without an integration exposing the relevant evidence — no live integrations were available in this run.`,
+  const controls: Record<string, ControlVerdict> = {};
+  for (const c of CONTROLS) {
+    controls[c.controlId] = {
+      status: "needs-human-input",
+      detail: `${c.controlId} (${c.title}) cannot be verified automatically without an integration exposing the relevant evidence — no live integrations were available in this run.`,
+      evidenceSources: [],
       suggestedAction: gapActionFor(c),
-    })),
+    };
+  }
+
+  return {
+    summary: `${pickedLine} The audit ran with zero live Composio integrations so no API surface could be probed. Each of the ${CONTROLS.length} canonical controls is surfaced below as a gap requiring either an integration OAuth grant or supporting documentation upload. This is a synthesized all-gaps stub — the OpenRouter call was deliberately skipped.`,
+    controls,
   };
 }
 
@@ -337,6 +203,19 @@ async function runAgentWithSlugs(
     temperature: 0,
     reasoning: { effort: "xhigh" },
   });
+
+  const controlIds = CONTROLS.map((c) => c.controlId);
+  const AuditSchema = buildAuditSchema(controlIds);
+
+  const allTools = {
+    ...tools,
+    submitAuditReport: dynamicTool({
+      description: "Submit the complete SOC 2 + EU AI Act audit report.",
+      inputSchema: AuditSchema,
+      execute: async (report: any) => report,
+    }),
+  };
+
   const prompt = [
     `You are a compliance auditor for the ${COMPOSIO_USER_ID} integration roster.`,
     "",
@@ -345,6 +224,9 @@ async function runAgentWithSlugs(
     "Controls that need documentation (policies, training records, risk assessments,",
     "public AI page) should be listed as gaps needing human input.",
     "",
+    'When you have checked all controls, call "submitAuditReport" with the complete report.',
+    "Do NOT skip or summarize — every control must have a verdict.",
+    "",
     "SOC 2 controls:",
     ...SOC2_CONTROLS.map(renderPromptLine),
     "",
@@ -352,40 +234,68 @@ async function runAgentWithSlugs(
     ...AI_ACT_CONTROLS.map(renderPromptLine),
   ].join("\n");
 
-  const result = await generateText({
+  console.log(paint("dim", "  Stream open — reasoning and tool calls will appear below:"));
+  console.log();
+
+  const result = streamText({
     model,
-    tools,
-    output: Output.object({ schema: AuditReportSchema, name: "AuditReport", description: "SOC 2 + EU AI Act compliance audit results" }),
-    stopWhen: stepCountIs(50),
+    tools: allTools,
     prompt,
   });
-  const report = (result.output as AuditReport | undefined) ?? null;
-  if (!report) return null;
-  return { report, source: "agent" };
+
+  let finalReport: AuditReport | null = null;
+  for await (const part of result.fullStream) {
+    if (part.type === "reasoning-delta") {
+      process.stdout.write(paint("dim", part.text));
+    } else if (part.type === "text-delta") {
+      process.stdout.write(part.text);
+    } else if (part.type === "tool-call") {
+      console.log(paint("cyan", `\n  ⚙ ${part.toolName}(${JSON.stringify(part.input as Record<string, unknown>).slice(0, 200)})`));
+    } else if (part.type === "tool-result") {
+      if (part.toolName === "submitAuditReport") {
+        finalReport = part.output as unknown as AuditReport;
+        console.log(paint("green", `  ✓ Report received`));
+      }
+    } else if (part.type === "error") {
+      console.log(paint("red", `\n  ✗ ${part.error}`));
+    }
+  }
+  console.log();
+  console.log();
+
+  if (!finalReport) return null;
+  return { report: finalReport, source: "agent" };
 }
 
 function printReport(report: AuditReport, source: "agent" | "synthesized") {
-  const { summary, verdicts, gapsNeedingHumanInput } = report;
+  const { summary, controls } = report;
+  const entries = Object.entries(controls) as [string, ControlVerdict][];
+  const totalVerified = entries.filter(([, v]) => v.status === "pass").length;
+  const totalFailed = entries.filter(([, v]) => v.status === "fail").length;
+  const totalWarnings = entries.filter(([, v]) => v.status === "warning").length;
+  const totalGaps = entries.filter(([, v]) => v.status === "needs-human-input").length;
   console.log();
   console.log(paint("bold", "  ── Audit report ──"));
   if (source === "synthesized") {
     console.log(paint("dim", "  (synthesized all-gaps stub — OpenRouter call was skipped because no live integrations were available)"));
   }
   console.log();
-  const passedColor = summary.totalVerified >= 0 ? "green" : "red";
+  const passedColor = totalVerified >= 0 ? "green" : "red";
   console.log(`  ${paint("bold", "Summary")}`);
-  console.log(`    Passed:    ${paint(passedColor, String(summary.totalVerified))}`);
-  console.log(`    Failed:    ${paint("red", String(summary.totalFailed))}`);
-  console.log(`    Warnings:  ${paint("yellow", String(summary.totalWarnings))}`);
-  console.log(`    Verdict:   ${summary.overallAssessment}`);
+  console.log(`    Passed:    ${paint(passedColor, String(totalVerified))}`);
+  console.log(`    Failed:    ${paint("red", String(totalFailed))}`);
+  console.log(`    Warnings:  ${paint("yellow", String(totalWarnings))}`);
+  console.log(`    Gaps:      ${paint("yellow", String(totalGaps))}`);
+  console.log(`    Verdict:   ${summary}`);
   console.log();
+  const verdicts = entries.filter(([, v]) => v.status !== "needs-human-input");
   console.log(`  ${paint("bold", `Verdicts (${verdicts.length})`)}`);
-  for (const v of verdicts) {
+  for (const [id, v] of verdicts) {
     const icon =
       v.status === "pass" ? paint("green", "✓") :
       v.status === "fail" ? paint("red", "✗") :
       paint("yellow", "?");
-    const head = `    ${icon} ${paint("bold", v.controlId)} (${v.status})`;
+    const head = `    ${icon} ${paint("bold", id)} (${v.status})`;
     console.log(head);
     if (v.detail) console.log(paint("dim", `      ${v.detail}`));
     if (v.evidenceSources?.length) {
@@ -393,11 +303,12 @@ function printReport(report: AuditReport, source: "agent" | "synthesized") {
     }
   }
   console.log();
-  console.log(`  ${paint("bold", `Gaps needing human input (${gapsNeedingHumanInput.length})`)}`);
-  for (const g of gapsNeedingHumanInput) {
-    const head = `    ${paint("yellow", "?")} ${paint("bold", g.controlId ?? "general")}`;
+  const gaps = entries.filter(([, v]) => v.status === "needs-human-input");
+  console.log(`  ${paint("bold", `Gaps needing human input (${gaps.length})`)}`);
+  for (const [id, g] of gaps) {
+    const head = `    ${paint("yellow", "?")} ${paint("bold", id)}`;
     console.log(head);
-    console.log(paint("dim", `      ${g.description}`));
+    console.log(paint("dim", `      ${g.detail}`));
     if (g.suggestedAction) console.log(paint("dim", `      → ${g.suggestedAction}`));
   }
 }
@@ -431,39 +342,30 @@ async function main() {
   requireEnv("OPENROUTER_API_KEY");
 
   const composioKey = process.env.COMPOSIO_API_KEY!;
-  const slugs = await pickIntegrations();
-
   const composio = new Composio({ apiKey: composioKey });
 
-  // connectedCount is hoisted so it's in scope regardless of whether the
-  // OAuth loop ran. It is the authoritative signal for the synthesized-stub
-  // short-circuit inside runAgentWithSlugs.
+  // Auto-detect already-connected accounts
+  console.log(paint("dim", `  ↻ Checking existing connected accounts for ${COMPOSIO_USER_ID}...`));
+  let slugs: string[] = [];
   let connectedCount = 0;
-  let failedCount = 0;
-
-  if (slugs.length === 0) {
-    console.log();
-    console.log(paint("dim", "  → No integrations selected — the audit will run as a synthesized all-gaps report."));
-  } else {
-    console.log();
-    console.log(paint("bold", `  Initiating OAuth for ${slugs.length} integration(s)...`));
-    for (const slug of slugs) {
-      const integ = INTEGRATIONS.find((i) => i.slug === slug);
-      const label = integ?.name ?? slug;
-      const res = await grantOne(composio, slug, label);
-      if (res.ok) connectedCount++;
-      else {
-        failedCount++;
-        console.log(paint("red", `    ✗ Skipping ${label} — ${res.reason}`));
-      }
+  try {
+    const list = await composio.connectedAccounts.list({
+      userIds: [COMPOSIO_USER_ID],
+      statuses: ["ACTIVE"],
+    });
+    const items = (list as { items?: Array<Record<string, unknown>> }).items ?? [];
+    const appSlugs = items.map((a) => ((a.toolkit as { slug?: string } | undefined)?.slug ?? "").toLowerCase());
+    slugs = INTEGRATIONS.filter((i) => appSlugs.includes(i.slug.toLowerCase())).map((i) => i.slug);
+    connectedCount = slugs.length;
+    if (connectedCount > 0) {
+      console.log(paint("green", `  ✓ ${connectedCount} connected account(s) found: ${slugs.join(", ")}`));
+    } else {
+      console.log(paint("yellow", "  → No connected accounts found. Audit will run as an all-gaps report."));
     }
-    console.log();
-    console.log(
-      paint(
-        "bold",
-        `  OAuth complete: ${paint("green", `${connectedCount} connected`)} · ${paint("red", `${failedCount} skipped`)}`,
-      ),
-    );
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e);
+    console.log(paint("red", `  ✗ Could not list connected accounts: ${msg}`));
+    console.log(paint("yellow", "  → Falling back to all-gaps report."));
   }
 
   const result = await runAgentWithSlugs(slugs, connectedCount);

@@ -451,8 +451,3 @@ export const DASHBOARD_INTEGRATIONS: readonly DashboardIntegration[] =
 export const INTEGRATIONS_BY_SLUG: Readonly<Record<string, Integration>> = Object.freeze(
   Object.fromEntries(INTEGRATIONS.map((i) => [i.slug, i])),
 );
-
-/** Set of valid slugs, useful for prerender/404 detection. */
-export const INTEGRATION_SLUGS: ReadonlySet<string> = new Set(
-  INTEGRATIONS.map((i) => i.slug),
-);

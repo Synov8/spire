@@ -1,5 +1,8 @@
 .DS_Store
 .env
+.env.production
+.env.staging
+.env.local
 /node_modules/
 *.tsbuildinfo
 
@@ -19,3 +22,14 @@ worker-configuration.d.ts
 .trigger.content-collections
 .playwright-mcp/
 .content-collections/cache/
+.trigger
+*.tsbuildinfo
+
+# CLI artifacts
+self-audit-*.json
+composio-by-slug.json
+composio-ground-truth.json
+.trigger
+.serena/
+tasks/
+thoughts/

@@ -40,7 +40,6 @@ export const BUYER_ROLES: ReadonlyArray<BuyerRole> = [
 ] as const;
 
 const ROLE_COOKIE = "spire_role";
-const ROLE_STORAGE_KEY = "spire_role";
 /** 30-day cookie lifetime in seconds. */
 const COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 30;
 
@@ -104,10 +103,5 @@ export function storeRoleCookie(role: BuyerRole): BuyerRole {
   // flag because dev runs on http://localhost; production is HTTPS
   // but the browser will tighten anyway.
   document.cookie = `${ROLE_COOKIE}=${encodeURIComponent(safeValue)}; path=/; expires=${expires}; SameSite=Lax`;
-  try {
-    window.localStorage.setItem(ROLE_STORAGE_KEY, safeValue);
-  } catch {
-    /* private-mode / quota storage — fall back silently to cookie. */
-  }
   return safeValue;
 }

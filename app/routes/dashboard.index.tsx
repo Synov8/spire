@@ -1,5 +1,5 @@
-import { useState, type ReactNode } from "react";
-import { useLoaderData, Link, redirect } from "react-router";
+import { useState, useEffect, type ReactNode } from "react";
+import { useLoaderData, Link } from "react-router";
 import { db } from "~/db";
 import { control, policyCheck } from "~/db/schema";
 import { auth } from "~/lib/auth.server";
@@ -11,6 +11,7 @@ import { unified } from "unified";
 import remarkParse from "remark-parse";
 import remarkGfm from "remark-gfm";
 import remarkHtml from "remark-html";
+import { useRealtimeRunWithStreams } from "@trigger.dev/react-hooks";
 
 const mdToHtml = unified().use(remarkParse).use(remarkGfm).use(remarkHtml);
 
@@ -66,30 +67,29 @@ Overall: The environment is on track, but the missing and failed controls block 
 export default function DashboardHome({ loaderData }: Route.ComponentProps) {
   const { controls, total, verified, failed, warned, unchecked, summary, orgId, hasAudit } = loaderData;
   const [running, setRunning] = useState(false);
-  const [logs, setLogs] = useState<string[]>([]);
+  const [runId, setRunId] = useState<string | null>(null);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [logs, setLogs] = useState<{ type: string; data: string }[]>([]);
 
   const runAudit = async () => {
     setRunning(true);
     setLogs([]);
+    setRunId(null);
+    setAccessToken(null);
     try {
-      const res = await fetch(`/api/audit/stream?orgId=${encodeURIComponent(orgId!)}`);
-      const reader = res.body?.getReader();
-      const decoder = new TextDecoder();
-      if (!reader) return;
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        const lines = decoder.decode(value).trim().split("\n");
-        for (const line of lines) {
-          try {
-            const msg = JSON.parse(line);
-            if (msg.type === "text") setLogs((prev) => [...prev, msg.data]);
-            if (msg.type === "done") { window.location.reload(); return; }
-          } catch {}
-        }
+      const res = await fetch(`/api/trigger-audit?orgId=${encodeURIComponent(orgId!)}`);
+      if (!res.ok) {
+        setLogs((prev) => [...prev, { type: "error", data: `Server returned ${res.status}` }]);
+        setRunning(false);
+        return;
       }
-    } catch {}
-    setRunning(false);
+      const data = await res.json() as { runId: string; publicToken: string };
+      setRunId(data.runId);
+      setAccessToken(data.publicToken);
+    } catch (e: any) {
+      setLogs((prev) => [...prev, { type: "error", data: `Failed to start audit: ${e.message ?? e}` }]);
+      setRunning(false);
+    }
   };
 
   return (
@@ -111,28 +111,28 @@ export default function DashboardHome({ loaderData }: Route.ComponentProps) {
         </div>
       </div>
 
-      {/* Stat cards with icon badges */}
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard label="SOC 2 Controls" value={total} icon={<svg className="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M8 1.5l5.5 2v4c0 3.5-2.5 6-5.5 7-3-1-5.5-3.5-5.5-7v-4l5.5-2z"/></svg>} />
-        <StatCard label="Verified" value={verified} accent="green" icon={<svg className="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3.5 8.5l3 3 6-7"/></svg>} />
-        <StatCard label="Failed" value={failed} accent="red" icon={<svg className="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg>} />
-        <StatCard label="Unchecked" value={unchecked} accent="muted" icon={<svg className="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><circle cx="8" cy="8" r="6"/><path d="M8 5v3.5M8 11h.01"/></svg>} />
-      </div>
+      {runId && accessToken && (
+        <AuditStream runId={runId} accessToken={accessToken} setRunning={setRunning} />
+      )}
 
-      {running && (
+      {running && !runId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#07080A]/80 backdrop-blur-sm">
           <div className="w-full max-w-2xl rounded-2xl border border-[#1A1D1E] bg-[#0B0D0E] p-6 shadow-[0_20px_70px_-15px_rgba(0,212,170,0.15)]">
             <div className="flex items-center gap-2">
               <span className="h-2 w-2 animate-pulse rounded-full bg-[#00D4AA]" />
-              <h2 className="text-sm font-semibold text-[#00D4AA]">AI Audit in progress</h2>
+              <h2 className="text-sm font-semibold text-[#00D4AA]">Starting audit…</h2>
             </div>
             <div className="mt-4 h-64 overflow-y-auto rounded-lg border border-[#1A1D1E] bg-[#07080A] p-3 font-mono text-xs leading-relaxed text-[#8B8B93]">
-              {logs.length === 0 && <span className="animate-pulse text-[#5C5C66]">Initializing audit…</span>}
-              {logs.map((line, i) => <div key={i}>{line}</div>)}
+              {logs.map((line, i) => {
+                const style = line.type === "reasoning" ? "text-[#5C5C66]" : line.type === "tool-call" ? "text-[#00D4AA]" : line.type === "error" ? "text-[#FF4D4D]" : "text-[#8B8B93]";
+                return <div key={i} className={style}>{line.data}</div>;
+              })}
             </div>
           </div>
         </div>
       )}
+
+      <AuditStream runId={runId} accessToken={accessToken} setRunning={setRunning} />
 
       {!hasAudit && !summary && (
         <div className="rounded-2xl border border-dashed border-[#1A1D1E] bg-[#0B0D0E]/50 p-12 text-center">
@@ -202,6 +202,60 @@ function StatCard({ label, value, accent, icon }: { label: string; value: number
         {icon && <span className={`flex h-7 w-7 items-center justify-center rounded-lg ${iconBg}`}>{icon}</span>}
       </div>
       <p className={`mt-2 text-3xl font-bold ${color}`}>{value}</p>
+    </div>
+  );
+}
+
+function AuditStream({ runId, accessToken, setRunning }: { runId: string | null; accessToken: string | null; setRunning: (v: boolean) => void }) {
+  const [logs, setLogs] = useState<{ type: string; data: string }[]>([]);
+  const { run, streams, error } = useRealtimeRunWithStreams(runId ?? undefined, {
+    accessToken: accessToken ?? undefined,
+    enabled: !!runId && !!accessToken,
+  });
+
+  useEffect(() => {
+    if (!streams?.["audit-stream"]) return;
+    for (const part of streams["audit-stream"] as string[]) {
+      try {
+        const msg = JSON.parse(part);
+        if (msg.type === "text") setLogs((p) => [...p, { type: "text", data: msg.data }]);
+        else if (msg.type === "reasoning") setLogs((p) => [...p, { type: "reasoning", data: msg.data }]);
+        else if (msg.type === "tool-call") setLogs((p) => [...p, { type: "tool-call", data: `${msg.tool}(${msg.args})` }]);
+        else if (msg.type === "error") setLogs((p) => [...p, { type: "error", data: msg.data }]);
+      } catch {}
+    }
+  }, [streams]);
+
+  useEffect(() => {
+    if (error) {
+      setLogs((p) => [...p, { type: "error", data: String(error) }]);
+    }
+  }, [error]);
+
+  useEffect(() => {
+    if (run?.status === "COMPLETED" || run?.status === "FAILED") {
+      setRunning(false);
+      if (run.status === "COMPLETED") window.location.reload();
+    }
+  }, [run?.status]);
+
+  if (!runId) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#07080A]/80 backdrop-blur-sm">
+      <div className="w-full max-w-2xl rounded-2xl border border-[#1A1D1E] bg-[#0B0D0E] p-6 shadow-[0_20px_70px_-15px_rgba(0,212,170,0.15)]">
+        <div className="flex items-center gap-2">
+          <span className="h-2 w-2 animate-pulse rounded-full bg-[#00D4AA]" />
+          <h2 className="text-sm font-semibold text-[#00D4AA]">AI Audit in progress</h2>
+        </div>
+        <div className="mt-4 h-64 overflow-y-auto rounded-lg border border-[#1A1D1E] bg-[#07080A] p-3 font-mono text-xs leading-relaxed text-[#8B8B93]">
+          {logs.length === 0 && <span className="animate-pulse text-[#5C5C66]">Initializing audit…</span>}
+          {logs.map((line, i) => {
+            const style = line.type === "reasoning" ? "text-[#5C5C66]" : line.type === "tool-call" ? "text-[#00D4AA]" : line.type === "error" ? "text-[#FF4D4D]" : "text-[#8B8B93]";
+            return <div key={i} className={style}>{line.data}</div>;
+          })}
+        </div>
+      </div>
     </div>
   );
 }
