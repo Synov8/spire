@@ -64,7 +64,7 @@ export async function action({ request }: ActionFunctionArgs) {
   const apiKey = process.env.COMPOSIO_API_KEY;
   if (!apiKey) return Response.json({ error: "COMPOSIO_API_KEY not set" }, { status: 500 });
 
-  const app = (await request.formData()).get("app") as string;
+  const { app } = await request.json() as { app: string };
   if (!app) return Response.json({ error: "Missing app" }, { status: 400 });
 
   const subs = await db.select().from(subscription).where(eq(subscription.referenceId, orgId));

@@ -1,14 +1,15 @@
 import { useLoaderData } from "react-router";
 import { PublicLayout } from "~/components/public-layout";
 import { neon } from "@neondatabase/serverless";
+import { Composio } from "@composio/core";
 
 async function check(label: string, fn: () => Promise<unknown>): Promise<{ label: string; ok: boolean; detail: string }> {
   const start = Date.now();
   try {
     await fn();
     return { label, ok: true, detail: `${Date.now() - start}ms` };
-  } catch (e: any) {
-    return { label, ok: false, detail: String(e.message ?? e).slice(0, 120) };
+  } catch {
+    return { label, ok: false, detail: "unreachable" };
   }
 }
 
@@ -21,13 +22,11 @@ export async function loader() {
     }),
 
     check("Stripe API", async () => {
-      if (!process.env.STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY.startsWith("sk_test")) throw new Error("Using test key or missing");
+      if (!process.env.STRIPE_SECRET_KEY) throw new Error("missing key");
       const r = await fetch("https://api.stripe.com/v1/balance", {
         headers: { Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}` },
       });
       if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
-      const b = await r.json() as any;
-      if (!b.available) throw new Error("no balance data");
     }),
 
     check("Resend API", async () => {
@@ -48,10 +47,10 @@ export async function loader() {
 
     check("Composio API", async () => {
       if (!process.env.COMPOSIO_API_KEY) throw new Error("missing key");
-      const r = await fetch("https://backend.composio.dev/api/v1/connectedAccounts", {
-        headers: { Authorization: `Bearer ${process.env.COMPOSIO_API_KEY}` },
-      });
-      if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
+      const composio = new Composio({ apiKey: process.env.COMPOSIO_API_KEY! });
+      const list = await composio.connectedAccounts.list({ statuses: ["ACTIVE"] });
+      const items = (list as { items?: unknown }).items ?? [];
+      if (!Array.isArray(items)) throw new Error("unexpected response");
     }),
 
     check("Better Auth config", async () => {

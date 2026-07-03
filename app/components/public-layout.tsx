@@ -168,6 +168,8 @@ export function PublicFooter() {
               <Link to="/contact" className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">Contact</Link>
               <Link to="/privacy" className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">Privacy</Link>
               <Link to="/terms" className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">Terms</Link>
+              <Link to="/ai" className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">AI</Link>
+              <Link to="/health" className="block text-xs text-[#8B8B93] hover:text-[#F1F1F3] transition-colors">Health</Link>
             </div>
           </div>
         </div>
