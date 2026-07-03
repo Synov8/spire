@@ -1,6 +1,5 @@
 import { Link } from "react-router";
 import { useEffect, useState } from "react";
-import { auth } from "~/lib/auth.server";
 import { PublicLayout } from "~/components/public-layout";
 import { TrustStrip } from "~/components/trust-strip";
 import { HeroDemo } from "~/components/hero-demo";
@@ -67,7 +66,6 @@ export function meta() {
 }
 
 export async function loader({ request }: Route.LoaderArgs) {
-  const session = await auth.api.getSession({ headers: request.headers });
   // SSR-side role resolution (spec §11 buyer-role): read the cookie only.
   // The `?role=` URL param is honoured client-side via storeRoleCookie() so
   // the same browser surfaces the right variant on the next non-JS render
@@ -80,7 +78,6 @@ export async function loader({ request }: Route.LoaderArgs) {
   const url = new URL(request.url);
   const urlRole = parseRoleFromUrl(url);
   return {
-    loggedIn: !!session,
     role,
     initialRoleFromUrl: urlRole,
   };
@@ -131,20 +128,6 @@ export default function Home({ loaderData }: Route.ComponentProps) {
     }
     setPersistedRoleOnce(true);
   }, [persistedRoleOnce, urlRole, cookieRole]);
-
-  if (loaderData.loggedIn) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-[#0A0A0C]">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold text-white">Spire</h1>
-          <p className="mt-2 text-[#8B8B93]">You're signed in.</p>
-          <Link to="/dashboard" className="mt-4 inline-block rounded-lg bg-[#00D4AA] px-6 py-2.5 font-medium text-black hover:bg-[#00B894]">
-            Go to Dashboard <ArrowRight />
-          </Link>
-        </div>
-      </div>
-    );
-  }
 
   const cta = FINAL_CTA_BY_ROLE[effectiveRole];
 

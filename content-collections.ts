@@ -12,6 +12,7 @@ const posts = defineCollection({
     published: z.string(),
     updated: z.string().optional(),
     description: z.string(),
+    content: z.string(),
     author: z.string().default("Spire Team"),
     tags: z.array(z.string()).default([]),
     image: z.string().optional(),

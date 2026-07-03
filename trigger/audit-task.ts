@@ -3,11 +3,22 @@ import { streamText, dynamicTool } from "ai";
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import { Composio } from "@composio/core";
 import { VercelProvider } from "@composio/vercel";
+import { buildAuditSchema } from "../app/agents/audit-schema";
+import { neon } from "@neondatabase/serverless";
 
-// typed stream for audit progress — reasoning, text, tool calls
-export const auditStream = streams.define<string>({
-  id: "audit-stream",
-});
+export const auditStream = streams.define<string>({ id: "audit-stream" });
+
+async function storeAuditReport(orgId: string, report: any) {
+  const sql = neon(process.env.DATABASE_URL!);
+  await sql`DELETE FROM policy_check WHERE organization_id = ${orgId} AND rule_id = 'agent-audit'`;
+  for (const [controlId, v] of Object.entries(report.controls ?? {})) {
+    const status = v.status === "needs-human-input" ? "warning" : v.status;
+    await sql`
+      INSERT INTO policy_check (id, rule_id, organization_id, status, detail, needs_review, last_checked_at, created_at)
+      VALUES (${`agent-${controlId}-${Date.now()}`}, 'agent-audit', ${orgId}, ${status}, ${v.detail + (v.suggestedAction ? ` ${v.suggestedAction}` : "")}, ${status === "warning" || v.status === "needs-human-input"}, NOW(), NOW())
+    `;
+  }
+}
 
 export const runAudit = task({
   id: "run-audit",
@@ -15,8 +26,6 @@ export const runAudit = task({
     payload: {
       orgId: string;
       controls: { controlId: string; category: string; title: string; description: string }[];
-      composioKey: string;
-      openrouterKey: string;
     },
     { signal },
   ) => {
@@ -31,7 +40,6 @@ export const runAudit = task({
     const tools = await session.tools();
 
     const controlIds = payload.controls.map((c) => c.controlId);
-    const { buildAuditSchema } = await import("../app/agents/audit-schema");
     const AuditSchema = buildAuditSchema(controlIds);
 
     const allTools = {
@@ -80,7 +88,6 @@ export const runAudit = task({
     }
 
     if (finalReport) {
-      const { storeAuditReport } = await import("../app/agents/compliance-agent");
       await storeAuditReport(payload.orgId, finalReport as any);
       return { stored: true };
     }

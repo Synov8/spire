@@ -1,6 +1,14 @@
 import { useState } from "react";
-import { Link } from "react-router";
+import { Link, redirect } from "react-router";
 import { authClient } from "~/lib/auth-client";
+import { auth } from "~/lib/auth.server";
+import type { Route } from "./+types/login";
+
+export async function loader({ request }: Route.LoaderArgs) {
+  const session = await auth.api.getSession({ headers: request.headers });
+  if (session) throw redirect("/dashboard");
+  return null;
+}
 
 export default function Login() {
   const [email, setEmail] = useState("");
