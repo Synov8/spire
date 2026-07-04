@@ -1,11 +1,11 @@
-import { useState, useRef, useCallback } from "react";
+import { useState } from "react";
 import { useFetcher, redirect } from "react-router";
 import { db } from "~/db";
 import { policyCheck, control, manualEvidence } from "~/db/schema";
 import { auth } from "~/lib/auth.server";
 import { eq, and, desc, inArray, ne } from "drizzle-orm";
 import { hasActiveSubscription } from "~/lib/subscription-check";
-import { reviewEvaluate } from "~/agents/review-evaluate";
+import { batchReviewEvaluate } from "~/agents/review-evaluate";
 import { cloudflareContext } from "~/lib/cloudflare-context.server";
 import type { Route } from "./+types/dashboard.review";
 
@@ -59,43 +59,52 @@ export async function action({ request, context }: Route.ActionArgs) {
   const intent = formData.get("intent") as string;
 
   if (intent === "submit-evidence") {
-    const policyCheckId = formData.get("policyCheckId") as string;
     const content = formData.get("content") as string;
 
-    const original = await db.select().from(policyCheck).where(eq(policyCheck.id, policyCheckId)).limit(1).then((r) => r[0]);
-    if (!original) return { ok: false };
+    const allNonPass = await db.select().from(policyCheck).where(
+      and(eq(policyCheck.organizationId, orgId), ne(policyCheck.status, "pass")),
+    );
+    if (allNonPass.length === 0) return { ok: true };
 
-    let fileUrl: string | null = null;
-    let originalFilename: string | null = null;
-    let fileContent: string | null = null;
+    const cf = context.get(cloudflareContext)!;
+    let fileTexts: { name: string; content: string }[] = [];
+    const fileEntries = formData.getAll("file") as File[];
+    let fileUrls: string[] = [];
+    let fileNames: string[] = [];
 
-    const file = formData.get("file") as File | null;
-    if (file && file.size > 0) {
-      const cf = context.get(cloudflareContext)!;
-      const key = `${orgId}/${crypto.randomUUID()}-${file.name}`;
-      await cf.env.EVIDENCE_BUCKET.put(key, await file.bytes(), {
-        httpMetadata: { contentType: file.type },
-      });
-      fileUrl = `https://evidence.${new URL(request.url).hostname}/${key}`;
-      originalFilename = file.name;
-      try { fileContent = await file.text(); } catch { /* binary file */ }
+    for (const file of fileEntries) {
+      if (file.size > 0) {
+        const key = `${orgId}/${crypto.randomUUID()}-${file.name}`;
+        await cf.env.EVIDENCE_BUCKET.put(key, await file.bytes(), {
+          httpMetadata: { contentType: file.type },
+        });
+        fileUrls.push(`https://evidence.${new URL(request.url).hostname}/${key}`);
+        fileNames.push(file.name);
+        try { fileTexts.push({ name: file.name, content: await file.text() }); } catch { /* binary */ }
+      }
     }
 
-    const result = await reviewEvaluate(orgId, original.ruleId, content, fileContent, originalFilename);
+    const combinedFileContent = fileTexts.map((f) => `--- ${f.name} ---\n${f.content}`).join("\n\n");
+    const combinedFilename = fileNames.join(", ");
+    const controlIds = allNonPass.map((c) => c.ruleId);
 
-    await db.update(policyCheck)
-      .set({ status: result.status, detail: result.detail })
-      .where(eq(policyCheck.id, policyCheckId));
+    const results = await batchReviewEvaluate(orgId, controlIds, content, combinedFileContent || null, combinedFilename || null);
+
+    for (const [ruleId, r] of Object.entries(results)) {
+      await db.update(policyCheck)
+        .set({ status: r.status, detail: r.detail })
+        .where(and(eq(policyCheck.ruleId, ruleId), eq(policyCheck.organizationId, orgId)));
+    }
 
     await db.insert(manualEvidence).values({
       id: crypto.randomUUID(),
       organizationId: orgId,
-      policyCheckId,
+      policyCheckId: allNonPass[0].id,
       category: "other",
-      title: original.ruleId,
+      title: "batch-review",
       content,
-      fileUrl,
-      originalFilename,
+      fileUrl: fileUrls.join(",") || null,
+      originalFilename: fileNames.join(",") || null,
       status: "pending",
       submittedAt: new Date(),
     });
@@ -135,7 +144,13 @@ export default function ReviewPage({ loaderData }: Route.ComponentProps) {
   const { items, submitted } = loaderData;
   const fetcher = useFetcher();
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
-  const [selectedFiles, setSelectedFiles] = useState<Record<string, File>>({});
+  const [selectedFiles, setSelectedFiles] = useState<Record<string, File[]>>({});
+  const [framework, setFramework] = useState<"soc2" | "ai-act">("soc2");
+
+  const frameworkItems = items.filter((it) => {
+    const fw = it.control?.framework;
+    return fw === framework || (!fw && framework === "soc2");
+  });
 
   return (
     <div className="space-y-6">
@@ -157,96 +172,139 @@ export default function ReviewPage({ loaderData }: Route.ComponentProps) {
           <p className="mt-1 text-xs text-[#5C5C66]">No controls need attention.</p>
         </div>
       ) : (
-        <div className="space-y-2">
-          {items.map(({ check, control: ctrl }) => {
-            const isOpen = expanded[check.id] ?? false;
-            const statusColour = check.status === "fail" ? "bg-[#EF4444]"
-              : check.status === "warning" ? "bg-[#F59E0B]"
-              : "bg-[#6A6D6E]";
+        <div>
+          <div className="mb-4 flex items-center gap-3">
+            {(["soc2", "ai-act"] as const).map((fw) => (
+              <button
+                key={fw}
+                onClick={() => setFramework(fw)}
+                className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
+                  framework === fw
+                    ? "bg-[#00D4AA]/10 text-[#00D4AA]"
+                    : "text-[#5C5C66] hover:text-[#8B8B93] hover:bg-[#141718]"
+                }`}
+              >
+                {fw === "soc2" ? "SOC 2" : "EU AI Act"}
+              </button>
+            ))}
+          </div>
 
-            return (
-              <div key={check.id} className="overflow-hidden rounded-xl border border-[#1A1D1E] bg-[#0B0D0E] transition-all duration-200 hover:border-[#1C1C24]">
-                <button onClick={() => setExpanded((prev) => ({ ...prev, [check.id]: !isOpen }))}
-                  className="flex w-full items-start gap-3 p-4 text-left">
-                  <span className={`mt-0.5 h-2 w-2 shrink-0 rounded-full ${statusColour}`} />
-                  <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      {ctrl && <span className="rounded bg-[#00D4AA]/10 px-2 py-0.5 font-mono text-xs text-[#00D4AA]">{ctrl.controlId}</span>}
-                      <span className={`rounded px-1.5 py-0.5 text-[10px] font-semibold leading-none ${
-                        check.status === "fail" ? "bg-[#EF4444]/10 text-[#EF4444]"
-                        : check.status === "warning" ? "bg-[#F59E0B]/10 text-[#F59E0B]"
-                        : "bg-[#6A6D6E]/10 text-[#6A6D6E]"
-                      }`}>
-                        {check.status}
-                      </span>
-                      <span className="text-xs font-medium text-[#F1F1F3]">{ctrl?.title || "Unknown control"}</span>
+          <div className="space-y-2">
+            {frameworkItems.map(({ check, control: ctrl }) => {
+              const isOpen = expanded[check.id] ?? false;
+              const statusColour = check.status === "fail" ? "bg-[#EF4444]"
+                : check.status === "warning" ? "bg-[#F59E0B]"
+                : "bg-[#6A6D6E]";
+              const files = selectedFiles[check.id] || [];
+
+              return (
+                <div key={check.id} className="overflow-hidden rounded-xl border border-[#1A1D1E] bg-[#0B0D0E] transition-all duration-200 hover:border-[#1C1C24]">
+                  <button onClick={() => setExpanded((prev) => ({ ...prev, [check.id]: !isOpen }))}
+                    className="flex w-full items-start gap-3 p-4 text-left">
+                    <span className={`mt-0.5 h-2 w-2 shrink-0 rounded-full ${statusColour}`} />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        {ctrl && <span className="rounded bg-[#00D4AA]/10 px-2 py-0.5 font-mono text-xs text-[#00D4AA]">{ctrl.controlId}</span>}
+                        <span className={`rounded px-1.5 py-0.5 text-[10px] font-semibold leading-none ${
+                          check.status === "fail" ? "bg-[#EF4444]/10 text-[#EF4444]"
+                          : check.status === "warning" ? "bg-[#F59E0B]/10 text-[#F59E0B]"
+                          : "bg-[#6A6D6E]/10 text-[#6A6D6E]"
+                        }`}>
+                          {check.status}
+                        </span>
+                        <span className="text-xs font-medium text-[#F1F1F3]">{ctrl?.title || "Unknown control"}</span>
+                      </div>
+                      <p className={`mt-1.5 text-sm leading-relaxed text-[#8B8B93] ${isOpen ? "" : "line-clamp-2"}`}>{check.detail}</p>
                     </div>
-                    <p className={`mt-1.5 text-sm leading-relaxed text-[#8B8B93] ${isOpen ? "" : "line-clamp-2"}`}>{check.detail}</p>
-                  </div>
-                </button>
-                {isOpen && (
-                  <div className="border-t border-[#1A1D1E] px-4 pb-4">
-                    <fetcher.Form method="POST" encType="multipart/form-data" className="mt-4 space-y-3">
-                      <input type="hidden" name="intent" value="submit-evidence" />
-                      <input type="hidden" name="policyCheckId" value={check.id} />
+                  </button>
+                  {isOpen && (
+                    <div className="border-t border-[#1A1D1E] px-4 pb-4">
+                      <fetcher.Form method="POST" encType="multipart/form-data" className="mt-4 space-y-3">
+                        <input type="hidden" name="intent" value="submit-evidence" />
+                        <input type="hidden" name="policyCheckId" value={check.id} />
 
-                      <label className="mb-1.5 block text-xs font-medium text-[#5C5C66]">Your response</label>
-                      <textarea
-                        name="content"
-                        rows={4}
-                        placeholder="Describe the evidence you have to address this finding…"
-                        className="w-full rounded-lg border border-[#1A1D1E] bg-[#07080A] px-3 py-2.5 text-sm text-[#F1F1F3] placeholder-[#5C5C66] focus:border-[#00D4AA] focus:outline-none focus:ring-1 focus:ring-[#00D4AA]/20 transition-all resize-y"
-                      />
+                        <label className="mb-1.5 block text-xs font-medium text-[#5C5C66]">Your response</label>
+                        <textarea
+                          name="content"
+                          rows={4}
+                          placeholder="Describe the evidence you have to address this finding…"
+                          className="w-full rounded-lg border border-[#1A1D1E] bg-[#07080A] px-3 py-2.5 text-sm text-[#F1F1F3] placeholder-[#5C5C66] focus:border-[#00D4AA] focus:outline-none focus:ring-1 focus:ring-[#00D4AA]/20 transition-all resize-y"
+                        />
 
-                      <div>
-                        <label className="mb-1.5 block text-xs font-medium text-[#5C5C66]">Supporting file (optional)</label>
-                        {selectedFiles[check.id] ? (
-                          <div className="flex items-center gap-2 rounded-lg border border-[#1A1D1E] bg-[#07080A] px-3 py-2">
-                            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-[#1A1D1E] text-[10px] font-semibold text-[#6A6D6E]">
-                              <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M9 1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V5l-4-4z"/><path d="M9 1v4h4"/></svg>
-                            </span>
-                            <span className="min-w-0 flex-1 truncate text-sm text-[#F1F1F3]">{selectedFiles[check.id].name}</span>
-                            {extBadge(selectedFiles[check.id].name)}
-                            <button
-                              type="button"
-                              onClick={() => setSelectedFiles((prev) => { const n = { ...prev }; delete n[check.id]; return n; })}
-                              className="shrink-0 rounded p-1 text-[#5C5C66] hover:bg-[#1A1D1E] hover:text-[#EF4444] transition-colors"
-                            >
-                              <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg>
-                            </button>
-                          </div>
-                        ) : (
-                          <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-dashed border-[#1A1D1E] bg-[#07080A] px-3 py-2.5 text-sm text-[#5C5C66] hover:border-[#00D4AA]/30 hover:text-[#8B8B93] transition-colors">
-                            <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M8 2v12M2 8h12"/></svg>
-                            Choose file…
-                            <input
-                              type="file"
-                              name="file"
-                              className="hidden"
-                              onChange={(e) => {
-                                const f = e.target.files?.[0];
-                                if (f) setSelectedFiles((prev) => ({ ...prev, [check.id]: f }));
-                              }}
-                            />
-                          </label>
-                        )}
-                      </div>
+                        <div>
+                          <label className="mb-1.5 block text-xs font-medium text-[#5C5C66]">Supporting files (optional)</label>
+                          {files.length > 0 ? (
+                            <div className="space-y-1.5">
+                              {files.map((f, i) => (
+                                <div key={`${f.name}-${i}`} className="flex items-center gap-2 rounded-lg border border-[#1A1D1E] bg-[#07080A] px-3 py-2">
+                                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-[#1A1D1E] text-[10px] font-semibold text-[#6A6D6E]">
+                                    <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M9 1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V5l-4-4z"/><path d="M9 1v4h4"/></svg>
+                                  </span>
+                                  <span className="min-w-0 flex-1 truncate text-sm text-[#F1F1F3]">{f.name}</span>
+                                  {extBadge(f.name)}
+                                  <button
+                                    type="button"
+                                    onClick={() => setSelectedFiles((prev) => ({
+                                      ...prev,
+                                      [check.id]: prev[check.id]?.filter((_, j) => j !== i) || [],
+                                    }))}
+                                    className="shrink-0 rounded p-1 text-[#5C5C66] hover:bg-[#1A1D1E] hover:text-[#EF4444] transition-colors"
+                                  >
+                                    <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg>
+                                  </button>
+                                </div>
+                              ))}
+                              <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-dashed border-[#1A1D1E] bg-[#07080A] px-3 py-2 text-sm text-[#5C5C66] hover:border-[#00D4AA]/30 hover:text-[#8B8B93] transition-colors">
+                                <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M8 2v12M2 8h12"/></svg>
+                                Add more files…
+                                <input type="file" multiple className="hidden"
+                                  onChange={(e) => {
+                                    const newFiles = Array.from(e.target.files || []);
+                                    if (newFiles.length > 0) {
+                                      setSelectedFiles((prev) => ({
+                                        ...prev,
+                                        [check.id]: [...(prev[check.id] || []), ...newFiles],
+                                      }));
+                                    }
+                                  }}
+                                />
+                              </label>
+                            </div>
+                          ) : (
+                            <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-dashed border-[#1A1D1E] bg-[#07080A] px-3 py-2.5 text-sm text-[#5C5C66] hover:border-[#00D4AA]/30 hover:text-[#8B8B93] transition-colors">
+                              <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M8 2v12M2 8h12"/></svg>
+                              Choose files…
+                              <input type="file" multiple className="hidden"
+                                onChange={(e) => {
+                                  const newFiles = Array.from(e.target.files || []);
+                                  if (newFiles.length > 0) {
+                                    setSelectedFiles((prev) => ({
+                                      ...prev,
+                                      [check.id]: newFiles,
+                                    }));
+                                  }
+                                }}
+                              />
+                            </label>
+                          )}
+                        </div>
 
-                      <div className="flex justify-end">
-                        <button
-                          type="submit"
-                          disabled={fetcher.state !== "idle"}
-                          className="rounded-lg bg-[#00D4AA] px-5 py-2 text-sm font-medium text-black hover:bg-[#00B894] transition-all duration-200 disabled:opacity-50"
-                        >
-                          {fetcher.state !== "idle" ? "Submitting…" : "Submit evidence"}
-                        </button>
-                      </div>
-                    </fetcher.Form>
-                  </div>
-                )}
-              </div>
-            );
-          })}
+                        <div className="flex justify-end">
+                          <button
+                            type="submit"
+                            disabled={fetcher.state !== "idle"}
+                            className="rounded-lg bg-[#00D4AA] px-5 py-2 text-sm font-medium text-black hover:bg-[#00B894] transition-all duration-200 disabled:opacity-50"
+                          >
+                            {fetcher.state !== "idle" ? "Re-evaluating…" : "Submit & re-evaluate all"}
+                          </button>
+                        </div>
+                      </fetcher.Form>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </div>
       )}
 
@@ -264,12 +322,8 @@ export default function ReviewPage({ loaderData }: Route.ComponentProps) {
                   <p className="text-sm text-[#F1F1F3]">{item.content}</p>
                 </div>
                 {item.fileUrl && item.originalFilename && (
-                  <a
-                    href={item.fileUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-2 flex items-center gap-2 rounded-lg border border-[#1A1D1E] bg-[#07080A] px-3 py-2 hover:border-[#00D4AA]/30 transition-colors"
-                  >
+                  <a href={item.fileUrl} target="_blank" rel="noopener noreferrer"
+                    className="mt-2 flex items-center gap-2 rounded-lg border border-[#1A1D1E] bg-[#07080A] px-3 py-2 hover:border-[#00D4AA]/30 transition-colors">
                     <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-[#1A1D1E] text-[10px] font-semibold text-[#6A6D6E]">
                       <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M9 1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V5l-4-4z"/><path d="M9 1v4h4"/></svg>
                     </span>

@@ -64,6 +64,7 @@ export default function DashboardHome({ loaderData }: Route.ComponentProps) {
   const [running, setRunning] = useState(false);
   const [auditError, setAuditError] = useState<string | null>(null);
   const [expandedControl, setExpandedControl] = useState<string | null>(null);
+  const [confirmAudit, setConfirmAudit] = useState(false);
   const [framework, setFramework] = useState<"soc2" | "ai-act">("soc2");
   // NOTE: useNavigate causes full-page reloads in some React Router v7 configs,
   // so we use window.location.href for navigation instead.
@@ -112,8 +113,8 @@ export default function DashboardHome({ loaderData }: Route.ComponentProps) {
                 View current audit
               </Link>
             )}
-            <button onClick={runAudit} disabled={running}
-              className="rounded-lg bg-[#00D4AA] px-4 py-2 text-sm font-medium text-black hover:bg-[#00B894] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_2px_12px_-2px_rgba(0,212,170,0.3)]">
+            <button onClick={() => setConfirmAudit(true)} disabled={running}
+              className="rounded-lg bg-[#00D4AA] px-4 py-2 text-sm font-medium text-black hover:bg-[#00B894] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_2px_12px_-2px rgba(0,212,170,0.3)]">
               {running ? "Auditing…" : "Run AI audit"}
             </button>
           </div>
@@ -201,6 +202,27 @@ export default function DashboardHome({ loaderData }: Route.ComponentProps) {
             })}
           </div>
         </section>
+      )}
+      {confirmAudit && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#07080A]/80 backdrop-blur-sm">
+          <div className="w-full max-w-sm rounded-2xl border border-[#1A1D1E] bg-[#0B0D0E] p-6 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.5)]">
+            <h3 className="text-sm font-semibold text-[#F1F1F3]">Run a new audit?</h3>
+            <p className="mt-2 text-xs text-[#6A6D6E] leading-relaxed">
+              This will clear all current review items and uploaded evidence files.
+              The AI will re-check every control from scratch.
+            </p>
+            <div className="mt-5 flex items-center justify-end gap-3">
+              <button onClick={() => setConfirmAudit(false)}
+                className="rounded-lg border border-[#1A1D1E] px-4 py-2 text-xs font-medium text-[#8B8B93] hover:bg-[#141718] transition-all">
+                Cancel
+              </button>
+              <button onClick={() => { setConfirmAudit(false); runAudit(); }}
+                className="rounded-lg bg-[#00D4AA] px-4 py-2 text-xs font-medium text-black hover:bg-[#00B894] transition-all">
+                Run audit
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
