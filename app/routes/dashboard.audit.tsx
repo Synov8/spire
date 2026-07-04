@@ -18,6 +18,30 @@ export async function loader({ request }: Route.LoaderArgs) {
   return { orgId, accessToken };
 }
 
+const APP_NAMES = new Set([
+  "GitHub", "Stripe", "Notion", "Cloudflare", "Neon", "Resend",
+  "Gmail", "Discord", "Slack", "Jira", "Linear", "Figma",
+  "Sentry", "Datadog", "AWS", "Vercel", "Google", "OpenAI",
+]);
+
+function highlightApps(text: string): (string | { app: string })[] {
+  const parts: (string | { app: string })[] = [];
+  const re = /(\w+)/g;
+  let last = 0, m: RegExpExecArray | null;
+  while ((m = re.exec(text)) !== null) {
+    if (m.index > last) parts.push(text.slice(last, m.index));
+    const word = m[1];
+    if (APP_NAMES.has(word)) {
+      parts.push({ app: word });
+    } else {
+      parts.push(word);
+    }
+    last = re.lastIndex;
+  }
+  if (last < text.length) parts.push(text.slice(last));
+  return parts;
+}
+
 // ─── Tool name parsing ───
 
 const APP_LABELS: Record<string, string> = {
@@ -130,7 +154,11 @@ function ToolCallCard({ card }: { card: ToolCard }) {
   return (
     <div className={`flex items-center gap-2 rounded-lg border border-[#1A1D1E] px-3 py-2 ${hasResult ? "" : "border-l-2 border-l-[#00D4AA]"}`}>
       <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${hasResult ? "bg-[#5C5C66]" : "bg-[#00D4AA] animate-pulse"}`} />
-      <p className="min-w-0 flex-1 text-xs text-[#8B8B93]">{card.action}</p>
+      <p className="min-w-0 flex-1 text-xs text-[#8B8B93]">
+        {highlightApps(card.action).map((p, i) =>
+          typeof p === "string" ? <span key={i}>{p}</span> : <span key={i} className="rounded bg-[#00D4AA]/10 px-1 py-0.5 font-mono text-[10px] font-semibold text-[#00D4AA]">{p.app}</span>
+        )}
+      </p>
     </div>
   );
 }
