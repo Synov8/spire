@@ -1,5 +1,5 @@
 import { task } from "@trigger.dev/sdk";
-import { generateText, stepCountIs, Output } from "ai";
+import { generateText, stepCountIs } from "ai";
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import { Composio } from "@composio/core";
 import { VercelProvider } from "@composio/vercel";
@@ -21,14 +21,25 @@ const ResultSchema = z.object({
 });
 
 function extractQuestions(result: any): Array<{ question: string; answer: string; confidence: number }> {
+  const raw = result.text;
+  const jsonBlock = raw.match(/```(?:json)?\s*([\s\S]*?)```/);
+  let jsonStr = jsonBlock ? jsonBlock[1] : raw.match(/\{[\s\S]*\}/)?.[0] || raw;
   try {
-    return result.output.questions;
-  } catch {
-    const raw = result.text;
-    const jsonBlock = raw.match(/```(?:json)?\s*([\s\S]*?)```/);
-    const jsonStr = jsonBlock ? jsonBlock[1] : raw.match(/\{[\s\S]*\}/)?.[0] || raw;
     const parsed = JSON.parse(jsonStr);
     return (parsed.questions || (Array.isArray(parsed) ? parsed : [parsed])).filter((q: any) => q.question);
+  } catch {
+    // Truncated JSON — try to fix by closing the array and object
+    jsonStr = jsonStr.replace(/,\s*$/, "").replace(/\[\s*$/, "[]");
+    if (!jsonStr.endsWith("]}}}}") && !jsonStr.endsWith("]}")) {
+      const lastBrace = jsonStr.lastIndexOf("{");
+      if (lastBrace > 0) jsonStr = jsonStr.slice(0, lastBrace);
+    }
+    try {
+      const parsed = JSON.parse(jsonStr + "]}");
+      return (parsed.questions || []).filter((q: any) => q.question);
+    } catch {
+      return [];
+    }
   }
 }
 
@@ -73,9 +84,9 @@ export const processQuestionnaire = task({
           `7. If no evidence covers the question, leave answer blank (empty string).`,
           `8. Confidence: 0.8+ for direct evidence, 0.4-0.7 for partial, 0 for unknown.`,
           ``,
+          `Respond ONLY with a valid JSON object: { "questions": [{ "question": "...", "answer": "...", "confidence": 0-1 }] }`,
         ].join("\n"),
-        prompt: `Parse and answer this security questionnaire by investigating the company's connected apps. Output ONLY valid JSON — no surrounding text:\n\n${rawText}`,
-        output: Output.object({ schema: ResultSchema }),
+        prompt: `Parse and answer this security questionnaire by investigating the company's connected apps. Output ONLY the JSON — no surrounding text:\n\n${rawText}`,
       });
 
       questions = extractQuestions(result);
