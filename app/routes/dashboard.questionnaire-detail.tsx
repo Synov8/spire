@@ -110,7 +110,8 @@ export default function QuestionnaireDetail({ loaderData }: Route.ComponentProps
     enabled: runEnabled,
   });
   const latestRun = runs?.[0];
-  const isProcessing = latestRun && ["PENDING", "RUNNING", "QUEUED", "WAITING"].includes(latestRun.status);
+  const runProcessing = latestRun && ["PENDING", "RUNNING", "QUEUED", "WAITING"].includes(latestRun.status);
+  const isProcessing = runProcessing || q.status === "processing";
   useEffect(() => {
     if (latestRun && latestRun.status === "COMPLETED") {
       navigate(".", { replace: true });

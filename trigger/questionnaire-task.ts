@@ -20,6 +20,18 @@ const ResultSchema = z.object({
   })),
 });
 
+function extractQuestions(result: any): Array<{ question: string; answer: string; confidence: number }> {
+  try {
+    return result.output.questions;
+  } catch {
+    const raw = result.text;
+    const jsonBlock = raw.match(/```(?:json)?\s*([\s\S]*?)```/);
+    const jsonStr = jsonBlock ? jsonBlock[1] : raw.match(/\{[\s\S]*\}/)?.[0] || raw;
+    const parsed = JSON.parse(jsonStr);
+    return (parsed.questions || (Array.isArray(parsed) ? parsed : [parsed])).filter((q: any) => q.question);
+  }
+}
+
 export const processQuestionnaire = task({
   id: "process-questionnaire",
   run: async (payload: { orgId: string; questionnaireId: string; rawText: string; verdictText: string }) => {
@@ -60,12 +72,13 @@ export const processQuestionnaire = task({
           `6. If evidence partially supports an answer, give the best short answer without hedging.`,
           `7. If no evidence covers the question, leave answer blank (empty string).`,
           `8. Confidence: 0.8+ for direct evidence, 0.4-0.7 for partial, 0 for unknown.`,
+          ``,
         ].join("\n"),
-        prompt: `Parse and answer this security questionnaire by investigating the company's connected apps:\n\n${rawText}`,
+        prompt: `Parse and answer this security questionnaire by investigating the company's connected apps. Output ONLY valid JSON — no surrounding text:\n\n${rawText}`,
         output: Output.object({ schema: ResultSchema }),
       });
 
-      questions = result.output.questions;
+      questions = extractQuestions(result);
     } catch (err) {
       console.error("Questionnaire processing failed:", err);
     }
