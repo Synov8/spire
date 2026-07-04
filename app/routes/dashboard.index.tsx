@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
 import { animate } from "motion";
-import { PDFDownloadLink } from "@react-pdf/renderer";
 import { useLoaderData, Link } from "react-router";
 import { db } from "~/db";
 import { control, policyCheck } from "~/db/schema";
@@ -66,6 +65,17 @@ export default function DashboardHome({ loaderData }: Route.ComponentProps) {
   const [running, setRunning] = useState(false);
   const [auditError, setAuditError] = useState<string | null>(null);
   const [confirmAudit, setConfirmAudit] = useState(false);
+  const [DownloadBtn, setDownloadBtn] = useState<React.ComponentType<{ reportData: typeof reportData }> | null>(null);
+  useEffect(() => { import("@react-pdf/renderer").then((mod) => {
+    const Btn = ({ reportData: rd }: { reportData: typeof reportData }) => (
+      <mod.PDFDownloadLink document={<ReportPdf orgName={rd!.orgName} date={rd!.date} frameworks={rd!.frameworks} />}
+        fileName={`spire-compliance-report-${rd!.date}.pdf`}
+        className="rounded-lg border border-[#1A1D1E] px-5 py-2.5 text-sm font-medium text-[#8B8B93] hover:border-[#00D4AA] hover:text-[#00D4AA] transition-all">
+        {({ loading }: { loading: boolean }) => (loading ? "Preparing…" : "Download report")}
+      </mod.PDFDownloadLink>
+    );
+    setDownloadBtn(() => Btn);
+  }); }, []);
   // NOTE: useNavigate causes full-page reloads in some React Router v7 configs,
   // so we use window.location.href for navigation instead.
 
@@ -130,12 +140,9 @@ export default function DashboardHome({ loaderData }: Route.ComponentProps) {
               className="rounded-lg border border-[#1A1D1E] px-5 py-2.5 text-sm font-medium text-[#8B8B93] hover:border-[#EF4444] hover:text-[#EF4444] transition-all disabled:opacity-50">
               {running ? "Auditing…" : "New audit"}
             </button>
-            {reportData && (
-              <PDFDownloadLink document={<ReportPdf orgName={reportData.orgName} date={reportData.date} frameworks={reportData.frameworks} />}
-                fileName={`spire-compliance-report-${reportData.date}.pdf`}
-                className="rounded-lg border border-[#1A1D1E] px-5 py-2.5 text-sm font-medium text-[#8B8B93] hover:border-[#00D4AA] hover:text-[#00D4AA] transition-all">
-                {({ loading }) => (loading ? "Preparing…" : "Download report")}
-              </PDFDownloadLink>
+            {reportData && DownloadBtn && <DownloadBtn reportData={reportData} />}
+            {reportData && !DownloadBtn && (
+              <span className="rounded-lg border border-[#1A1D1E] px-5 py-2.5 text-sm font-medium text-[#5C5C66]">Download report</span>
             )}
           </div>
           {auditError && (
