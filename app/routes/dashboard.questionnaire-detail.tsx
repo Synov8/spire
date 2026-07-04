@@ -42,6 +42,13 @@ export async function action({ request, params }: Route.ActionArgs) {
   if (!await hasActiveSubscription(orgId, session.user.id)) return { ok: false, error: "Subscription required" };
 
   const formData = await request.formData();
+  const intent = formData.get("intent") as string;
+
+  if (intent === "delete") {
+    await db.delete(questionnaire).where(eq(questionnaire.id, params.id));
+    return { ok: true, deleted: true };
+  }
+
   const file = formData.get("file") as File;
   if (!file) return { ok: false, error: "No file provided" };
 
@@ -77,12 +84,14 @@ export default function QuestionnaireDetail({ loaderData }: Route.ComponentProps
   if (!loaderData) return <p className="text-[#5C5C66]">Questionnaire not found.</p>;
   const { questionnaire: q, hasAudit } = loaderData;
   const fetcher = useFetcher();
-  const actionData = fetcher.data as { ok?: boolean; error?: string; questions?: QuestionItem[]; avgConfidence?: number; status?: string; questionsCount?: number } | null;
+  const actionData = fetcher.data as { ok?: boolean; error?: string; questions?: QuestionItem[]; avgConfidence?: number; status?: string; questionsCount?: number; deleted?: boolean } | null;
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [questions, setQuestions] = useState<QuestionItem[]>(
     q.questions ? (q.questions as QuestionItem[]) : []
   );
+  if (actionData?.deleted) { window.location.href = "/dashboard/questionnaires"; return null; }
+
   const [editingIdx, setEditingIdx] = useState<number | null>(null);
   const [editValue, setEditValue] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -99,6 +108,11 @@ export default function QuestionnaireDetail({ loaderData }: Route.ComponentProps
     setEditValue("");
   };
   const cancelEdit = () => { setEditingIdx(null); setEditValue(""); };
+
+  const handleDelete = async () => {
+    if (!confirm("Delete this questionnaire?")) return;
+    fetcher.submit({ intent: "delete" }, { method: "POST" });
+  };
 
   const handleExport = () => {
     const exportData = { title: q.title, status: q.status, generatedAt: new Date().toISOString(), questions: displayQuestions };
@@ -123,11 +137,17 @@ export default function QuestionnaireDetail({ loaderData }: Route.ComponentProps
           <p className="mt-1 flex items-center gap-2 text-sm text-[#6A6D6E]">
             <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 1.5"/></svg>
             {displayQuestions.length > 0 ? `${displayQuestions.length} questions` : "No questions yet"}
-            {q.createdAt && ` · Created ${new Date(q.createdAt).toLocaleDateString()}`}
+            {q.createdAt && ` · ${new Date(q.createdAt).toLocaleDateString()}`}
+            {q.originalFile && ` · ${q.originalFile}`}
           </p>
         </div>
         <div className="flex items-center gap-2">
-          {displayQuestions.length > 0 && (
+          <button onClick={handleDelete}
+            className="flex items-center gap-1.5 rounded-lg border border-[#1A1D1E] px-3.5 py-2 text-sm font-medium text-[#8B8B93] hover:border-[#EF4444]/30 hover:text-[#EF4444] transition-all">
+            <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M2 4h12M5 4V2.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 .5.5V4M4 4v9.5a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4"/></svg>
+            Delete
+          </button>
+          {q.originalFile && (
             <button onClick={handleExport}
               className="flex items-center gap-1.5 rounded-lg border border-[#1A1D1E] px-3.5 py-2 text-sm font-medium text-[#8B8B93] transition-all hover:border-[#00D4AA] hover:text-[#00D4AA]">
               <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M8 2v10M4 8l4 4 4-4M2 14h12"/></svg>
