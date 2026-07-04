@@ -1,4 +1,5 @@
-import { useLoaderData, Link, redirect } from "react-router";
+import { useEffect } from "react";
+import { useLoaderData, Link, redirect, useFetcher } from "react-router";
 import { db } from "~/db";
 import { questionnaire } from "~/db/schema";
 import { auth } from "~/lib/auth.server";
@@ -14,8 +15,24 @@ export async function loader({ request }: Route.LoaderArgs) {
   return { questionnaires: await db.select().from(questionnaire).where(eq(questionnaire.organizationId, orgId)) };
 }
 
+export async function action({ request }: Route.ActionArgs) {
+  const session = await auth.api.getSession({ headers: request.headers });
+  if (!session) return { ok: false };
+  const orgId = session.session.activeOrganizationId!;
+  const id = crypto.randomUUID();
+  await db.insert(questionnaire).values({ id, organizationId: orgId, title: "New Questionnaire", status: "draft", questions: [], createdAt: new Date() });
+  return { ok: true, id };
+}
+
 export default function Questionnaires({ loaderData }: Route.ComponentProps) {
   const { questionnaires } = loaderData;
+  const fetcher = useFetcher();
+  const createData = fetcher.data as { ok?: boolean; id?: string } | null;
+  useEffect(() => {
+    if (createData?.ok && createData.id) {
+      window.location.href = `/dashboard/questionnaires/${createData.id}`;
+    }
+  }, [createData]);
 
   const statusConfig: Record<string, { dot: string; badge: string }> = {
     completed: { dot: "bg-[#00D4AA]", badge: "bg-[#00D4AA]/10 text-[#00D4AA]" },
@@ -30,10 +47,12 @@ export default function Questionnaires({ loaderData }: Route.ComponentProps) {
           <h1 className="text-2xl font-bold tracking-tight text-[#F1F1F3]">Questionnaires</h1>
           <p className="mt-1 text-sm text-[#6A6D6E]">Upload security questionnaires and let AI auto-fill answers</p>
         </div>
-        <Link to="/dashboard/questionnaires/upload"
+        <button onClick={async () => {
+          fetcher.submit({}, { method: "POST" });
+        }} disabled={fetcher.state !== "idle"}
           className="rounded-lg bg-[#00D4AA] px-4 py-2 text-sm font-medium text-black hover:bg-[#00B894] transition-all duration-200 shadow-[0_2px_12px_-2px_rgba(0,212,170,0.3)]">
-          Upload new
-        </Link>
+          {fetcher.state !== "idle" ? "Creating…" : "New questionnaire"}
+        </button>
       </div>
 
       {questionnaires.length === 0 ? (

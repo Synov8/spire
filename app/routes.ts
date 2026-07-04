@@ -12,7 +12,6 @@ export default [
     index("routes/dashboard.index.tsx"),
     route("integrations", "routes/dashboard.integrations.tsx"),
     route("questionnaires", "routes/dashboard.questionnaires.tsx"),
-    route("questionnaires/upload", "routes/dashboard.questionnaire-upload.tsx"),
     route("questionnaires/:id", "routes/dashboard.questionnaire-detail.tsx"),
 
     route("review", "routes/dashboard.review.tsx"),
