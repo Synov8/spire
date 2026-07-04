@@ -188,10 +188,23 @@ export default function QuestionnaireDetail({ loaderData, actionData }: Route.Co
       {isProcessing && (
         <div className="rounded-xl border border-[#F59E0B]/20 bg-[#F59E0B]/[0.04] px-5 py-4">
           <div className="flex items-center gap-3">
-            <span className="h-3 w-3 animate-spin rounded-full border-2 border-[#F59E0B]/30 border-t-[#F59E0B]" />
-            <div>
-              <p className="text-sm font-medium text-[#F59E0B]">Processing questionnaire…</p>
-              <p className="text-xs text-[#6A6D6E] mt-0.5">AI is parsing and investigating your questionnaire. This page will update when complete.</p>
+            <span className="relative flex h-4 w-4">
+              <span className="absolute inset-0 animate-ping rounded-full bg-[#F59E0B]/40" />
+              <span className="relative h-4 w-4 animate-spin rounded-full border-2 border-[#F59E0B]/30 border-t-[#F59E0B]" />
+            </span>
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <p className="text-sm font-medium text-[#F59E0B]">Processing questionnaire</p>
+                <span className="flex gap-0.5">
+                  <span className="h-1 w-1 animate-bounce rounded-full bg-[#F59E0B]" style={{ animationDelay: "0ms" }} />
+                  <span className="h-1 w-1 animate-bounce rounded-full bg-[#F59E0B]" style={{ animationDelay: "150ms" }} />
+                  <span className="h-1 w-1 animate-bounce rounded-full bg-[#F59E0B]" style={{ animationDelay: "300ms" }} />
+                </span>
+              </div>
+              <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-[#1A1D1E]">
+                <div className="h-full w-1/3 animate-pulse rounded-full bg-gradient-to-r from-[#F59E0B] to-[#00D4AA]" style={{ animationDuration: "2s" }} />
+              </div>
+              <p className="mt-1.5 text-xs text-[#6A6D6E]">AI is parsing and investigating your questionnaire. Page will update when complete.</p>
             </div>
           </div>
         </div>
