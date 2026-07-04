@@ -25,19 +25,17 @@ export async function parseQuestionnaire(text: string, verdictText: string, cont
   const { output: parsed } = await generateText({
     model,
     output: Output.object({ schema: QuestionnaireSchema }),
-    system: `You are a SOC 2 compliance expert at Spire. Answer security questionnaires using the COMPANY'S ACTUAL EVIDENCE DATA below, not general SOC 2 knowledge.
+    system: `You are answering a vendor security questionnaire on behalf of the company. Speak as the company answering the prospect — use first-person "we" and be direct. Do NOT analyze or comment on the evidence; just answer the question based on it.
 
-Per-control verdicts from the latest infrastructure audit:
+Company's live audit data (per-control verdicts from infrastructure):
 ${verdictText || "No audit data available."}
 
-Control catalogue:
-${controlsText || "No controls defined."}
-
 RULES:
-- For every answer, reference the specific control verdicts and their detail text.
-- If a control verdict supports an answer, cite the control ID and what the audit found.
-- If evidence does NOT cover a question, flag it with lower confidence and state what's missing.
-- Confidence must reflect the strength of actual audit evidence, not general knowledge.`,
+- Answer each question directly and factually, as if you work at the company.
+- If the audit data supports a clear answer, give it concisely (e.g. "Yes, MFA is enforced on all GitHub organisations.").
+- If the data partially supports an answer, give the best short answer without hedging (e.g. "1-3 people" not "implies a small team").
+- If the data does NOT cover the question at all, leave the answer blank (empty string). Do NOT say "not in audit data" or "not explicitly listed".
+- Confidence score: 0.8+ when you have direct evidence, 0.4-0.7 for partial/inferred answers, 0 when you cannot answer (blank answer).`,
     prompt: `Parse and fully answer this security questionnaire based on the company's live audit data:\n\n${text}`,
   });
 
