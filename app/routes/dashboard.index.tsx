@@ -5,14 +5,12 @@ import { control, policyCheck } from "~/db/schema";
 import { auth } from "~/lib/auth.server";
 import { auth as triggerAuth, runs } from "@trigger.dev/sdk";
 import { eq } from "drizzle-orm";
-import { hasActiveSubscription } from "~/lib/subscription-check";
 import type { Route } from "./+types/dashboard.index";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const session = await auth.api.getSession({ headers: request.headers });
-  if (!session) return { controls: [], total: 0, verified: 0, failed: 0, warned: 0, unchecked: 0, orgId: "", hasAudit: false, controlStatus: {} as Record<string, string>, controlDetails: {} as Record<string, string>, activeRunId: null, summaryStats: null };
+  if (!session) return { summaryStats: null, orgId: "", hasAudit: false, activeRunId: null };
   const orgId = session.session.activeOrganizationId!;
-  // if (!await hasActiveSubscription(orgId, session.user.id)) throw redirect("/dashboard/billing");
   const allControls = await db.select().from(control);
   const verdicts = await db.select().from(policyCheck).where(eq(policyCheck.organizationId, orgId));
 
@@ -20,22 +18,9 @@ export async function loader({ request }: Route.LoaderArgs) {
   const failed = verdicts.filter((v) => v.status === "fail").length;
   const warned = verdicts.filter((v) => v.status === "warning").length;
   const unchecked = allControls.length - verdicts.length;
-
   const pct = allControls.length > 0 ? Math.round((verified / allControls.length) * 100) : 0;
   const summaryStats = verdicts.length > 0 ? { pct, verified, failed, warned, unchecked, total: allControls.length } : null;
 
-  // build a map of controlId → latest verdict status + detail
-  // ruleId is the controlId directly
-  const controlStatus: Record<string, string> = {};
-  const controlDetails: Record<string, string> = {};
-  for (const v of verdicts) {
-    if (v.ruleId) {
-      controlStatus[v.ruleId] = v.status;
-      controlDetails[v.ruleId] = v.detail || "";
-    }
-  }
-
-  // Check for active audit runs for this org
   let activeRunId: string | null = null;
   try {
     const recentRuns = await runs.list({
@@ -52,20 +37,16 @@ export async function loader({ request }: Route.LoaderArgs) {
       });
       activeRunId = `${active.id}:${token}`;
     }
-  } catch {
-    // runs.list not critical — just skip if it fails
-  }
+  } catch { /* skip */ }
 
-  return { controls: allControls, total: allControls.length, verified, failed, warned, unchecked, summaryStats, orgId, hasAudit: verdicts.length > 0, controlStatus, controlDetails, activeRunId };
+  return { summaryStats, orgId, hasAudit: verdicts.length > 0, activeRunId };
 }
 
 export default function DashboardHome({ loaderData }: Route.ComponentProps) {
-  const { controls, total, verified, failed, warned, unchecked, summaryStats, orgId, hasAudit, controlStatus, controlDetails, activeRunId } = loaderData;
+  const { summaryStats, orgId, hasAudit, activeRunId } = loaderData;
   const [running, setRunning] = useState(false);
   const [auditError, setAuditError] = useState<string | null>(null);
-  const [expandedControl, setExpandedControl] = useState<string | null>(null);
   const [confirmAudit, setConfirmAudit] = useState(false);
-  const [framework, setFramework] = useState<"soc2" | "ai-act">("soc2");
   // NOTE: useNavigate causes full-page reloads in some React Router v7 configs,
   // so we use window.location.href for navigation instead.
 
@@ -115,7 +96,7 @@ export default function DashboardHome({ loaderData }: Route.ComponentProps) {
             )}
             <button onClick={() => setConfirmAudit(true)} disabled={running}
               className="rounded-lg bg-[#00D4AA] px-4 py-2 text-sm font-medium text-black hover:bg-[#00B894] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_2px_12px_-2px rgba(0,212,170,0.3)]">
-              {running ? "Auditing…" : "Run AI audit"}
+              {running ? "Auditing…" : "New audit"}
             </button>
           </div>
         </div>
@@ -149,60 +130,6 @@ export default function DashboardHome({ loaderData }: Route.ComponentProps) {
         </div>
       )}
 
-      {hasAudit && (
-        <section>
-          <div className="mb-4 flex items-center gap-3">
-            {(["soc2", "ai-act"] as const).map((fw) => (
-              <button
-                key={fw}
-                onClick={() => setFramework(fw)}
-                className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
-                  framework === fw
-                    ? "bg-[#00D4AA]/10 text-[#00D4AA]"
-                    : "text-[#5C5C66] hover:text-[#8B8B93] hover:bg-[#141718]"
-                }`}
-              >
-                {fw === "soc2" ? "SOC 2" : "EU AI Act"}
-              </button>
-            ))}
-          </div>
-          <div className="space-y-1">
-            {controls.filter((c) => c.framework === framework).map((c) => {
-              const status = controlStatus[c.controlId] || "unchecked";
-              const isOpen = expandedControl === c.controlId;
-              const detail = controlDetails[c.controlId];
-              const dot =
-                status === "pass" ? "bg-[#00D4AA]" :
-                status === "fail" ? "bg-[#EF4444]" :
-                status === "warning" ? "bg-[#F59E0B]" :
-                "bg-[#1A1D1E]";
-              return (
-                <div key={c.id}>
-                  <button
-                    onClick={() => setExpandedControl(isOpen ? null : c.controlId)}
-                    className={`flex w-full items-center gap-2 rounded-lg border ${isOpen ? "border-[#00D4AA]/30" : "border-[#1A1D1E]"} bg-[#0B0D0E]/50 px-3 py-2 text-xs transition-all hover:border-[#1C1C24] text-left`}
-                  >
-                    <span className={`h-2 w-2 shrink-0 rounded-full ${dot}`} />
-                    <span className="font-mono text-[#5C5C66] w-16 shrink-0">{c.controlId}</span>
-                    <span className="truncate text-[#8B8B93] flex-1">{c.title}</span>
-                    <span className={`shrink-0 text-[10px] font-medium uppercase ${
-                      status === "pass" ? "text-[#00D4AA]" :
-                      status === "fail" ? "text-[#EF4444]" :
-                      status === "warning" ? "text-[#F59E0B]" :
-                      "text-[#5C5C66]"
-                    }`}>{status}</span>
-                  </button>
-                  {isOpen && detail && (
-                    <div className="mx-3 mb-1 mt-0.5 rounded-lg border border-[#1A1D1E] bg-[#07080A] px-3 py-2">
-                      <p className="text-[11px] text-[#6A6D6E] leading-relaxed">{detail}</p>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </section>
-      )}
       {confirmAudit && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#07080A]/80 backdrop-blur-sm">
           <div className="w-full max-w-sm rounded-2xl border border-[#1A1D1E] bg-[#0B0D0E] p-6 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.5)]">

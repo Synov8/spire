@@ -15,11 +15,11 @@ export async function loader({ request }: Route.LoaderArgs) {
   const orgId = session.session.activeOrganizationId!;
   if (!await hasActiveSubscription(orgId, session.user.id)) throw redirect("/dashboard/billing");
 
+  const allControls = await db.select().from(control);
   const checks = await db.select().from(policyCheck).where(
-    and(eq(policyCheck.organizationId, orgId), ne(policyCheck.status, "pass")),
+    eq(policyCheck.organizationId, orgId),
   ).orderBy(desc(policyCheck.lastCheckedAt));
 
-  const controls = await db.select().from(control);
   const submittedRows = await db.select().from(manualEvidence).where(
     eq(manualEvidence.organizationId, orgId)
   ).orderBy(desc(manualEvidence.submittedAt));
@@ -30,9 +30,19 @@ export async function loader({ request }: Route.LoaderArgs) {
     : [];
   const originalById = new Map(originals.map((o) => [o.id, o]));
 
-  const items = checks.map((check) => {
-    const ctrl = controls.find((c) => c.controlId === check.ruleId);
-    return { check, control: ctrl || null };
+  const statusByControl: Record<string, typeof checks[0]> = {};
+  for (const c of checks) {
+    if (c.ruleId) statusByControl[c.ruleId] = c;
+  }
+
+  const items = allControls.map((ctrl) => {
+    const pc = statusByControl[ctrl.controlId];
+    return {
+      control: ctrl,
+      check: pc || null,
+      status: pc?.status || "unchecked",
+      detail: pc?.detail || null,
+    };
   });
 
   const submitted = submittedRows
@@ -42,7 +52,7 @@ export async function loader({ request }: Route.LoaderArgs) {
       return {
         ...row,
         originalFinding: finding,
-        control: controls.find((c) => c.controlId === finding.ruleId) || null,
+        control: allControls.find((c) => c.controlId === finding.ruleId) || null,
       };
     });
 
@@ -60,7 +70,6 @@ export async function action({ request, context }: Route.ActionArgs) {
 
   if (intent === "submit-evidence") {
     const content = formData.get("content") as string;
-
     const allNonPass = await db.select().from(policyCheck).where(
       and(eq(policyCheck.organizationId, orgId), ne(policyCheck.status, "pass")),
     );
@@ -101,7 +110,7 @@ export async function action({ request, context }: Route.ActionArgs) {
       organizationId: orgId,
       policyCheckId: allNonPass[0].id,
       category: "other",
-      title: "batch-review",
+      title: "org-evidence",
       content,
       fileUrl: fileUrls.join(",") || null,
       originalFilename: fileNames.join(",") || null,
@@ -121,13 +130,10 @@ function extBadge(filename: string) {
     PDF: "bg-[#EF4444]/10 text-[#EF4444] border-[#EF4444]/20",
     PNG: "bg-[#3B82F6]/10 text-[#3B82F6] border-[#3B82F6]/20",
     JPG: "bg-[#3B82F6]/10 text-[#3B82F6] border-[#3B82F6]/20",
-    JPEG: "bg-[#3B82F6]/10 text-[#3B82F6] border-[#3B82F6]/20",
     GIF: "bg-[#8B5CF6]/10 text-[#8B5CF6] border-[#8B5CF6]/20",
     SVG: "bg-[#F59E0B]/10 text-[#F59E0B] border-[#F59E0B]/20",
     DOC: "bg-[#2563EB]/10 text-[#2563EB] border-[#2563EB]/20",
     DOCX: "bg-[#2563EB]/10 text-[#2563EB] border-[#2563EB]/20",
-    XLS: "bg-[#10B981]/10 text-[#10B981] border-[#10B981]/20",
-    XLSX: "bg-[#10B981]/10 text-[#10B981] border-[#10B981]/20",
     TXT: "bg-[#6A6D6E]/10 text-[#6A6D6E] border-[#6A6D6E]/20",
     CSV: "bg-[#10B981]/10 text-[#10B981] border-[#10B981]/20",
     JSON: "bg-[#F59E0B]/10 text-[#F59E0B] border-[#F59E0B]/20",
@@ -144,187 +150,141 @@ export default function ReviewPage({ loaderData }: Route.ComponentProps) {
   const { items, submitted } = loaderData;
   const fetcher = useFetcher();
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
-  const [selectedFiles, setSelectedFiles] = useState<Record<string, File[]>>({});
+  const [evidenceFiles, setEvidenceFiles] = useState<File[]>([]);
+  const [evidenceText, setEvidenceText] = useState("");
   const [framework, setFramework] = useState<"soc2" | "ai-act">("soc2");
 
-  const frameworkItems = items.filter((it) => it.control?.framework === framework);
-
+  const frameworkItems = items.filter((it) => it.control.framework === framework);
   const frameworkSubmitted = submitted.filter((s: any) => s.control?.framework === framework);
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-xl font-bold tracking-tight text-[#F1F1F3]">Review</h1>
-        <p className="mt-1 text-sm text-[#6A6D6E]">
-          {items.length > 0
-            ? `${items.length} control${items.length === 1 ? "" : "s"} need${items.length === 1 ? "s" : ""} attention`
-            : "All controls are passing"}
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-bold tracking-tight text-[#F1F1F3]">Review</h1>
+          <p className="mt-1 text-sm text-[#6A6D6E]">{items.length} controls mapped</p>
+        </div>
+        <div className="flex items-center gap-3">
+          {(["soc2", "ai-act"] as const).map((fw) => (
+            <button key={fw} onClick={() => setFramework(fw)}
+              className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
+                framework === fw ? "bg-[#00D4AA]/10 text-[#00D4AA]" : "text-[#5C5C66] hover:text-[#8B8B93]"
+              }`}
+            >{fw === "soc2" ? "SOC 2" : "EU AI Act"}</button>
+          ))}
+        </div>
       </div>
 
-      {items.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-[#1A1D1E] bg-[#0B0D0E]/50 p-12 text-center">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-[#1A1D1E] bg-[#141718]">
-            <svg className="h-6 w-6 text-[#4A4D4E]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>
+      {/* Org-level evidence section */}
+      <div className="rounded-xl border border-[#1A1D1E] bg-[#0B0D0E] p-4">
+        <h2 className="text-xs font-semibold uppercase tracking-wider text-[#5C5C66] mb-3">Submit evidence</h2>
+        <fetcher.Form method="POST" encType="multipart/form-data" className="space-y-3">
+          <input type="hidden" name="intent" value="submit-evidence" />
+          <textarea name="content" value={evidenceText} onChange={(e) => setEvidenceText(e.target.value)}
+            rows={3} placeholder="Describe the evidence you have…"
+            className="w-full rounded-lg border border-[#1A1D1E] bg-[#07080A] px-3 py-2.5 text-sm text-[#F1F1F3] placeholder-[#5C5C66] focus:border-[#00D4AA] focus:outline-none focus:ring-1 focus:ring-[#00D4AA]/20 transition-all resize-y"
+          />
+          <div>
+            {evidenceFiles.length > 0 ? (
+              <div className="space-y-1.5">
+                {evidenceFiles.map((f, i) => (
+                  <div key={`${f.name}-${i}`} className="flex items-center gap-2 rounded-lg border border-[#1A1D1E] bg-[#07080A] px-3 py-2">
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-[#1A1D1E]">
+                      <svg className="h-4 w-4 text-[#6A6D6E]" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M9 1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V5l-4-4z"/><path d="M9 1v4h4"/></svg>
+                    </span>
+                    <span className="min-w-0 flex-1 truncate text-sm text-[#F1F1F3]">{f.name}</span>
+                    {extBadge(f.name)}
+                    <button type="button" onClick={() => setEvidenceFiles((p) => p.filter((_, j) => j !== i))}
+                      className="shrink-0 rounded p-1 text-[#5C5C66] hover:bg-[#1A1D1E] hover:text-[#EF4444] transition-colors">
+                      <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg>
+                    </button>
+                  </div>
+                ))}
+                <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-dashed border-[#1A1D1E] bg-[#07080A] px-3 py-2 text-sm text-[#5C5C66] hover:border-[#00D4AA]/30 hover:text-[#8B8B93] transition-colors">
+                  <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M8 2v12M2 8h12"/></svg>
+                  Add more files…
+                  <input type="file" multiple className="hidden" onChange={(e) => {
+                    const nf = Array.from(e.target.files || []);
+                    if (nf.length > 0) setEvidenceFiles((p) => [...p, ...nf]);
+                  }} />
+                </label>
+              </div>
+            ) : (
+              <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-dashed border-[#1A1D1E] bg-[#07080A] px-3 py-2.5 text-sm text-[#5C5C66] hover:border-[#00D4AA]/30 hover:text-[#8B8B93] transition-colors">
+                <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M8 2v12M2 8h12"/></svg>
+                Choose files…
+                <input type="file" multiple className="hidden" onChange={(e) => {
+                  const nf = Array.from(e.target.files || []);
+                  if (nf.length > 0) setEvidenceFiles(nf);
+                }} />
+              </label>
+            )}
           </div>
-          <p className="mt-4 text-sm font-medium text-[#8B8B93]">All clear</p>
-          <p className="mt-1 text-xs text-[#5C5C66]">No controls need attention.</p>
-        </div>
-      ) : (
-        <div>
-          <div className="mb-4 flex items-center gap-3">
-            {(["soc2", "ai-act"] as const).map((fw) => (
-              <button
-                key={fw}
-                onClick={() => setFramework(fw)}
-                className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
-                  framework === fw
-                    ? "bg-[#00D4AA]/10 text-[#00D4AA]"
-                    : "text-[#5C5C66] hover:text-[#8B8B93] hover:bg-[#141718]"
-                }`}
-              >
-                {fw === "soc2" ? "SOC 2" : "EU AI Act"}
-              </button>
-            ))}
+          <div className="flex justify-end">
+            <button type="submit" disabled={fetcher.state !== "idle"}
+              className="rounded-lg bg-[#00D4AA] px-5 py-2 text-sm font-medium text-black hover:bg-[#00B894] transition-all duration-200 disabled:opacity-50">
+              {fetcher.state !== "idle" ? "Re-evaluating…" : "Submit & re-evaluate"}
+            </button>
           </div>
+        </fetcher.Form>
+      </div>
 
-          <div className="space-y-2">
-            {frameworkItems.map(({ check, control: ctrl }) => {
-              const isOpen = expanded[check.id] ?? false;
-              const statusColour = check.status === "fail" ? "bg-[#EF4444]"
-                : check.status === "warning" ? "bg-[#F59E0B]"
-                : "bg-[#6A6D6E]";
-              const files = selectedFiles[check.id] || [];
+      {/* Control cards — all controls */}
+      <div className="space-y-2">
+        {frameworkItems.map(({ control: ctrl, check, status, detail }) => {
+          const isOpen = expanded[ctrl.controlId] ?? false;
+          const dot = status === "pass" ? "bg-[#00D4AA]"
+            : status === "fail" ? "bg-[#EF4444]"
+            : status === "warning" ? "bg-[#F59E0B]"
+            : "bg-[#1A1D1E]";
 
-              return (
-                <div key={check.id} className="overflow-hidden rounded-xl border border-[#1A1D1E] bg-[#0B0D0E] transition-all duration-200 hover:border-[#1C1C24]">
-                  <button onClick={() => setExpanded((prev) => ({ ...prev, [check.id]: !isOpen }))}
-                    className="flex w-full items-start gap-3 p-4 text-left">
-                    <span className={`mt-0.5 h-2 w-2 shrink-0 rounded-full ${statusColour}`} />
-                    <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-center gap-2">
-                        {ctrl && <span className="rounded bg-[#00D4AA]/10 px-2 py-0.5 font-mono text-xs text-[#00D4AA]">{ctrl.controlId}</span>}
-                        <span className={`rounded px-1.5 py-0.5 text-[10px] font-semibold leading-none ${
-                          check.status === "fail" ? "bg-[#EF4444]/10 text-[#EF4444]"
-                          : check.status === "warning" ? "bg-[#F59E0B]/10 text-[#F59E0B]"
-                          : "bg-[#6A6D6E]/10 text-[#6A6D6E]"
-                        }`}>
-                          {check.status}
-                        </span>
-                        <span className="text-xs font-medium text-[#F1F1F3]">{ctrl?.title || "Unknown control"}</span>
-                      </div>
-                      <p className={`mt-1.5 text-sm leading-relaxed text-[#8B8B93] ${isOpen ? "" : "line-clamp-2"}`}>{check.detail}</p>
-                    </div>
-                  </button>
-                  {isOpen && (
-                    <div className="border-t border-[#1A1D1E] px-4 pb-4">
-                      <fetcher.Form method="POST" encType="multipart/form-data" className="mt-4 space-y-3">
-                        <input type="hidden" name="intent" value="submit-evidence" />
-                        <input type="hidden" name="policyCheckId" value={check.id} />
-
-                        <label className="mb-1.5 block text-xs font-medium text-[#5C5C66]">Your response</label>
-                        <textarea
-                          name="content"
-                          rows={4}
-                          placeholder="Describe the evidence you have to address this finding…"
-                          className="w-full rounded-lg border border-[#1A1D1E] bg-[#07080A] px-3 py-2.5 text-sm text-[#F1F1F3] placeholder-[#5C5C66] focus:border-[#00D4AA] focus:outline-none focus:ring-1 focus:ring-[#00D4AA]/20 transition-all resize-y"
-                        />
-
-                        <div>
-                          <label className="mb-1.5 block text-xs font-medium text-[#5C5C66]">Supporting files (optional)</label>
-                          {files.length > 0 ? (
-                            <div className="space-y-1.5">
-                              {files.map((f, i) => (
-                                <div key={`${f.name}-${i}`} className="flex items-center gap-2 rounded-lg border border-[#1A1D1E] bg-[#07080A] px-3 py-2">
-                                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-[#1A1D1E] text-[10px] font-semibold text-[#6A6D6E]">
-                                    <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M9 1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V5l-4-4z"/><path d="M9 1v4h4"/></svg>
-                                  </span>
-                                  <span className="min-w-0 flex-1 truncate text-sm text-[#F1F1F3]">{f.name}</span>
-                                  {extBadge(f.name)}
-                                  <button
-                                    type="button"
-                                    onClick={() => setSelectedFiles((prev) => ({
-                                      ...prev,
-                                      [check.id]: prev[check.id]?.filter((_, j) => j !== i) || [],
-                                    }))}
-                                    className="shrink-0 rounded p-1 text-[#5C5C66] hover:bg-[#1A1D1E] hover:text-[#EF4444] transition-colors"
-                                  >
-                                    <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg>
-                                  </button>
-                                </div>
-                              ))}
-                              <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-dashed border-[#1A1D1E] bg-[#07080A] px-3 py-2 text-sm text-[#5C5C66] hover:border-[#00D4AA]/30 hover:text-[#8B8B93] transition-colors">
-                                <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M8 2v12M2 8h12"/></svg>
-                                Add more files…
-                                <input type="file" multiple className="hidden"
-                                  onChange={(e) => {
-                                    const newFiles = Array.from(e.target.files || []);
-                                    if (newFiles.length > 0) {
-                                      setSelectedFiles((prev) => ({
-                                        ...prev,
-                                        [check.id]: [...(prev[check.id] || []), ...newFiles],
-                                      }));
-                                    }
-                                  }}
-                                />
-                              </label>
-                            </div>
-                          ) : (
-                            <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-dashed border-[#1A1D1E] bg-[#07080A] px-3 py-2.5 text-sm text-[#5C5C66] hover:border-[#00D4AA]/30 hover:text-[#8B8B93] transition-colors">
-                              <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M8 2v12M2 8h12"/></svg>
-                              Choose files…
-                              <input type="file" multiple className="hidden"
-                                onChange={(e) => {
-                                  const newFiles = Array.from(e.target.files || []);
-                                  if (newFiles.length > 0) {
-                                    setSelectedFiles((prev) => ({
-                                      ...prev,
-                                      [check.id]: newFiles,
-                                    }));
-                                  }
-                                }}
-                              />
-                            </label>
-                          )}
-                        </div>
-
-                        <div className="flex justify-end">
-                          <button
-                            type="submit"
-                            disabled={fetcher.state !== "idle"}
-                            className="rounded-lg bg-[#00D4AA] px-5 py-2 text-sm font-medium text-black hover:bg-[#00B894] transition-all duration-200 disabled:opacity-50"
-                          >
-                            {fetcher.state !== "idle" ? "Re-evaluating…" : "Submit & re-evaluate all"}
-                          </button>
-                        </div>
-                      </fetcher.Form>
-                    </div>
+          return (
+            <div key={ctrl.id} className="overflow-hidden rounded-xl border border-[#1A1D1E] bg-[#0B0D0E] transition-all duration-200 hover:border-[#1C1C24]">
+              <button onClick={() => setExpanded((prev) => ({ ...prev, [ctrl.controlId]: !isOpen }))}
+                className="flex w-full items-start gap-3 p-4 text-left">
+                <span className={`mt-0.5 h-2 w-2 shrink-0 rounded-full ${dot}`} />
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="rounded bg-[#00D4AA]/10 px-2 py-0.5 font-mono text-xs text-[#00D4AA]">{ctrl.controlId}</span>
+                    <span className={`rounded px-1.5 py-0.5 text-[10px] font-semibold leading-none ${
+                      status === "pass" ? "bg-[#00D4AA]/10 text-[#00D4AA]"
+                      : status === "fail" ? "bg-[#EF4444]/10 text-[#EF4444]"
+                      : status === "warning" ? "bg-[#F59E0B]/10 text-[#F59E0B]"
+                      : "bg-[#1A1D1E]/10 text-[#5C5C66]"
+                    }`}>{status}</span>
+                    <span className="text-xs font-medium text-[#F1F1F3]">{ctrl.title}</span>
+                  </div>
+                  {detail && (
+                    <p className={`mt-1.5 text-sm leading-relaxed text-[#8B8B93] ${isOpen ? "" : "line-clamp-2"}`}>{detail}</p>
                   )}
                 </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
+              </button>
+              {isOpen && detail && (
+                <div className="border-t border-[#1A1D1E] px-4 pb-4">
+                  <p className="mt-3 text-sm leading-relaxed text-[#6A6D6E]">{detail}</p>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
 
+      {/* Submitted evidence history */}
       {frameworkSubmitted.length > 0 && (
         <section>
-          <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-[#00D4AA]">Submitted ({frameworkSubmitted.length})</h2>
+          <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-[#00D4AA]">Submitted evidence ({frameworkSubmitted.length})</h2>
           <div className="space-y-2">
             {frameworkSubmitted.map((item: any) => (
               <div key={item.id} className="rounded-xl border border-[#1A1D1E] bg-[#0B0D0E] p-4">
                 <div className="flex items-center gap-2 mb-1.5">
-                  {item.control && <span className="rounded bg-[#00D4AA]/10 px-2 py-0.5 font-mono text-xs text-[#00D4AA]">{item.control.controlId}</span>}
+                  <span className="rounded bg-[#5C5C66]/10 px-2 py-0.5 font-mono text-xs text-[#5C5C66]">Evidence</span>
                 </div>
-                <p className="text-xs text-[#6A6D6E] leading-relaxed">{item.originalFinding?.detail}</p>
-                <div className="mt-2 rounded-lg border border-[#1A1D1E] bg-[#07080A] px-3 py-2">
-                  <p className="text-sm text-[#F1F1F3]">{item.content}</p>
-                </div>
+                <p className="text-xs text-[#6A6D6E] leading-relaxed">{item.content}</p>
                 {item.fileUrl && item.originalFilename && (
                   <a href={item.fileUrl} target="_blank" rel="noopener noreferrer"
                     className="mt-2 flex items-center gap-2 rounded-lg border border-[#1A1D1E] bg-[#07080A] px-3 py-2 hover:border-[#00D4AA]/30 transition-colors">
-                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-[#1A1D1E] text-[10px] font-semibold text-[#6A6D6E]">
-                      <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M9 1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V5l-4-4z"/><path d="M9 1v4h4"/></svg>
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-[#1A1D1E]">
+                      <svg className="h-4 w-4 text-[#6A6D6E]" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M9 1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V5l-4-4z"/><path d="M9 1v4h4"/></svg>
                     </span>
                     <span className="min-w-0 flex-1 truncate text-sm text-[#00D4AA] hover:underline">{item.originalFilename}</span>
                     {extBadge(item.originalFilename)}
