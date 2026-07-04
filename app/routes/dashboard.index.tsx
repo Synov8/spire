@@ -187,9 +187,10 @@ function DonutSummary({ stats }: { stats: { pct: number; verified: number; faile
   }, [arcs, circ]);
 
   return (
-    <div className="relative shrink-0">
-      <svg viewBox="6 6 88 88" className="h-56 w-56">
-        {arcs.map((a) => (
+    <div className="relative shrink-0" onMouseLeave={() => setHovered(null)}>
+      <div className="relative h-56 w-56">
+        <svg viewBox="6 6 88 88" className="h-full w-full">
+          {arcs.map((a) => (
             <circle
               id={`arc-${a.key}`}
               key={a.key}
@@ -199,13 +200,15 @@ function DonutSummary({ stats }: { stats: { pct: number; verified: number; faile
               transform={`rotate(-90 ${cx} ${cy})`}
               className="cursor-pointer transition-opacity hover:opacity-80"
               onMouseEnter={() => setHovered({ key: a.key, label: a.label, value: a.value, total: stats.total })}
-              onMouseLeave={() => setHovered(null)}
               style={{ outline: "none" }}
             />
-        ))}
-          <text x={cx} y={cy} textAnchor="middle" dominantBaseline="central" className="fill-[#F1F1F3]" style={{ fontSize: 38, fontWeight: 700 }}>{stats.pct}%</text>
-          <text x={cx} y={cy + 26} textAnchor="middle" dominantBaseline="central" className="fill-[#8B8B93]" style={{ fontSize: 13 }}>pass rate</text>
-      </svg>
+          ))}
+        </svg>
+        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+          <span className="text-4xl font-bold text-[#F1F1F3]">{stats.pct}%</span>
+          <span className="text-sm text-[#8B8B93] mt-0.5">pass rate</span>
+        </div>
+      </div>
       {hovered && (
         <div className="absolute left-1/2 top-full mt-2 -translate-x-1/2 rounded-lg border border-[#2A2D2E] bg-[#1A1D1E] px-4 py-2.5 text-sm font-medium text-[#E8E8E8] whitespace-nowrap shadow-lg">
           {hovered.label}: {hovered.value}/{hovered.total}

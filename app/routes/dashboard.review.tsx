@@ -253,78 +253,81 @@ export default function ReviewPage({ loaderData }: Route.ComponentProps) {
         ))}
       </div>
 
-      {/* Control cards — all controls */}
-      <div className="space-y-2">
-        {filteredItems.map(({ control: ctrl, check, status, detail }) => {
-          const isOpen = expanded[ctrl.controlId] ?? false;
-          const dot = status === "pass" ? "bg-[#00D4AA]"
-            : status === "fail" ? "bg-[#EF4444]"
-            : status === "warning" ? "bg-[#F59E0B]"
-            : "bg-[#1A1D1E]";
+      <div className={`grid gap-6 ${frameworkSubmitted.length > 0 ? "lg:grid-cols-2" : "lg:grid-cols-1"}`}>
+        {/* Control cards — all controls */}
+        <div className="space-y-2">
+          <h2 className="text-xs font-semibold uppercase tracking-wider text-[#5C5C66]">Controls</h2>
+          {filteredItems.map(({ control: ctrl, check, status, detail }) => {
+            const isOpen = expanded[ctrl.controlId] ?? false;
+            const dot = status === "pass" ? "bg-[#00D4AA]"
+              : status === "fail" ? "bg-[#EF4444]"
+              : status === "warning" ? "bg-[#F59E0B]"
+              : "bg-[#1A1D1E]";
 
-          return (
-            <div key={ctrl.id} className="overflow-hidden rounded-xl border border-[#1A1D1E] bg-[#0B0D0E] transition-all duration-200 hover:border-[#1C1C24]">
-              <button onClick={() => setExpanded((prev) => ({ ...prev, [ctrl.controlId]: !isOpen }))}
-                className="flex w-full items-start gap-3 p-4 text-left">
-                <span className={`mt-0.5 h-2 w-2 shrink-0 rounded-full ${dot}`} />
-                <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="rounded bg-[#00D4AA]/10 px-2 py-0.5 font-mono text-xs text-[#00D4AA]">{ctrl.controlId}</span>
-                    <span className={`rounded px-1.5 py-0.5 text-[10px] font-semibold leading-none ${
-                      status === "pass" ? "bg-[#00D4AA]/10 text-[#00D4AA]"
-                      : status === "fail" ? "bg-[#EF4444]/10 text-[#EF4444]"
-                      : status === "warning" ? "bg-[#F59E0B]/10 text-[#F59E0B]"
-                      : "bg-[#1A1D1E]/10 text-[#5C5C66]"
-                    }`}>{status}</span>
-                    <span className="text-xs font-medium text-[#F1F1F3]">{ctrl.title}</span>
+            return (
+              <div key={ctrl.id} className="overflow-hidden rounded-xl border border-[#1A1D1E] bg-[#0B0D0E] transition-all duration-200 hover:border-[#1C1C24]">
+                <button onClick={() => setExpanded((prev) => ({ ...prev, [ctrl.controlId]: !isOpen }))}
+                  className="flex w-full items-start gap-3 p-4 text-left">
+                  <span className={`mt-0.5 h-2 w-2 shrink-0 rounded-full ${dot}`} />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="rounded bg-[#00D4AA]/10 px-2 py-0.5 font-mono text-xs text-[#00D4AA]">{ctrl.controlId}</span>
+                      <span className={`rounded px-1.5 py-0.5 text-[10px] font-semibold leading-none ${
+                        status === "pass" ? "bg-[#00D4AA]/10 text-[#00D4AA]"
+                        : status === "fail" ? "bg-[#EF4444]/10 text-[#EF4444]"
+                        : status === "warning" ? "bg-[#F59E0B]/10 text-[#F59E0B]"
+                        : "bg-[#1A1D1E]/10 text-[#5C5C66]"
+                      }`}>{status}</span>
+                      <span className="text-xs font-medium text-[#F1F1F3]">{ctrl.title}</span>
+                    </div>
+                    {detail && (
+                      <p className={`mt-1.5 text-sm leading-relaxed text-[#8B8B93] ${isOpen ? "" : "line-clamp-2"}`}>{detail}</p>
+                    )}
                   </div>
-                  {detail && (
-                    <p className={`mt-1.5 text-sm leading-relaxed text-[#8B8B93] ${isOpen ? "" : "line-clamp-2"}`}>{detail}</p>
-                  )}
-                </div>
-              </button>
-              {isOpen && detail && (
-                <div className="border-t border-[#1A1D1E] px-4 pb-4">
-                  <p className="mt-3 text-sm leading-relaxed text-[#6A6D6E]">{detail}</p>
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Submitted evidence history */}
-      {frameworkSubmitted.length > 0 && (
-        <section>
-          <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-[#00D4AA]">Submitted evidence ({frameworkSubmitted.length})</h2>
-          <div className="space-y-2">
-            {frameworkSubmitted.map((item: any) => (
-              <div key={item.id} className="rounded-xl border border-[#1A1D1E] bg-[#0B0D0E] p-4">
-                <div className="flex items-center gap-2 mb-1.5">
-                  {item.control && <span className="rounded bg-[#00D4AA]/10 px-2 py-0.5 font-mono text-xs text-[#00D4AA]">{item.control.controlId}</span>}
-                  <span className="rounded bg-[#5C5C66]/10 px-2 py-0.5 font-mono text-xs text-[#5C5C66]">Evidence</span>
-                </div>
-                <p className="text-xs text-[#6A6D6E] leading-relaxed">{item.originalFinding?.detail}</p>
-                <div className="mt-2 rounded-lg border border-[#1A1D1E] bg-[#07080A] px-3 py-2">
-                  <p className="text-sm text-[#F1F1F3]">{item.content}</p>
-                </div>
-                {item.fileUrl && item.originalFilename && (
-                  <a href={item.fileUrl} target="_blank" rel="noopener noreferrer"
-                    className="mt-2 flex items-center gap-2 rounded-lg border border-[#1A1D1E] bg-[#07080A] px-3 py-2 hover:border-[#00D4AA]/30 transition-colors">
-                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-[#1A1D1E]">
-                      <svg className="h-4 w-4 text-[#6A6D6E]" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M9 1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V5l-4-4z"/><path d="M9 1v4h4"/></svg>
-                    </span>
-                    <span className="min-w-0 flex-1 truncate text-sm text-[#00D4AA] hover:underline">{item.originalFilename}</span>
-                    {extBadge(item.originalFilename)}
-                    <svg className="h-3 w-3 shrink-0 text-[#5C5C66]" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M6 2l5 5-5 5"/></svg>
-                  </a>
+                </button>
+                {isOpen && detail && (
+                  <div className="border-t border-[#1A1D1E] px-4 pb-4">
+                    <p className="mt-3 text-sm leading-relaxed text-[#6A6D6E]">{detail}</p>
+                  </div>
                 )}
-                <p className="mt-2 text-[10px] text-[#5C5C66]">Submitted {new Date(item.submittedAt).toLocaleDateString()}</p>
               </div>
-            ))}
-          </div>
-        </section>
-      )}
+            );
+          })}
+        </div>
+
+        {/* Submitted evidence history */}
+        <div className="space-y-2">
+          {frameworkSubmitted.length > 0 && (
+            <>
+              <h2 className="text-xs font-semibold uppercase tracking-wider text-[#00D4AA]">Submitted ({frameworkSubmitted.length})</h2>
+              {frameworkSubmitted.map((item: any) => (
+                <div key={item.id} className="rounded-xl border border-[#1A1D1E] bg-[#0B0D0E] p-4">
+                  <div className="flex items-center gap-2 mb-1.5">
+                    {item.control && <span className="rounded bg-[#00D4AA]/10 px-2 py-0.5 font-mono text-xs text-[#00D4AA]">{item.control.controlId}</span>}
+                    <span className="rounded bg-[#5C5C66]/10 px-2 py-0.5 font-mono text-xs text-[#5C5C66]">Evidence</span>
+                  </div>
+                  <p className="text-xs text-[#6A6D6E] leading-relaxed">{item.originalFinding?.detail}</p>
+                  <div className="mt-2 rounded-lg border border-[#1A1D1E] bg-[#07080A] px-3 py-2">
+                    <p className="text-sm text-[#F1F1F3]">{item.content}</p>
+                  </div>
+                  {item.fileUrl && item.originalFilename && (
+                    <a href={item.fileUrl} target="_blank" rel="noopener noreferrer"
+                      className="mt-2 flex items-center gap-2 rounded-lg border border-[#1A1D1E] bg-[#07080A] px-3 py-2 hover:border-[#00D4AA]/30 transition-colors">
+                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-[#1A1D1E]">
+                        <svg className="h-4 w-4 text-[#6A6D6E]" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M9 1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V5l-4-4z"/><path d="M9 1v4h4"/></svg>
+                      </span>
+                      <span className="min-w-0 flex-1 truncate text-sm text-[#00D4AA] hover:underline">{item.originalFilename}</span>
+                      {extBadge(item.originalFilename)}
+                      <svg className="h-3 w-3 shrink-0 text-[#5C5C66]" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M6 2l5 5-5 5"/></svg>
+                    </a>
+                  )}
+                  <p className="mt-2 text-[10px] text-[#5C5C66]">Submitted {new Date(item.submittedAt).toLocaleDateString()}</p>
+                </div>
+              ))}
+            </>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
