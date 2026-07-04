@@ -146,6 +146,12 @@ function extBadge(filename: string) {
   );
 }
 
+const STATUS_FILTERS = [
+  { key: "needs-attention", label: "Needs attention" },
+  { key: "pass", label: "Passed" },
+  { key: "all", label: "All" },
+] as const;
+
 export default function ReviewPage({ loaderData }: Route.ComponentProps) {
   const { items, submitted } = loaderData;
   const fetcher = useFetcher();
@@ -153,8 +159,15 @@ export default function ReviewPage({ loaderData }: Route.ComponentProps) {
   const [evidenceFiles, setEvidenceFiles] = useState<File[]>([]);
   const [evidenceText, setEvidenceText] = useState("");
   const [framework, setFramework] = useState<"soc2" | "ai-act">("soc2");
+  const [statusFilter, setStatusFilter] = useState<string>("needs-attention");
 
   const frameworkItems = items.filter((it) => it.control.framework === framework);
+  const filteredItems = statusFilter === "needs-attention"
+    ? frameworkItems.filter((it) => it.status !== "pass" && it.status !== "unchecked")
+    : statusFilter === "pass"
+    ? frameworkItems.filter((it) => it.status === "pass" || it.status === "unchecked")
+    : frameworkItems;
+
   const frameworkSubmitted = submitted.filter((s: any) => s.control?.framework === framework);
 
   return (
@@ -229,9 +242,20 @@ export default function ReviewPage({ loaderData }: Route.ComponentProps) {
         </fetcher.Form>
       </div>
 
+      {/* Status filter */}
+      <div className="flex items-center gap-2">
+        {STATUS_FILTERS.map((sf) => (
+          <button key={sf.key} onClick={() => setStatusFilter(sf.key)}
+            className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
+              statusFilter === sf.key ? "bg-[#141718] text-[#F1F1F3]" : "text-[#5C5C66] hover:text-[#8B8B93]"
+            }`}
+          >{sf.label}</button>
+        ))}
+      </div>
+
       {/* Control cards — all controls */}
       <div className="space-y-2">
-        {frameworkItems.map(({ control: ctrl, check, status, detail }) => {
+        {filteredItems.map(({ control: ctrl, check, status, detail }) => {
           const isOpen = expanded[ctrl.controlId] ?? false;
           const dot = status === "pass" ? "bg-[#00D4AA]"
             : status === "fail" ? "bg-[#EF4444]"
@@ -277,9 +301,13 @@ export default function ReviewPage({ loaderData }: Route.ComponentProps) {
             {frameworkSubmitted.map((item: any) => (
               <div key={item.id} className="rounded-xl border border-[#1A1D1E] bg-[#0B0D0E] p-4">
                 <div className="flex items-center gap-2 mb-1.5">
+                  {item.control && <span className="rounded bg-[#00D4AA]/10 px-2 py-0.5 font-mono text-xs text-[#00D4AA]">{item.control.controlId}</span>}
                   <span className="rounded bg-[#5C5C66]/10 px-2 py-0.5 font-mono text-xs text-[#5C5C66]">Evidence</span>
                 </div>
-                <p className="text-xs text-[#6A6D6E] leading-relaxed">{item.content}</p>
+                <p className="text-xs text-[#6A6D6E] leading-relaxed">{item.originalFinding?.detail}</p>
+                <div className="mt-2 rounded-lg border border-[#1A1D1E] bg-[#07080A] px-3 py-2">
+                  <p className="text-sm text-[#F1F1F3]">{item.content}</p>
+                </div>
                 {item.fileUrl && item.originalFilename && (
                   <a href={item.fileUrl} target="_blank" rel="noopener noreferrer"
                     className="mt-2 flex items-center gap-2 rounded-lg border border-[#1A1D1E] bg-[#07080A] px-3 py-2 hover:border-[#00D4AA]/30 transition-colors">
