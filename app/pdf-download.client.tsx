@@ -41,7 +41,7 @@ function ReportPdf({ orgName, date, frameworks }: { orgName: string; date: strin
       <Page size="A4" style={styles.page}>
         <View style={styles.header}>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 8 }}>
-            <Image source="/icon.png" style={{ width: 22, height: 22 }} />
+            <Image source="/icon.png" style={{ width: 28, height: 28 }} />
             <Text style={styles.title}>Compliance Report</Text>
           </View>
           <View style={styles.accentBar} />
