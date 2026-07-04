@@ -112,7 +112,7 @@ export default function DashboardHome({ loaderData }: Route.ComponentProps) {
               className="rounded-lg border border-[#1A1D1E] px-5 py-2.5 text-sm font-medium text-[#8B8B93] hover:border-[#EF4444] hover:text-[#EF4444] transition-all disabled:opacity-50">
               {running ? "Auditing…" : "New audit"}
             </button>
-            <a href="/dashboard/export" download
+            <a href="/dashboard/export"
               className="rounded-lg border border-[#1A1D1E] px-5 py-2.5 text-sm font-medium text-[#8B8B93] hover:border-[#00D4AA] hover:text-[#00D4AA] transition-all">
               Export report
             </a>
