@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { useSearchParams, redirect, useNavigate } from "react-router";
+import { redirect, useNavigate, useFetcher } from "react-router";
 import { useRealtimeRunsWithTag } from "@trigger.dev/react-hooks";
 import { db } from "~/db";
 import { questionnaire, policyCheck, control } from "~/db/schema";
@@ -56,6 +56,8 @@ export async function action({ request, params }: Route.ActionArgs) {
       return redirect("/dashboard/questionnaires");
     }
 
+    const file = formData.get("file") as File; // must be after delete check
+
     const fileEntry = formData.get("file");
     if (!fileEntry) return { ok: false, error: "No file provided" };
     if (!(fileEntry instanceof File)) return { ok: false, error: "File field was not uploaded as a file. Try a different browser or file." };
@@ -82,17 +84,25 @@ export async function action({ request, params }: Route.ActionArgs) {
       title: fileEntry.name, originalFile: fileEntry.name, status: "processing",
     }).where(eq(questionnaire.id, params.id));
 
-    return redirect(`/dashboard/questionnaires/${params.id}`);
+    return { ok: true };
   } catch (err) {
     console.error("Questionnaire action failed:", err);
     return { ok: false, error: err instanceof Error ? err.message : "An unexpected error occurred." };
   }
 }
 
-export default function QuestionnaireDetail({ loaderData, actionData }: Route.ComponentProps) {
+export default function QuestionnaireDetail({ loaderData }: Route.ComponentProps) {
   if (!loaderData) return <p className="text-[#5C5C66]">Questionnaire not found.</p>;
   const { questionnaire: q, hasAudit, tag, accessToken } = loaderData;
   const navigate = useNavigate();
+  const fetcher = useFetcher();
+  const uploading = fetcher.state !== "idle";
+  const actionErr = fetcher.data && typeof fetcher.data === "object" && "error" in fetcher.data ? (fetcher.data as { error: string }).error : null;
+  useEffect(() => {
+    if (fetcher.data && typeof fetcher.data === "object" && "ok" in fetcher.data && (fetcher.data as any).ok) {
+      navigate(".", { replace: true });
+    }
+  }, [fetcher.data, navigate]);
 
   const runEnabled = !!accessToken;
   const { runs } = useRealtimeRunsWithTag(tag, {
@@ -106,7 +116,6 @@ export default function QuestionnaireDetail({ loaderData, actionData }: Route.Co
       navigate(".", { replace: true });
     }
   }, [latestRun, navigate]);
-  const actionErr = actionData && typeof actionData === "object" && "error" in actionData ? (actionData as { error: string }).error : null;
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [questions, setQuestions] = useState<QuestionItem[]>(
@@ -212,7 +221,7 @@ export default function QuestionnaireDetail({ loaderData, actionData }: Route.Co
 
       {/* Upload area — shown when draft or no questions */}
       {isDraft && (
-        <form method="POST" encType="multipart/form-data" action={`/dashboard/questionnaires/${q.id}`} className="space-y-4">
+        <fetcher.Form method="POST" encType="multipart/form-data" action={`/dashboard/questionnaires/${q.id}`} className="space-y-4">
           <input ref={fileInputRef} id="questionnaire-file" type="file" name="file" accept=".txt,.md,.csv,.pdf,.html" required className="hidden"
             onChange={(e) => { const f = e.target.files?.[0]; if (f) setSelectedFile(f); }} />
           <div className="rounded-xl border border-dashed border-[#1A1D1E] bg-[#0B0D0E] p-6">
@@ -231,9 +240,9 @@ export default function QuestionnaireDetail({ loaderData, actionData }: Route.Co
                     <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg>
                   </button>
                 </div>
-                <button type="submit"
-                  className="w-full rounded-lg bg-[#00D4AA] py-2.5 text-sm font-medium text-black hover:bg-[#00B894] transition-all">
-                  Upload & parse questions
+                <button type="submit" disabled={uploading}
+                  className="w-full rounded-lg bg-[#00D4AA] py-2.5 text-sm font-medium text-black hover:bg-[#00B894] transition-all disabled:opacity-50">
+                  {uploading ? "Uploading…" : "Upload & parse questions"}
                 </button>
               </div>
             ) : (
@@ -248,10 +257,11 @@ export default function QuestionnaireDetail({ loaderData, actionData }: Route.Co
               </label>
             )}
           </div>
+          {uploading && <p className="text-xs text-[#F59E0B] text-center">Uploading and processing…</p>}
           {!hasAudit && (
             <p className="text-xs text-[#F59E0B] text-center">⚠ Run an AI audit from the overview page first for better answers.</p>
           )}
-        </form>
+        </fetcher.Form>
       )}
 
       {/* Confidence bar */}
