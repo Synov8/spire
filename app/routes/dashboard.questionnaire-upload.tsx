@@ -46,22 +46,18 @@ export async function action({ request }: Route.ActionArgs) {
     : new TextDecoder().decode(buffer);
   const orgId = session.session.activeOrganizationId!;
   const agentVerdicts = await db.select().from(policyCheck).where(eq(policyCheck.organizationId, orgId));
-  const controlsList = await db.select().from(control).where(eq(control.framework, "soc2"));
-
-  const controlsSummary = `SOC 2: ${controlsList.length} controls`;
-  const evidenceSummary = agentVerdicts.length > 0
-    ? `Agent checked ${agentVerdicts.length} controls. ${agentVerdicts.filter((v) => v.status === "pass").length} passed, ${agentVerdicts.filter((v) => v.status === "fail").length} failed, ${agentVerdicts.filter((v) => v.status === "warning").length} need review.`
-    : "No agent audit run yet. Connect integrations and run an audit first.";
+  if (agentVerdicts.length === 0) {
+    return { ok: false, error: "No audit data found. Run an AI audit from the dashboard first so Spire has evidence to draw from." };
+  }
+  const controlsList = await db.select().from(control);
+  const verdictText = agentVerdicts.map((v) => `${v.ruleId}: ${v.status} — ${v.detail || "no detail"}`).join("\n");
+  const controlsText = controlsList.map((c) => `${c.controlId} (${c.framework}): ${c.title}`).join("\n");
 
   let parsed: Awaited<ReturnType<typeof parseQuestionnaire>>;
   let status = "completed";
 
   try {
-    parsed = await parseQuestionnaire(text, {
-      name: session.user.name,
-      evidenceSummary,
-      controlsSummary,
-    });
+    parsed = await parseQuestionnaire(text, verdictText, controlsText);
   } catch {
     status = "flagged";
     parsed = { questions: [] };

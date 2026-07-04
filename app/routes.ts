@@ -4,7 +4,8 @@ export default [
   route("api/auth/*", "routes/api/auth.ts"),
   route("api/trigger-audit", "routes/api.trigger-audit.ts"),
   route("api/upload-evidence", "routes/api.upload-evidence.ts"),
-  route("api/composio/connect", "routes/api/composio.connect.ts"),
+    route("api/composio/connect", "routes/api/composio.connect.ts"),
+    route("api/investigate-questionnaire", "routes/api.investigate-questionnaire.ts"),
   route("login", "routes/login.tsx"),
   route("logout", "routes/logout.tsx"),
   route("dashboard", "routes/dashboard.tsx", [

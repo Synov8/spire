@@ -21,29 +21,24 @@ const QuestionnaireSchema = z.object({
   })),
 });
 
-export async function parseQuestionnaire(
-  text: string,
-  context: {
-    name?: string;
-    evidenceSummary?: string;
-    controlsSummary?: string;
-  },
-) {
+export async function parseQuestionnaire(text: string, verdictText: string, controlsText: string) {
   const { output: parsed } = await generateText({
     model,
     output: Output.object({ schema: QuestionnaireSchema }),
-    system: `You are a SOC 2 compliance expert at Spire. Answer security questionnaires using the COMPANY'S ACTUAL EVIDENCE DATA provided below, not general SOC 2 knowledge.
+    system: `You are a SOC 2 compliance expert at Spire. Answer security questionnaires using the COMPANY'S ACTUAL EVIDENCE DATA below, not general SOC 2 knowledge.
 
-Company: ${context.name || "Unknown"}
-Evidence collected from live infrastructure: ${context.evidenceSummary || "None yet"}
-Controls status: ${context.controlsSummary || "Unknown"}
+Per-control verdicts from the latest infrastructure audit:
+${verdictText || "No audit data available."}
+
+Control catalogue:
+${controlsText || "No controls defined."}
 
 RULES:
-- For every answer, reference the specific evidence the company has collected.
-- If evidence supports an answer, cite it directly (e.g. "GitHub branch protection shows all production branches are protected").
-- If evidence does NOT cover a question, flag it with lower confidence and state what evidence is missing.
-- Confidence must reflect the strength of actual evidence, not general knowledge.`,
-    prompt: `Parse and fully answer this security questionnaire. Base your answers on the company's evidence:\n\n${text}`,
+- For every answer, reference the specific control verdicts and their detail text.
+- If a control verdict supports an answer, cite the control ID and what the audit found.
+- If evidence does NOT cover a question, flag it with lower confidence and state what's missing.
+- Confidence must reflect the strength of actual audit evidence, not general knowledge.`,
+    prompt: `Parse and fully answer this security questionnaire based on the company's live audit data:\n\n${text}`,
   });
 
   return parsed;

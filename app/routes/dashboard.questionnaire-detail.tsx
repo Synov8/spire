@@ -28,6 +28,7 @@ export default function QuestionnaireDetail({ loaderData }: Route.ComponentProps
   );
   const [editingIdx, setEditingIdx] = useState<number | null>(null);
   const [editValue, setEditValue] = useState("");
+  const [investigating, setInvestigating] = useState(false);
 
   const avgConfidence = questions.length > 0 ? questions.reduce((s, qa) => s + qa.confidence, 0) / questions.length : 0;
 
@@ -79,6 +80,22 @@ export default function QuestionnaireDetail({ loaderData }: Route.ComponentProps
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <button onClick={async () => {
+            setInvestigating(true);
+            try {
+              const res = await fetch(`/api/investigate-questionnaire?id=${q.id}`);
+              if (res.ok) {
+                const data = await res.json() as { runId: string; publicToken: string };
+                window.location.href = `/dashboard/audit?runId=${data.runId}&token=${data.publicToken}`;
+              }
+            } finally {
+              setInvestigating(false);
+            }
+          }} disabled={investigating}
+            className="flex items-center gap-1.5 rounded-lg bg-[#00D4AA] px-3.5 py-2 text-sm font-medium text-black hover:bg-[#00B894] transition-all disabled:opacity-50">
+            <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 2"/></svg>
+            {investigating ? "Investigating…" : "Investigate with AI"}
+          </button>
           <button onClick={handleExport}
             className="flex items-center gap-1.5 rounded-lg border border-[#1A1D1E] px-3.5 py-2 text-sm font-medium text-[#8B8B93] transition-all hover:border-[#00D4AA] hover:text-[#00D4AA]">
             <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M8 2v10M4 8l4 4 4-4M2 14h12"/></svg>
