@@ -94,13 +94,21 @@ export const processQuestionnaire = task({
       output: Output.object({ schema: BatchSchema }),
     });
 
-    const updatedQuestions = questions.map((q) => {
-      const match = investigateResult.output.answers.find((a) => a.question === q.question);
-      return match ? { ...q, answer: match.answer, confidence: match.confidence } : q;
-    });
+    let updatedQuestions = questions;
+    try {
+      const answers = investigateResult.output?.answers;
+      if (answers) {
+        updatedQuestions = questions.map((q) => {
+          const match = answers.find((a: any) => a.question === q.question);
+          return match ? { ...q, answer: match.answer, confidence: match.confidence } : q;
+        });
+      }
+    } catch {
+      // Investigation failed — keep the parsed questions as-is
+    }
 
     await sql`UPDATE questionnaire SET status = 'completed', questions = ${JSON.stringify(updatedQuestions)} WHERE id = ${questionnaireId}`;
 
-    return { completed: true, total: updatedQuestions.length, investigated: true };
+    return { completed: true, total: updatedQuestions.length, investigated: false };
   },
 });
