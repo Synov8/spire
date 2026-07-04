@@ -36,48 +36,53 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 }
 
 export async function action({ request, params }: Route.ActionArgs) {
-  const session = await auth.api.getSession({ headers: request.headers });
-  if (!session) return { ok: false, error: "Not authenticated" };
-  const orgId = session.session.activeOrganizationId!;
-  if (!await hasActiveSubscription(orgId, session.user.id)) return { ok: false, error: "Subscription required" };
-
-  const formData = await request.formData();
-  const intent = formData.get("intent") as string;
-
-  if (intent === "delete") {
-    await db.delete(questionnaire).where(eq(questionnaire.id, params.id));
-    return { ok: true, deleted: true };
-  }
-
-  const file = formData.get("file") as File;
-  if (!file) return { ok: false, error: "No file provided" };
-
-  const agentVerdicts = await db.select().from(policyCheck).where(eq(policyCheck.organizationId, orgId));
-  if (agentVerdicts.length === 0) return { ok: false, error: "Run an AI audit first so Spire has evidence to draw from." };
-
-  const buffer = await file.arrayBuffer();
-  const text = file.type === "application/pdf" ? await extractPdfText(buffer) : new TextDecoder().decode(buffer);
-  const controlsList = await db.select().from(control);
-  const verdictText = agentVerdicts.map((v) => `${v.ruleId}: ${v.status} — ${v.detail || "no detail"}`).join("\n");
-  const controlsText = controlsList.map((c) => `${c.controlId} (${c.framework}): ${c.title}`).join("\n");
-
-  let parsed: Awaited<ReturnType<typeof parseQuestionnaire>>;
-  let status = "completed";
   try {
-    parsed = await parseQuestionnaire(text, verdictText, controlsText);
-  } catch {
-    status = "flagged";
-    parsed = { questions: [] };
+    const session = await auth.api.getSession({ headers: request.headers });
+    if (!session) return { ok: false, error: "Not authenticated" };
+    const orgId = session.session.activeOrganizationId!;
+    if (!await hasActiveSubscription(orgId, session.user.id)) return { ok: false, error: "Subscription required" };
+
+    const formData = await request.formData();
+    const intent = formData.get("intent") as string;
+
+    if (intent === "delete") {
+      await db.delete(questionnaire).where(eq(questionnaire.id, params.id));
+      return { ok: true, deleted: true };
+    }
+
+    const file = formData.get("file") as File;
+    if (!file) return { ok: false, error: "No file provided" };
+
+    const agentVerdicts = await db.select().from(policyCheck).where(eq(policyCheck.organizationId, orgId));
+    if (agentVerdicts.length === 0) return { ok: false, error: "Run an AI audit first so Spire has evidence to draw from." };
+
+    const buffer = await file.arrayBuffer();
+    const text = file.type === "application/pdf" ? await extractPdfText(buffer) : new TextDecoder().decode(buffer);
+    const controlsList = await db.select().from(control);
+    const verdictText = agentVerdicts.map((v) => `${v.ruleId}: ${v.status} — ${v.detail || "no detail"}`).join("\n");
+    const controlsText = controlsList.map((c) => `${c.controlId} (${c.framework}): ${c.title}`).join("\n");
+
+    let parsed: Awaited<ReturnType<typeof parseQuestionnaire>>;
+    let status = "completed";
+    try {
+      parsed = await parseQuestionnaire(text, verdictText, controlsText);
+    } catch {
+      status = "flagged";
+      parsed = { questions: [] };
+    }
+
+    await db.update(questionnaire).set({
+      title: file.name, status, originalFile: file.name,
+      questions: parsed.questions as any,
+      completedAt: status === "completed" ? new Date() : undefined,
+    }).where(eq(questionnaire.id, params.id));
+
+    const avg = parsed.questions.length > 0 ? Math.round(parsed.questions.reduce((s, q) => s + q.confidence, 0) / parsed.questions.length * 100) : 0;
+    return { ok: true, questions: parsed.questions, avgConfidence: avg, status, questionsCount: parsed.questions.length };
+  } catch (err) {
+    console.error("Questionnaire action failed:", err);
+    return { ok: false, error: err instanceof Error ? err.message : "An unexpected error occurred." };
   }
-
-  await db.update(questionnaire).set({
-    title: file.name, status, originalFile: file.name,
-    questions: parsed.questions as any,
-    completedAt: status === "completed" ? new Date() : undefined,
-  }).where(eq(questionnaire.id, params.id));
-
-  const avg = parsed.questions.length > 0 ? Math.round(parsed.questions.reduce((s, q) => s + q.confidence, 0) / parsed.questions.length * 100) : 0;
-  return { ok: true, questions: parsed.questions, avgConfidence: avg, status, questionsCount: parsed.questions.length };
 }
 
 export default function QuestionnaireDetail({ loaderData }: Route.ComponentProps) {
