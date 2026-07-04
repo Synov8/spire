@@ -3,7 +3,7 @@ import { auth } from "~/lib/auth.server";
 import { authClient } from "~/lib/auth-client";
 import { db } from "~/db";
 import { policyCheck } from "~/db/schema";
-import { eq, and } from "drizzle-orm";
+import { eq, and, ne } from "drizzle-orm";
 import { hasActiveSubscription } from "~/lib/subscription-check";
 import type { Route } from "./+types/dashboard";
 import { useState } from "react";
@@ -46,7 +46,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 
   const reviewCount = subscribed ? await db.select({ count: policyCheck.id })
     .from(policyCheck)
-    .where(and(eq(policyCheck.organizationId, orgId), eq(policyCheck.needsReview, true)))
+    .where(and(eq(policyCheck.organizationId, orgId), ne(policyCheck.status, "pass")))
     .then((rows) => rows.length) : 0;
 
   const currentOrg = orgs.find((o) => o.id === orgId);
