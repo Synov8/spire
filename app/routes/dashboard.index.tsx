@@ -244,8 +244,8 @@ function DonutSummary({ stats }: { stats: { pct: number; verified: number; faile
             style={{ outline: "none" }}
           />
         ))}
-        <text x={cx} y={cy + 2} textAnchor="middle" dominantBaseline="central" className="fill-[#F1F1F3]" style={{ fontSize: 20, fontWeight: 700 }}>{stats.pct}%</text>
-        <text x={cx} y={cy + 13} textAnchor="middle" dominantBaseline="central" className="fill-[#8B8B93]" style={{ fontSize: 7 }}>pass rate</text>
+          <text x={cx} y={cy} textAnchor="middle" dominantBaseline="central" className="fill-[#F1F1F3]" style={{ fontSize: 20, fontWeight: 700 }}>{stats.pct}%</text>
+          <text x={cx} y={cy + 15} textAnchor="middle" dominantBaseline="central" className="fill-[#8B8B93]" style={{ fontSize: 7 }}>pass rate</text>
       </svg>
       {hovered && (
         <div className="absolute left-1/2 top-full mt-1 -translate-x-1/2 rounded-lg border border-[#2A2D2E] bg-[#1A1D1E] px-2.5 py-1.5 text-xs font-medium text-[#E8E8E8] whitespace-nowrap shadow-lg">
