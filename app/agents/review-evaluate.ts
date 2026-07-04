@@ -32,9 +32,10 @@ export async function batchReviewEvaluate(
   const allChecks = await db.select().from(policyCheck).where(eq(policyCheck.organizationId, orgId));
   const controlsList = await db.select().from(control).where(ne(control.framework, "none"));
 
-  const checksContext = allChecks
-    .map((c) => `${c.ruleId}: ${c.status} — ${c.detail || "no detail"}`)
-    .join("\n");
+  const passingChecks = allChecks.filter((c) => c.status === "pass");
+  const checksContext = passingChecks.length > 0
+    ? passingChecks.map((c) => `${c.ruleId}: ${c.status} — ${c.detail || "no detail"}`).join("\n")
+    : "No passing controls yet.";
 
   const controlsContext = controlIds.map((id) => {
     const c = controlsList.find((c) => c.controlId === id);

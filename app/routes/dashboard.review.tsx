@@ -152,6 +152,11 @@ export default function ReviewPage({ loaderData }: Route.ComponentProps) {
     return fw === framework || (!fw && framework === "soc2");
   });
 
+  const frameworkSubmitted = submitted.filter((s: any) => {
+    const fw = s.control?.framework;
+    return fw === framework || (!fw && framework === "soc2");
+  });
+
   return (
     <div className="space-y-6">
       <div>
@@ -308,11 +313,11 @@ export default function ReviewPage({ loaderData }: Route.ComponentProps) {
         </div>
       )}
 
-      {submitted.length > 0 && (
+      {frameworkSubmitted.length > 0 && (
         <section>
-          <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-[#00D4AA]">Submitted ({submitted.length})</h2>
+          <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-[#00D4AA]">Submitted ({frameworkSubmitted.length})</h2>
           <div className="space-y-2">
-            {submitted.map((item: any) => (
+            {frameworkSubmitted.map((item: any) => (
               <div key={item.id} className="rounded-xl border border-[#1A1D1E] bg-[#0B0D0E] p-4">
                 <div className="flex items-center gap-2 mb-1.5">
                   {item.control && <span className="rounded bg-[#00D4AA]/10 px-2 py-0.5 font-mono text-xs text-[#00D4AA]">{item.control.controlId}</span>}
