@@ -54,11 +54,9 @@ export async function loader() {
     }),
 
     check("Background jobs", async () => {
-      if (!process.env.TRIGGER_SECRET_KEY) throw new Error("missing key");
-      const res = await fetch("https://api.trigger.dev/v1/projects", {
-        headers: { Authorization: `Bearer ${process.env.TRIGGER_SECRET_KEY}` },
-      });
-      if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+      const { runs } = await import("@trigger.dev/sdk");
+      const result = await runs.list({ limit: 1 });
+      if (!(result as any).data) throw new Error("unexpected response");
     }),
   ]);
 
