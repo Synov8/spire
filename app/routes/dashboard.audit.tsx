@@ -63,40 +63,58 @@ const APP_LABELS: Record<string, string> = {
   vercel: "Vercel", google: "Google", openai: "OpenAI",
 };
 
-const COMPOSIO_TOOL_LABELS: Record<string, { action: string; description: string }> = {
-  composio_search_tools: {
-    action: "Scanning available integrations…",
-    description: "Checking which connected apps can provide audit evidence",
-  },
-  composio_get_connected_accounts: {
-    action: "Checking connected accounts…",
-    description: "Verifying which integrations are active for this organisation",
-  },
-  composio_manage_connections: {
-    action: "Checking connection status…",
-    description: "Verifying integration connections are healthy",
-  },
-  composio_execute_tool: {
-    action: "Running integration action…",
-    description: "Executing a query against a connected app",
-  },
-  composio_multi_execute_tool: {
-    action: "Probing integrations…",
-    description: "Gathering evidence across connected apps",
-  },
-  composio_remote_workbench: {
-    action: "Executing remote checks…",
-    description: "Running verification routines on connected services",
-  },
-  composio_get_tool_schemas: {
-    action: "Loading tool schemas…",
-    description: "Preparing to query connected services",
-  },
-  composio_execute_actions: {
-    action: "Running compliance checks…",
-    description: "Executing automated audit procedures",
-  },
-};
+function describeComposioTool(toolName: string, args: any): { app: string; action: string; description: string; progress?: string } {
+  const lower = toolName.toLowerCase();
+
+  if (lower === "composio_manage_connections") {
+    const toolkits: string[] = args?.toolkits ?? [];
+    const apps = toolkits.map((t: string) => APP_LABELS[t.toLowerCase()] || t.charAt(0).toUpperCase() + t.slice(1));
+    return { app: apps.join(", "), action: "Checking connections…", description: `Verifying ${apps.length} integration connections` };
+  }
+
+  if (lower === "composio_search_tools") {
+    const queries: Array<{ use_case?: string }> = args?.queries ?? [];
+    if (queries.length === 1 && queries[0].use_case?.startsWith("list all available")) {
+      return { app: "Composio", action: "Discovering available tools…", description: "" };
+    }
+    const apps = new Set<string>();
+    for (const q of queries) {
+      const match = q.use_case?.match(/for (\w+)/);
+      if (match) apps.add(APP_LABELS[match[1].toLowerCase()] || match[1]);
+    }
+    return { app: [...apps].join(", ") || "Composio", action: "Finding relevant tools…", description: `${queries.length} queries` };
+  }
+
+  if (lower === "composio_get_tool_schemas") {
+    const slugs: string[] = args?.tool_slugs ?? [];
+    const apps = slugs.map(slugApp);
+    const unique = [...new Set(apps)];
+    return { app: unique.join(", ") || "Composio", action: "Loading tool schemas…", description: `${slugs.length} tools` };
+  }
+
+  if (lower === "composio_multi_execute_tool") {
+    const tools: Array<{ tool_slug?: string; arguments?: Record<string, unknown> }> = args?.tools ?? [];
+    const thought: string = args?.thought ?? "";
+    const metric: string = args?.current_step_metric ?? "";
+    const apps = [...new Set(tools.map((t) => slugApp(t.tool_slug || "")))];
+    const short = thought ? (thought.length > 60 ? thought.slice(0, 60) + "…" : thought) : `Probing ${apps.length} apps`;
+    return { app: apps.join(", "), action: short, description: `${tools.length} tools • ${metric}`, progress: metric };
+  }
+
+  if (lower === "composio_remote_workbench") {
+    const thought: string = args?.thought ?? "";
+    const metric: string = args?.current_step_metric ?? "";
+    return { app: "Composio", action: thought || "Processing evidence…", description: metric || "" };
+  }
+
+  return { app: "Composio", action: "Running audit checks…", description: "" };
+}
+
+function slugApp(slug: string): string {
+  if (!slug) return "";
+  const prefix = slug.split("_")[0]?.toLowerCase();
+  return APP_LABELS[prefix] || prefix?.toUpperCase() || slug;
+}
 
 function describeAction(actionName: string, args: Record<string, unknown>): string {
   const v = (k: string) => (args[k] != null ? String(args[k]) : null);
@@ -131,44 +149,10 @@ function describeAction(actionName: string, args: Record<string, unknown>): stri
   return actionName.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-function parseSubTool(args: Record<string, unknown>): { app: string; action: string; description: string }[] {
-  if (!args || Object.keys(args).length === 0) return [];
-  const raw = args as any;
-
-  if (raw.query) {
-    const q = String(raw.query);
-    const app = APP_LABELS[q.toLowerCase()] || q.charAt(0).toUpperCase() + q.slice(1);
-    return [{ app, action: `Searching ${q}`, description: `Looking up compliance data in ${q}` }];
-  }
-
-  const appName = raw.appName || raw.app || raw.integration;
-  const actionName = raw.actionName || raw.action || raw.operation;
-  if (appName && actionName) {
-    const label = APP_LABELS[appName.toLowerCase()] || appName.charAt(0).toUpperCase() + appName.slice(1);
-    return [{ app: label, action: describeAction(actionName, raw.input ?? raw.params ?? raw.parameters ?? {}), description: `Checking ${label} for compliance evidence…` }];
-  }
-
-  const actions = raw.actions ?? raw.operations ?? raw.tasks;
-  if (Array.isArray(actions) && actions.length > 0) {
-    return actions.map((a: any) => {
-      const aApp = a.appName || a.app || a.integration || "";
-      const label = APP_LABELS[aApp.toLowerCase()] || aApp.charAt(0).toUpperCase() + aApp.slice(1) || "";
-      const act = describeAction(a.actionName || a.action || a.operation || "", a.input ?? a.params ?? a.parameters ?? {});
-      return { action: act, description: `Checking ${label || "integrations"} for compliance evidence…`, app: label || "" };
-    });
-  }
-
-  return [];
-}
-
 function describeToolCall(toolName: string, args: Record<string, unknown>): { app: string; action: string; description: string }[] {
   const lower = toolName.toLowerCase();
   if (lower.startsWith("composio_")) {
-    const subs = parseSubTool(args);
-    if (subs.length > 0) return subs;
-    const label = COMPOSIO_TOOL_LABELS[lower];
-    if (label) return [{ app: "Composio", action: label.action, description: label.description }];
-    return [{ app: "Composio", action: "Running audit checks…", description: "" }];
+    return [describeComposioTool(toolName, args)];
   }
   if (lower === "submitauditreport") return [{ app: "", action: "Submitting audit report…", description: "" }];
   const parts = toolName.split("_");
@@ -186,6 +170,7 @@ interface ToolCard {
   app: string;
   action: string;
   description: string;
+  progress?: string;
   toolName?: string;
   args?: unknown;
   result?: unknown;
@@ -234,6 +219,15 @@ function ToolCallCard({ card }: { card: ToolCard }) {
             <p className="mt-1 text-[11px] text-[#6A6D6E] leading-relaxed">{card.description}</p>
           )}
 
+          {card.progress && (
+            <div className="mt-1.5 flex items-center gap-2 text-[10px] text-[#5C5C66]">
+              <div className="h-1 flex-1 overflow-hidden rounded-full bg-[#1A1D1E]">
+                <div className="h-full animate-pulse rounded-full bg-[#00D4AA]" style={{ width: "30%" }} />
+              </div>
+              <span className="shrink-0">{card.progress}</span>
+            </div>
+          )}
+
           {card.toolName && (
             <details className="mt-2">
               <summary className="cursor-pointer text-[10px] text-[#5C5C66] hover:text-[#8B8B93]">Raw tool info</summary>
@@ -278,6 +272,7 @@ function buildCards(parts: unknown[]): ToolCard[] {
           app: entry.app,
           action: entry.action,
           description: entry.description,
+          progress: (entry as any).progress,
           toolName: p.toolName,
           args: p.args,
         });
