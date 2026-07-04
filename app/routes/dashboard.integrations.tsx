@@ -38,9 +38,9 @@ function integrationCategory(app: string) {
   return slugToCat.get(app) ?? "Other";
 }
 
-function Card({ app, label, desc, initial, connected, loading, onConnect }: {
+function Card({ app, label, desc, initial, connected, loading, onConnect, onDisconnect }: {
   app: string; label: string; desc: string; initial: string;
-  connected: boolean; loading: string | null; onConnect: (app: string) => void;
+  connected: boolean; loading: string | null; onConnect: (app: string) => void; onDisconnect?: (app: string) => void;
 }) {
   return (
     <div className={`rounded-2xl border p-5 ${connected ? "border-[#00D4AA]/20 bg-[#00D4AA]/[0.02]" : "border-[#1A1D1E] bg-[#0B0D0E]"}`}>
@@ -54,10 +54,13 @@ function Card({ app, label, desc, initial, connected, loading, onConnect }: {
         </div>
       </div>
       {connected ? (
-        <div className="mt-4 flex items-center justify-center gap-2 rounded-lg border border-[#00D4AA]/20 bg-[#00D4AA]/[0.04] py-2 text-sm text-[#00D4AA]">
-          <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3.5 8.5l3 3 6-7"/></svg>
-          Connected
-        </div>
+        <button onClick={() => onDisconnect?.(app)}
+          className="group mt-4 flex w-full items-center justify-center gap-2 rounded-lg border border-[#00D4AA]/20 bg-[#00D4AA]/[0.04] py-2 text-sm text-[#00D4AA] hover:border-[#EF4444]/30 hover:bg-[#EF4444]/[0.04] hover:text-[#EF4444] transition-all duration-200">
+          <svg className="h-4 w-4 group-hover:hidden" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3.5 8.5l3 3 6-7"/></svg>
+          <svg className="hidden h-4 w-4 group-hover:block" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg>
+          <span className="group-hover:hidden">Connected</span>
+          <span className="hidden group-hover:inline">Disconnect</span>
+        </button>
       ) : (
         <button onClick={() => onConnect(app)} disabled={loading === app}
           className="mt-4 w-full rounded-lg border border-[#1A1D1E] bg-[#141718] py-2 text-sm font-medium text-[#8B8B93] hover:border-[#00D4AA]/40 hover:text-[#00D4AA] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
@@ -92,6 +95,21 @@ export default function IntegrationsPage() {
     : DASHBOARD_INTEGRATIONS.filter((i) => integrationCategory(i.app) === activeCategory);
   const inCategoryConnected = inCategory.filter((i) => connectedSet.has(i.app));
   const inCategoryAvailable = inCategory.filter((i) => !connectedSet.has(i.app));
+
+  const disconnect = async (app: string) => {
+    if (!confirm(`Disconnect ${app}? This will remove all collected evidence from this integration.`)) return;
+    setLoading(app);
+    try {
+      await fetch("/api/composio/connect", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ app }),
+      });
+      window.location.reload();
+    } finally {
+      setLoading(null);
+    }
+  };
 
   const connect = async (app: string) => {
     setLoading(app);
@@ -171,7 +189,7 @@ export default function IntegrationsPage() {
                 <section key={cat.label}>
                   <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-[#5C5C66]">{cat.label}</h2>
                   <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-                    {catConnected.map((i) => <Card key={i.app} {...i} connected={true} loading={loading} onConnect={connect} />)}
+                    {catConnected.map((i) => <Card key={i.app} {...i} connected={true} loading={loading} onConnect={connect} onDisconnect={disconnect} />)}
                     {catAvailable.map((i) => <Card key={i.app} {...i} connected={false} loading={loading} onConnect={connect} />)}
                   </div>
                 </section>
@@ -184,7 +202,7 @@ export default function IntegrationsPage() {
               <div>
                 <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-[#00D4AA]">Connected ({inCategoryConnected.length})</h2>
                 <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-                  {inCategoryConnected.map((i) => <Card key={i.app} {...i} connected={true} loading={loading} onConnect={connect} />)}
+                  {inCategoryConnected.map((i) => <Card key={i.app} {...i} connected={true} loading={loading} onConnect={connect} onDisconnect={disconnect} />)}
                 </div>
               </div>
             )}

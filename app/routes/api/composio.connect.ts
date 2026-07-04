@@ -64,14 +64,30 @@ export async function action({ request }: ActionFunctionArgs) {
   const apiKey = process.env.COMPOSIO_API_KEY;
   if (!apiKey) return Response.json({ error: "COMPOSIO_API_KEY not set" }, { status: 500 });
 
+  const composio = new Composio({ apiKey });
+
+  if (request.method === "DELETE") {
+    const { app } = await request.json() as { app: string };
+    if (!app) return Response.json({ error: "Missing app" }, { status: 400 });
+    const authConfigId = authConfigFor(app);
+    if (!authConfigId) return Response.json({ error: `Unknown integration: ${app}` }, { status: 400 });
+    const list = await composio.connectedAccounts.list({ userIds: [orgId], statuses: ["ACTIVE"] });
+    const items = (list as any)?.items ?? [];
+    for (const acct of items) {
+      const slug = ((acct.toolkit as { slug?: string } | undefined)?.slug ?? "").toLowerCase();
+      if (slug === app || slug === authConfigId) {
+        await composio.connectedAccounts.delete(acct.id as string);
+      }
+    }
+    return Response.json({ ok: true });
+  }
+
   const { app } = await request.json() as { app: string };
   if (!app) return Response.json({ error: "Missing app" }, { status: 400 });
 
   const subs = await db.select().from(subscription).where(eq(subscription.referenceId, orgId));
   const plan = subs.find((s) => s.status === "active" || s.status === "trialing")?.plan || "starter";
   const limit = LIMITS[plan] ?? 3;
-
-  const composio = new Composio({ apiKey });
 
   if (limit !== -1) {
     const list = await composio.connectedAccounts.list({ userIds: [orgId] });

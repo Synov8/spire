@@ -2,16 +2,18 @@ import { useState, useEffect, useMemo } from "react";
 import { animate } from "motion";
 import { useLoaderData, Link } from "react-router";
 import { db } from "~/db";
-import { control, policyCheck, organization } from "~/db/schema";
+import { control, policyCheck, organization, manualEvidence, questionnaire } from "~/db/schema";
 import { auth } from "~/lib/auth.server";
 import { auth as triggerAuth, runs } from "@trigger.dev/sdk";
 import { eq } from "drizzle-orm";
+import { Composio } from "@composio/core";
+import { VercelProvider } from "@composio/vercel";
 import { DownloadReportButton } from "~/pdf-download.client";
 import type { Route } from "./+types/dashboard.index";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const session = await auth.api.getSession({ headers: request.headers });
-  if (!session) return { summaryStats: null, orgId: "", hasAudit: false, activeRunId: null, reportData: null };
+  if (!session) return { summaryStats: null, orgId: "", hasAudit: false, activeRunId: null, reportData: null, evidenceCount: 0, questionnaireCount: 0, connectedCount: 0 };
   const orgId = session.session.activeOrganizationId!;
   const allControls = await db.select().from(control);
   const verdicts = await db.select().from(policyCheck).where(eq(policyCheck.organizationId, orgId));
@@ -42,6 +44,15 @@ export async function loader({ request }: Route.LoaderArgs) {
     })),
   } : null;
 
+  const evidenceCount = await db.select({ count: manualEvidence.id }).from(manualEvidence).where(eq(manualEvidence.organizationId, orgId)).then((r) => r.length);
+  const questionnaireCount = await db.select({ count: questionnaire.id }).from(questionnaire).where(eq(questionnaire.organizationId, orgId)).then((r) => r.length);
+  let connectedCount = 0;
+  try {
+    const composio = new Composio({ provider: new VercelProvider(), apiKey: process.env.COMPOSIO_API_KEY || "" });
+    const list = await composio.connectedAccounts.list({ userIds: [orgId], statuses: ["ACTIVE"] });
+    connectedCount = ((list as any)?.items || []).length;
+  } catch { /* not set up */ }
+
   let activeRunId: string | null = null;
   try {
     const recentRuns = await runs.list({
@@ -60,11 +71,11 @@ export async function loader({ request }: Route.LoaderArgs) {
     }
   } catch { /* skip */ }
 
-  return { summaryStats, orgId, hasAudit: verdicts.length > 0, activeRunId, reportData };
+  return { summaryStats, orgId, hasAudit: verdicts.length > 0, activeRunId, reportData, evidenceCount, questionnaireCount, connectedCount };
 }
 
 export default function DashboardHome({ loaderData }: Route.ComponentProps) {
-  const { summaryStats, orgId, hasAudit, activeRunId, reportData } = loaderData;
+  const { summaryStats, orgId, hasAudit, activeRunId, reportData, evidenceCount, questionnaireCount, connectedCount } = loaderData;
   const [running, setRunning] = useState(false);
   const [auditError, setAuditError] = useState<string | null>(null);
   const [confirmAudit, setConfirmAudit] = useState(false);
@@ -139,6 +150,20 @@ export default function DashboardHome({ loaderData }: Route.ComponentProps) {
           {auditError && (
             <p className="text-sm text-[#EF4444]">Failed to start audit: {auditError}</p>
           )}
+          <div className="flex items-center gap-6 text-xs text-[#5C5C66]">
+            <span className="flex items-center gap-1.5">
+              <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><rect x="2.5" y="2.5" width="4.5" height="4.5" rx="1"/><rect x="9" y="2.5" width="4.5" height="4.5" rx="1"/><rect x="2.5" y="9" width="4.5" height="4.5" rx="1"/><rect x="9" y="9" width="4.5" height="4.5" rx="1"/></svg>
+              {evidenceCount} evidence items
+            </span>
+            <span className="flex items-center gap-1.5">
+              <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M3 2h10a1 1 0 011 1v10a1 1 0 01-1 1H3a1 1 0 01-1-1V3a1 1 0 011-1z"/><path d="M5 5h6M5 8h4M5 11h3"/></svg>
+              {questionnaireCount} questionnaires
+            </span>
+            <span className="flex items-center gap-1.5">
+              <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><rect x="2.5" y="2.5" width="4.5" height="4.5" rx="1"/><rect x="9" y="2.5" width="4.5" height="4.5" rx="1"/><rect x="2.5" y="9" width="4.5" height="4.5" rx="1"/><rect x="9" y="9" width="4.5" height="4.5" rx="1"/></svg>
+              {connectedCount} integrations
+            </span>
+          </div>
         </div>
       )}
 
