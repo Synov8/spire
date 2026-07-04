@@ -206,7 +206,7 @@ export default function DashboardHome({ loaderData }: Route.ComponentProps) {
   );
 }
 function DonutSummary({ stats }: { stats: { pct: number; verified: number; failed: number; warned: number; unchecked: number; total: number } }) {
-  const [hovered, setHovered] = useState<string | null>(null);
+  const [hovered, setHovered] = useState<{ key: string; label: string; value: number; total: number } | null>(null);
   const cx = 50, cy = 50, r = 36, sw = 8;
   const circ = 2 * Math.PI * r;
 
@@ -228,12 +228,9 @@ function DonutSummary({ stats }: { stats: { pct: number; verified: number; faile
       return a;
     });
 
-  const hoveredSeg = segs.find((s) => s.key === hovered);
-  const tooltip = hoveredSeg ? `${hoveredSeg.label}: ${hoveredSeg.value}/${stats.total}` : null;
-
   return (
-    <div className="shrink-0">
-      <svg viewBox="0 0 100 100" className="h-28 w-28">
+    <div className="relative shrink-0">
+      <svg viewBox="6 6 88 88" className="h-28 w-28">
         {arcs.map((a) => (
           <circle
             key={a.key}
@@ -242,20 +239,19 @@ function DonutSummary({ stats }: { stats: { pct: number; verified: number; faile
             strokeDasharray={a.dash} strokeDashoffset={a.off}
             transform={`rotate(-90 ${cx} ${cy})`}
             className="cursor-pointer transition-opacity hover:opacity-80"
-            onMouseEnter={() => setHovered(a.key)}
+            onMouseEnter={() => setHovered({ key: a.key, label: a.label, value: a.value, total: stats.total })}
             onMouseLeave={() => setHovered(null)}
             style={{ outline: "none" }}
           />
         ))}
-          <text x={cx} y={cy + 2} textAnchor="middle" dominantBaseline="central" className="fill-[#F1F1F3]" style={{ fontSize: 20, fontWeight: 700 }}>{stats.pct}%</text>
-          <text x={cx} y={cy + 13} textAnchor="middle" dominantBaseline="central" className="fill-[#8B8B93]" style={{ fontSize: 7 }}>pass rate</text>
-        {tooltip && (
-          <g>
-            <rect x={cx - 40} y={cy + 15} width={80} height={18} rx={5} fill="#1A1D1E" stroke="#2A2D2E" strokeWidth={0.5} />
-            <text x={cx} y={cy + 27} textAnchor="middle" className="fill-[#E8E8E8]" style={{ fontSize: 9, fontWeight: 500 }}>{tooltip}</text>
-          </g>
-        )}
+        <text x={cx} y={cy + 2} textAnchor="middle" dominantBaseline="central" className="fill-[#F1F1F3]" style={{ fontSize: 20, fontWeight: 700 }}>{stats.pct}%</text>
+        <text x={cx} y={cy + 13} textAnchor="middle" dominantBaseline="central" className="fill-[#8B8B93]" style={{ fontSize: 7 }}>pass rate</text>
       </svg>
+      {hovered && (
+        <div className="absolute left-1/2 top-full mt-1 -translate-x-1/2 rounded-lg border border-[#2A2D2E] bg-[#1A1D1E] px-2.5 py-1.5 text-xs font-medium text-[#E8E8E8] whitespace-nowrap shadow-lg">
+          {hovered.label}: {hovered.value}/{hovered.total}
+        </div>
+      )}
     </div>
   );
 }
