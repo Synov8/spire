@@ -52,6 +52,7 @@ export async function action({ request }: Route.ActionArgs) {
   const session = await auth.api.getSession({ headers: request.headers });
   if (!session) return { ok: false };
   const orgId = session.session.activeOrganizationId!;
+  if (!await hasActiveSubscription(orgId, session.user.id)) return { ok: false };
 
   const formData = await request.formData();
   const intent = formData.get("intent") as string;
@@ -102,7 +103,6 @@ export default function ReviewPage({ loaderData }: Route.ComponentProps) {
   const { items, submitted } = loaderData;
   const fetcher = useFetcher();
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
-  const [uploading, setUploading] = useState<Record<string, boolean>>({});
 
   return (
     <div className="space-y-6">
@@ -174,7 +174,6 @@ export default function ReviewPage({ loaderData }: Route.ComponentProps) {
                           onClick={async () => {
                             const fileInput = document.getElementById(`file-${check.id}`) as HTMLInputElement;
                             const textarea = document.getElementById(`content-${check.id}`) as HTMLTextAreaElement;
-                            setUploading((prev) => ({ ...prev, [check.id]: true }));
 
                             let fileUrl = "";
                             let originalFilename = "";
@@ -195,10 +194,10 @@ export default function ReviewPage({ loaderData }: Route.ComponentProps) {
                             formData.append("originalFilename", originalFilename);
                             fetcher.submit(formData, { method: "POST" });
                           }}
-                          disabled={uploading[check.id]}
+                          disabled={fetcher.state !== "idle"}
                           className="rounded-lg bg-[#00D4AA] px-5 py-2 text-sm font-medium text-black hover:bg-[#00B894] transition-all duration-200 disabled:opacity-50"
                         >
-                          {uploading[check.id] ? "Uploading…" : "Submit evidence"}
+                          {fetcher.state !== "idle" ? "Uploading…" : "Submit evidence"}
                         </button>
                       </div>
                     </div>
