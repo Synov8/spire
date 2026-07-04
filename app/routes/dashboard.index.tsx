@@ -79,6 +79,8 @@ export default function DashboardHome({ loaderData }: Route.ComponentProps) {
   const [running, setRunning] = useState(false);
   const [auditError, setAuditError] = useState<string | null>(null);
   const [confirmAudit, setConfirmAudit] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => { setHydrated(true); }, []);
   // NOTE: useNavigate causes full-page reloads in some React Router v7 configs,
   // so we use window.location.href for navigation instead.
 
@@ -143,9 +145,12 @@ export default function DashboardHome({ loaderData }: Route.ComponentProps) {
               className="rounded-lg border border-[#1A1D1E] px-5 py-2.5 text-sm font-medium text-[#8B8B93] hover:border-[#EF4444] hover:text-[#EF4444] transition-all disabled:opacity-50">
               {running ? "Auditing…" : "New audit"}
             </button>
-            {DownloadReportButton && reportData && <DownloadReportButton
+            {hydrated && DownloadReportButton && reportData && <DownloadReportButton
               appUrl={reportData.appUrl} orgName={reportData.orgName} date={reportData.date} frameworks={reportData.frameworks}
             />}
+            {!hydrated && reportData && (
+              <span className="rounded-lg border border-[#1A1D1E] px-5 py-2.5 text-sm font-medium text-[#5C5C66]">Download report</span>
+            )}
           </div>
           {auditError && (
             <p className="text-sm text-[#EF4444]">Failed to start audit: {auditError}</p>

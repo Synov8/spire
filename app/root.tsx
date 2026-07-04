@@ -25,9 +25,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
           as="style"
           href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
           crossOrigin="anonymous"
-          // @ts-expect-error — fetchpriority is a valid HTML attribute on link
-          // but React's TS types haven't caught up for every release.
-          fetchpriority="high"
+          fetchPriority="high"
         />
         <link
           href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
