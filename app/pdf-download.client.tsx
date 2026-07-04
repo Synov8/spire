@@ -26,7 +26,7 @@ const styles = StyleSheet.create({
   frameworkMeta: { fontSize: 9, color: textMuted, marginBottom: 8 },
   tableHeader: { borderBottom: `1 solid ${border}`, paddingBottom: 4, marginBottom: 4, flexDirection: "row" },
   tableHeaderText: { fontSize: 8, fontWeight: "bold", color: textMuted },
-  row: { flexDirection: "row", paddingVertical: 3, borderBottom: `1 solid ${border}` },
+  row: { flexDirection: "row", paddingVertical: 3, borderBottom: `1 solid ${border}`, alignItems: "center" },
   cellControl: { width: "18%", fontSize: 8, fontFamily: "Courier", color: textSecondary },
   cellTitle: { width: "42%", fontSize: 8, color: textPrimary },
   cellStatus: { width: "12%", fontSize: 8 },
