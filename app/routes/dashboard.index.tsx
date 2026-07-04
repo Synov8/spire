@@ -64,6 +64,7 @@ export default function DashboardHome({ loaderData }: Route.ComponentProps) {
   const [running, setRunning] = useState(false);
   const [auditError, setAuditError] = useState<string | null>(null);
   const [expandedControl, setExpandedControl] = useState<string | null>(null);
+  const [framework, setFramework] = useState<"soc2" | "ai-act">("soc2");
   // NOTE: useNavigate causes full-page reloads in some React Router v7 configs,
   // so we use window.location.href for navigation instead.
 
@@ -148,26 +149,23 @@ export default function DashboardHome({ loaderData }: Route.ComponentProps) {
 
       {hasAudit && (
         <section>
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-[#5C5C66]">
-              Controls ({verified + failed + warned} of {total} checked)
-            </h2>
-            <div className="flex items-center gap-4 text-xs text-[#5C5C66]">
-              <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-sm bg-[#00D4AA]" />Pass</span>
-              <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-sm bg-[#EF4444]" />Fail</span>
-              <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-sm bg-[#F59E0B]" />Warning</span>
-              <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-sm bg-[#1A1D1E]" />Unchecked</span>
-            </div>
+          <div className="mb-4 flex items-center gap-3">
+            {(["soc2", "ai-act"] as const).map((fw) => (
+              <button
+                key={fw}
+                onClick={() => setFramework(fw)}
+                className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
+                  framework === fw
+                    ? "bg-[#00D4AA]/10 text-[#00D4AA]"
+                    : "text-[#5C5C66] hover:text-[#8B8B93] hover:bg-[#141718]"
+                }`}
+              >
+                {fw === "soc2" ? "SOC 2" : "EU AI Act"}
+              </button>
+            ))}
           </div>
-          <div className="mb-4 h-2 w-full overflow-hidden rounded-full bg-[#1A1D1E]">
-            <div className="flex h-full">
-              <div className="bg-[#00D4AA] transition-all duration-500" style={{ width: `${total > 0 ? (verified / total) * 100 : 0}%` }} />
-              <div className="bg-[#EF4444] transition-all duration-500" style={{ width: `${total > 0 ? (failed / total) * 100 : 0}%` }} />
-              <div className="bg-[#F59E0B] transition-all duration-500" style={{ width: `${total > 0 ? (warned / total) * 100 : 0}%` }} />
-            </div>
-          </div>
-              <div className="space-y-1">
-            {controls.map((c) => {
+          <div className="space-y-1">
+            {controls.filter((c) => c.framework === framework).map((c) => {
               const status = controlStatus[c.controlId] || "unchecked";
               const isOpen = expandedControl === c.controlId;
               const detail = controlDetails[c.controlId];
@@ -233,45 +231,30 @@ function DonutSummary({ stats }: { stats: { pct: number; verified: number; faile
   const tooltip = hoveredSeg ? `${hoveredSeg.label}: ${hoveredSeg.value}/${stats.total}` : null;
 
   return (
-    <div className="flex items-center gap-8">
-      <div className="relative shrink-0">
-        <svg viewBox="0 0 100 100" className="h-28 w-28">
-          {arcs.map((a) => (
-            <circle
-              key={a.key}
-              cx={cx} cy={cy} r={r} fill="none"
-              stroke={a.color} strokeWidth={sw}
-              strokeDasharray={a.dash} strokeDashoffset={a.off}
-              transform={`rotate(-90 ${cx} ${cy})`}
-              className="cursor-pointer transition-opacity hover:opacity-80"
-              onMouseEnter={() => setHovered(a.key)}
-              onMouseLeave={() => setHovered(null)}
-              style={{ outline: "none" }}
-            />
-          ))}
-          <text x={cx} y={cy - 3} textAnchor="middle" className="fill-[#F1F1F3]" style={{ fontSize: 22, fontWeight: 700 }}>{stats.pct}%</text>
-          <text x={cx} y={cy + 10} textAnchor="middle" className="fill-[#5C5C66]" style={{ fontSize: 6 }}>pass rate</text>
-          {tooltip && (
-            <g>
-              <rect x={cx - 28} y={cy + 18} width={56} height={10} rx={3} fill="#1A1D1E" stroke="#2A2D2E" strokeWidth={0.5} />
-              <text x={cx} y={cy + 26} textAnchor="middle" className="fill-[#8B8B93]" style={{ fontSize: 5.5 }}>{tooltip}</text>
-            </g>
-          )}
-        </svg>
-      </div>
-      <div className="space-y-1.5">
-        {segs.map((s) => (
-          <div key={s.key} className="flex items-center gap-2 text-xs">
-            <span className="h-2 w-2 rounded-sm shrink-0" style={{ backgroundColor: s.color }} />
-            <span className="text-[#6A6D6E] w-16">{s.label}</span>
-            <span className="text-[#F1F1F3] font-medium tabular-nums">{s.value}</span>
-          </div>
+    <div className="shrink-0">
+      <svg viewBox="0 0 100 100" className="h-28 w-28">
+        {arcs.map((a) => (
+          <circle
+            key={a.key}
+            cx={cx} cy={cy} r={r} fill="none"
+            stroke={a.color} strokeWidth={sw}
+            strokeDasharray={a.dash} strokeDashoffset={a.off}
+            transform={`rotate(-90 ${cx} ${cy})`}
+            className="cursor-pointer transition-opacity hover:opacity-80"
+            onMouseEnter={() => setHovered(a.key)}
+            onMouseLeave={() => setHovered(null)}
+            style={{ outline: "none" }}
+          />
         ))}
-        <div className="pt-1 border-t border-[#1A1D1E] flex items-center gap-2 text-xs">
-          <span className="text-[#5C5C66] w-16">Total</span>
-          <span className="text-[#F1F1F3] font-medium tabular-nums">{stats.total}</span>
-        </div>
-      </div>
+        <text x={cx} y={cy - 3} textAnchor="middle" className="fill-[#F1F1F3]" style={{ fontSize: 22, fontWeight: 700 }}>{stats.pct}%</text>
+        <text x={cx} y={cy + 10} textAnchor="middle" className="fill-[#5C5C66]" style={{ fontSize: 6 }}>pass rate</text>
+        {tooltip && (
+          <g>
+            <rect x={cx - 30} y={cy + 15} width={60} height={14} rx={4} fill="#1A1D1E" stroke="#2A2D2E" strokeWidth={0.5} />
+            <text x={cx} y={cy + 25} textAnchor="middle" className="fill-[#E8E8E8]" style={{ fontSize: 7, fontWeight: 500 }}>{tooltip}</text>
+          </g>
+        )}
+      </svg>
     </div>
   );
 }
