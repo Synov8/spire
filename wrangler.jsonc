@@ -6,5 +6,12 @@
   "vars": { "VALUE_FROM_CLOUDFLARE": "Hello from Cloudflare" },
   "observability": { "enabled": true },
   "upload_source_maps": true,
-  "compatibility_flags": ["nodejs_compat"]
+  "compatibility_flags": ["nodejs_compat"],
+  "r2_buckets": [
+    {
+      "binding": "EVIDENCE_BUCKET",
+      "bucket_name": "spire-evidence",
+      "preview_bucket_name": "spire-evidence"
+    }
+  ]
 }
