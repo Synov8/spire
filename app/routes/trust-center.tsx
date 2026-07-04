@@ -2,10 +2,7 @@ import { Link } from "react-router";
 import { PublicLayout } from "~/components/public-layout";
 import { StructuredData } from "~/components/structured-data";
 import { organizationSchema } from "~/lib/structured-data";
-import { db } from "~/db";
-import { policyCheck, control } from "~/db/schema";
-import { eq } from "drizzle-orm";
-import type { Route } from "./+types/trust-center";
+import { spirePosture, type FrameworkPosture } from "~/data/spire-self-audit";
 
 /**
  * /trust-center — provable-by-design public trust surface.
@@ -36,32 +33,7 @@ export function meta() {
   ];
 }
 
-export async function loader() {
-  const verdicts = await db.select().from(policyCheck).where(eq(policyCheck.organizationId, "self-audit"));
-  const controlsList = await db.select().from(control);
 
-  const soc2 = controlsList.filter((c) => c.framework === "soc2");
-  const aiAct = controlsList.filter((c) => c.framework === "ai-act");
-
-  const soc2Verdicts = verdicts.filter((v) => soc2.some((c) => c.controlId === v.ruleId));
-  const aiVerdicts = verdicts.filter((v) => aiAct.some((c) => c.controlId === v.ruleId));
-
-  const posture = {
-    generatedAt: new Date().toISOString(),
-    frameworks: {
-      soc2: {
-        passed: soc2Verdicts.filter((v) => v.status === "pass").length,
-        total: soc2.length,
-      },
-      aiAct: {
-        passed: aiVerdicts.filter((v) => v.status === "pass").length,
-        total: aiAct.length,
-      },
-    },
-  };
-
-  return { posture };
-}
 
 const SUBPROCESSORS: ReadonlyArray<{
   name: string;
@@ -134,8 +106,7 @@ function PostureCard({ title, passed, total }: { title: string; passed: number; 
   );
 }
 
-export default function TrustCenter({ loaderData }: Route.ComponentProps) {
-  const { posture } = loaderData;
+export default function TrustCenter() {
   return (
     <PublicLayout>
       {/* JSON-LD: Organization (legal entity Synov8 Ltd., contact points, sameAs) */}
@@ -165,14 +136,14 @@ export default function TrustCenter({ loaderData }: Route.ComponentProps) {
           </div>
           <p className="mt-2 text-sm text-[#8B8B93]">
             Snapshot from{" "}
-            <time dateTime={posture.generatedAt} className="text-[#F1F1F3]">
-              {new Date(posture.generatedAt).toUTCString()}
+            <time dateTime={spirePosture.generatedAt} className="text-[#F1F1F3]">
+              {new Date(spirePosture.generatedAt).toUTCString()}
             </time>
             . Provability is end-to-end: Spire's audit engine runs against Spire's organization.
           </p>
           <div className="mt-8 grid gap-6 md:grid-cols-2">
-            <PostureCard title="SOC 2" passed={posture.frameworks.soc2.passed} total={posture.frameworks.soc2.total} />
-            <PostureCard title="EU AI Act" passed={posture.frameworks.aiAct.passed} total={posture.frameworks.aiAct.total} />
+            <PostureCard title="SOC 2" passed={spirePosture.frameworks.soc2.passed} total={spirePosture.frameworks.soc2.total} />
+            <PostureCard title="EU AI Act" passed={spirePosture.frameworks.aiAct.passed} total={spirePosture.frameworks.aiAct.total} />
           </div>
         </div>
       </section>

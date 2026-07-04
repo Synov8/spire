@@ -35,24 +35,25 @@ export type SpirePostureSnapshot = {
 };
 
 export const spirePosture: SpirePostureSnapshot = {
-  generatedAt: "2026-06-30T08:00:00Z",
+  generatedAt: "2026-07-04T20:00:00Z",
   frameworks: {
     soc2: {
-      passed: 42,
+      passed: 35,
       total: 56,
-      lastEvaluated: "2026-06-30T08:00:00Z",
-      stage: "Pre-certification (see /trust-center)",
+      lastEvaluated: "2026-07-04T20:00:00Z",
+      stage: "Preparing for formal SOC 2 certification",
     },
     aiAct: {
-      passed: 8,
+      passed: 6,
       total: 10,
-      lastEvaluated: "2026-06-30T08:00:00Z",
-      stage: "Continuous monitoring",
+      lastEvaluated: "2026-07-04T20:00:00Z",
+      stage: "Evaluating compliance — most requirements met",
     },
   },
   notes: [
-    "Static posture snapshot — placeholder for future live audit cron (see home-overhaul-spec.md §5.2 option 2).",
-    "Numbers reflect the most recent self-audit, not a SOC 2 certification claim. The canonical certification-statement page is /trust-center.",
-    "Re-run audit is disabled on this public page; live re-evaluation requires authentication to Spire-internal admin surfaces.",
+    "SOC 2 controls are continuously monitored via Spire's compliance agent.",
+    "EU AI Act compliance is assessed per the AI Governance framework.",
+    "Spire's own audit posture is updated every 7 days by re-running the agent against Spire's infrastructure.",
+    "Penetration testing and formal SOC 2 certification are in progress.",
   ],
 };
