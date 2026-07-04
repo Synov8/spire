@@ -53,14 +53,6 @@ export async function loader() {
       if (!Array.isArray(items)) throw new Error("unexpected response");
     }),
 
-    check("Auth service", async () => {
-      if (!process.env.BETTER_AUTH_SECRET) throw new Error("missing BETTER_AUTH_SECRET");
-      if (!process.env.BETTER_AUTH_URL) throw new Error("missing BETTER_AUTH_URL");
-    }),
-
-    check("Hosting platform", async () => {
-      // being served by CF means the platform is up
-    }),
   ]);
 
   return { results, healthy: results.every(r => r.ok), ts: new Date().toISOString() };
