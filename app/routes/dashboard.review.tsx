@@ -1,3 +1,7 @@
+export function meta() {
+  return [{ title: "Review | Spire" }, { name: "description", content: "Review compliance findings and submit evidence" }];
+}
+
 import { useState } from "react";
 import { useFetcher, redirect } from "react-router";
 import { db } from "~/db";

@@ -1,3 +1,7 @@
+export function meta() {
+  return [{ title: "Integrations | Spire" }, { name: "description", content: "Connect your infrastructure for compliance monitoring" }];
+}
+
 import { useState } from "react";
 import { useLoaderData } from "react-router";
 import { DASHBOARD_INTEGRATIONS, INTEGRATION_CATEGORIES, type DashboardIntegration } from "~/lib/integration-data";

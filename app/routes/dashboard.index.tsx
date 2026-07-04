@@ -1,3 +1,10 @@
+export function meta() {
+  return [
+    { title: "Overview | Spire" },
+    { name: "description", content: "Compliance posture and audit readiness overview" },
+  ];
+}
+
 import { useState, useEffect, useMemo } from "react";
 import { animate } from "motion";
 import { useLoaderData, Link, useNavigate } from "react-router";

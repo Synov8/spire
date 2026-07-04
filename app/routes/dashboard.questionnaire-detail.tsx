@@ -1,3 +1,8 @@
+export function meta({ loaderData }: Route.MetaArgs) {
+  const title = (loaderData as any)?.questionnaire?.title || "Questionnaire";
+  return [{ title: `${title} | Spire` }, { name: "description", content: "Security questionnaire detail" }];
+}
+
 import { useState, useRef, useEffect } from "react";
 import { redirect, useRevalidator, useFetcher } from "react-router";
 import { useRealtimeRunsWithTag } from "@trigger.dev/react-hooks";

@@ -1,3 +1,7 @@
+export function meta() {
+  return [{ title: "Settings | Spire" }, { name: "description", content: "Account and organisation settings" }];
+}
+
 import { useState } from "react";
 import { useLoaderData, useFetcher } from "react-router";
 import { auth } from "~/lib/auth.server";

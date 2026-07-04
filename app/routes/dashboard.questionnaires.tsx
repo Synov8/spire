@@ -1,3 +1,7 @@
+export function meta() {
+  return [{ title: "Questionnaires | Spire" }, { name: "description", content: "Upload and manage security questionnaires" }];
+}
+
 import { useEffect } from "react";
 import { useLoaderData, Link, redirect, useFetcher } from "react-router";
 import { db } from "~/db";

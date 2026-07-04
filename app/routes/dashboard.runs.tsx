@@ -1,3 +1,7 @@
+export function meta() {
+  return [{ title: "Audit Runs | Spire" }, { name: "description", content: "Past compliance audit runs" }];
+}
+
 import { Link, redirect } from "react-router";
 import { auth } from "~/lib/auth.server";
 import type { Route } from "./+types/dashboard.runs";

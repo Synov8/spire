@@ -1,3 +1,7 @@
+export function meta() {
+  return [{ title: "Billing | Spire" }, { name: "description", content: "Manage your subscription and billing" }];
+}
+
 import { useLoaderData } from "react-router";
 import { auth } from "~/lib/auth.server";
 import { db } from "~/db";

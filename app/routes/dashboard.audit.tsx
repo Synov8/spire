@@ -1,3 +1,7 @@
+export function meta() {
+  return [{ title: "Audit Run | Spire" }, { name: "description", content: "Live compliance audit stream" }];
+}
+
 import { useRef, useEffect, useState } from "react";
 import { Link, useLoaderData, useSearchParams } from "react-router";
 import { useRealtimeRunsWithTag, useRealtimeStream } from "@trigger.dev/react-hooks";
