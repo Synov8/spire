@@ -69,42 +69,31 @@ function describeComposioTool(toolName: string, args: any): { app: string; actio
   if (lower === "composio_manage_connections") {
     const toolkits: string[] = args?.toolkits ?? [];
     const apps = toolkits.map((t: string) => APP_LABELS[t.toLowerCase()] || t.charAt(0).toUpperCase() + t.slice(1));
-    return { app: apps.join(", "), action: "Checking connections…", description: `Verifying ${apps.length} integration connections` };
+    return { app: apps.join(", "), action: "Checking connections…", description: `Verifying ${apps.length} integrations` };
   }
 
   if (lower === "composio_search_tools") {
-    const queries: Array<{ use_case?: string }> = args?.queries ?? [];
-    if (queries.length === 1 && queries[0].use_case?.startsWith("list all available")) {
-      return { app: "Composio", action: "Discovering available tools…", description: "" };
-    }
-    const apps = new Set<string>();
-    for (const q of queries) {
-      const match = q.use_case?.match(/for (\w+)/);
-      if (match) apps.add(APP_LABELS[match[1].toLowerCase()] || match[1]);
-    }
-    return { app: [...apps].join(", ") || "Composio", action: "Finding relevant tools…", description: `${queries.length} queries` };
+    return { app: "Composio", action: "Finding relevant tools…", description: "" };
   }
 
   if (lower === "composio_get_tool_schemas") {
     const slugs: string[] = args?.tool_slugs ?? [];
-    const apps = slugs.map(slugApp);
-    const unique = [...new Set(apps)];
-    return { app: unique.join(", ") || "Composio", action: "Loading tool schemas…", description: `${slugs.length} tools` };
+    const apps = [...new Set(slugs.map(slugApp))];
+    return { app: apps.join(", "), action: "Loading tool schemas…", description: `${slugs.length} tools` };
   }
 
   if (lower === "composio_multi_execute_tool") {
-    const tools: Array<{ tool_slug?: string; arguments?: Record<string, unknown> }> = args?.tools ?? [];
+    const tools: Array<{ tool_slug?: string }> = args?.tools ?? [];
     const thought: string = args?.thought ?? "";
     const metric: string = args?.current_step_metric ?? "";
     const apps = [...new Set(tools.map((t) => slugApp(t.tool_slug || "")))];
-    const short = thought ? (thought.length > 60 ? thought.slice(0, 60) + "…" : thought) : `Probing ${apps.length} apps`;
-    return { app: apps.join(", "), action: short, description: `${tools.length} tools • ${metric}`, progress: metric };
+    const short = thought ? (thought.length > 50 ? thought.slice(0, 50) + "…" : thought) : `Probing ${apps.length} apps`;
+    return { app: apps.join(", "), action: short, description: `${tools.length} tools`, progress: metric };
   }
 
   if (lower === "composio_remote_workbench") {
     const thought: string = args?.thought ?? "";
-    const metric: string = args?.current_step_metric ?? "";
-    return { app: "Composio", action: thought || "Processing evidence…", description: metric || "" };
+    return { app: "Composio", action: thought || "Processing evidence…", description: "" };
   }
 
   return { app: "Composio", action: "Running audit checks…", description: "" };
@@ -219,14 +208,18 @@ function ToolCallCard({ card }: { card: ToolCard }) {
             <p className="mt-1 text-[11px] text-[#6A6D6E] leading-relaxed">{card.description}</p>
           )}
 
-          {card.progress && (
-            <div className="mt-1.5 flex items-center gap-2 text-[10px] text-[#5C5C66]">
-              <div className="h-1 flex-1 overflow-hidden rounded-full bg-[#1A1D1E]">
-                <div className="h-full animate-pulse rounded-full bg-[#00D4AA]" style={{ width: "30%" }} />
+          {card.progress && (() => {
+            const match = card.progress!.match(/(\d+)\/(\d+)/);
+            const pct = match ? Math.round((+match[1] / +match[2]) * 100) : 0;
+            return (
+              <div className="mt-1.5 flex items-center gap-2 text-[10px] text-[#5C5C66]">
+                <div className="h-1 flex-1 overflow-hidden rounded-full bg-[#1A1D1E]">
+                  <div className="h-full rounded-full bg-[#00D4AA] transition-all duration-500" style={{ width: `${pct}%` }} />
+                </div>
+                <span className="shrink-0">{card.progress}</span>
               </div>
-              <span className="shrink-0">{card.progress}</span>
-            </div>
-          )}
+            );
+          })()}
 
           {hasResult && resultPreview && (
             <div className="mt-2">
