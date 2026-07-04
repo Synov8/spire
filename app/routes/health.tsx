@@ -53,6 +53,13 @@ export async function loader() {
       if (!Array.isArray(items)) throw new Error("unexpected response");
     }),
 
+    check("Background jobs", async () => {
+      if (!process.env.TRIGGER_SECRET_KEY) throw new Error("missing key");
+      const res = await fetch("https://api.trigger.dev/v1/projects", {
+        headers: { Authorization: `Bearer ${process.env.TRIGGER_SECRET_KEY}` },
+      });
+      if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+    }),
   ]);
 
   return { results, healthy: results.every(r => r.ok), ts: new Date().toISOString() };
