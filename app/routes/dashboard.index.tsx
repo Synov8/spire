@@ -28,7 +28,9 @@ export async function loader({ request }: Route.LoaderArgs) {
 
   const frameworks = [...new Set(allControls.map((c) => c.framework))];
   const org = await db.select().from(organization).where(eq(organization.id, orgId)).limit(1).then((r) => r[0]);
+  const appUrl = new URL(request.url).origin;
   const reportData = verdicts.length > 0 ? {
+    appUrl,
     orgName: org?.name || session.user.name,
     date: new Date().toISOString().split("T")[0],
     frameworks: frameworks.map((fw) => ({
@@ -131,7 +133,7 @@ export default function DashboardHome({ loaderData }: Route.ComponentProps) {
               {running ? "Auditing…" : "New audit"}
             </button>
             {DownloadReportButton && reportData && <DownloadReportButton
-              orgName={reportData.orgName} date={reportData.date} frameworks={reportData.frameworks}
+              appUrl={reportData.appUrl} orgName={reportData.orgName} date={reportData.date} frameworks={reportData.frameworks}
               className="rounded-lg border border-[#1A1D1E] px-5 py-2.5 text-sm font-medium text-[#8B8B93] hover:border-[#00D4AA] hover:text-[#00D4AA] transition-all"
             />}
           </div>
