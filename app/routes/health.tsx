@@ -15,13 +15,13 @@ async function check(label: string, fn: () => Promise<unknown>): Promise<{ label
 
 export async function loader() {
   const results = await Promise.all([
-    check("Database (Neon)", async () => {
+    check("Database", async () => {
       const sql = neon(process.env.DATABASE_URL!);
       const r = await sql`SELECT 1 AS ok`;
       if (!r?.[0]?.ok) throw new Error("query returned no rows");
     }),
 
-    check("Stripe API", async () => {
+    check("Payments", async () => {
       if (!process.env.STRIPE_SECRET_KEY) throw new Error("missing key");
       const r = await fetch("https://api.stripe.com/v1/balance", {
         headers: { Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}` },
@@ -29,7 +29,7 @@ export async function loader() {
       if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
     }),
 
-    check("Resend API", async () => {
+    check("Email", async () => {
       if (!process.env.RESEND_API_KEY) throw new Error("missing key");
       const r = await fetch("https://api.resend.com/domains", {
         headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}` },
@@ -37,7 +37,7 @@ export async function loader() {
       if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
     }),
 
-    check("OpenRouter API", async () => {
+    check("AI provider", async () => {
       if (!process.env.OPENROUTER_API_KEY) throw new Error("missing key");
       const r = await fetch("https://openrouter.ai/api/v1/models", {
         headers: { Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}` },
@@ -45,7 +45,7 @@ export async function loader() {
       if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
     }),
 
-    check("Composio API", async () => {
+    check("Integrations", async () => {
       if (!process.env.COMPOSIO_API_KEY) throw new Error("missing key");
       const composio = new Composio({ apiKey: process.env.COMPOSIO_API_KEY! });
       const list = await composio.connectedAccounts.list({ statuses: ["ACTIVE"] });
@@ -53,12 +53,12 @@ export async function loader() {
       if (!Array.isArray(items)) throw new Error("unexpected response");
     }),
 
-    check("Better Auth config", async () => {
+    check("Auth service", async () => {
       if (!process.env.BETTER_AUTH_SECRET) throw new Error("missing BETTER_AUTH_SECRET");
       if (!process.env.BETTER_AUTH_URL) throw new Error("missing BETTER_AUTH_URL");
     }),
 
-    check("Cloudflare platform", async () => {
+    check("Hosting platform", async () => {
       // being served by CF means the platform is up
     }),
   ]);
@@ -102,12 +102,7 @@ export default function HealthPage() {
           ))}
         </div>
 
-        <div className="mt-8 rounded-xl border border-[#1C1C24] bg-[#111116] p-5">
-          <p className="text-xs text-[#5C5C66]">
-            This page checks connectivity to each service Spire depends on. If a check fails,
-            verify the corresponding API key is set in your Cloudflare Worker secrets and is valid.
-          </p>
-        </div>
+
       </section>
     </PublicLayout>
   );
