@@ -49,12 +49,13 @@ export default function App() {
 }
 
 export function ErrorBoundary({ error }: { error?: Error }) {
+  const isDev = import.meta.env.DEV;
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#07080A] p-8">
       <div className="max-w-lg text-center">
         <h1 className="text-2xl font-bold text-[#F1F1F3]">Something went wrong</h1>
         <p className="mt-2 text-[#6A6D6E]">An unexpected error occurred.</p>
-        {error && (
+        {isDev && error && (
           <>
             <p className="mt-4 rounded-lg border border-[#EF4444]/20 bg-[#EF4444]/[0.04] px-4 py-3 text-left text-sm font-mono text-[#EF4444] break-all">
               {error.message}

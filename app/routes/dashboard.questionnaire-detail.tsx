@@ -170,6 +170,8 @@ export default function QuestionnaireDetail({ loaderData, actionData }: Route.Co
       {/* Upload area — shown when draft or no questions */}
       {isDraft && (
         <form method="POST" encType="multipart/form-data" action={`/dashboard/questionnaires/${q.id}`} className="space-y-4">
+          <input ref={fileInputRef} id="questionnaire-file" type="file" name="file" accept=".txt,.md,.csv,.pdf,.html" required className="hidden"
+            onChange={(e) => { const f = e.target.files?.[0]; if (f) setSelectedFile(f); }} />
           <div className="rounded-xl border border-dashed border-[#1A1D1E] bg-[#0B0D0E] p-6">
             {selectedFile ? (
               <div className="space-y-4">
@@ -192,7 +194,7 @@ export default function QuestionnaireDetail({ loaderData, actionData }: Route.Co
                 </button>
               </div>
             ) : (
-              <label className="flex cursor-pointer flex-col items-center gap-3">
+              <label htmlFor="questionnaire-file" className="flex cursor-pointer flex-col items-center gap-3">
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-[#1A1D1E] bg-[#141718]">
                   <svg className="h-6 w-6 text-[#4A4D4E]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
                 </div>
@@ -200,8 +202,6 @@ export default function QuestionnaireDetail({ loaderData, actionData }: Route.Co
                   <p className="text-sm font-medium text-[#F1F1F3]">Upload a questionnaire</p>
                   <p className="text-xs text-[#5C5C66] mt-0.5">PDF, TXT, MD, CSV, or HTML</p>
                 </div>
-                <input ref={fileInputRef} type="file" name="file" accept=".txt,.md,.csv,.pdf,.html" required className="hidden"
-                  onChange={(e) => { const f = e.target.files?.[0]; if (f) setSelectedFile(f); }} />
               </label>
             )}
           </div>
