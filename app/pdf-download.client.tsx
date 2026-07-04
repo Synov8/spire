@@ -1,4 +1,4 @@
-import { PDFDownloadLink, Document, Page, View, Text, StyleSheet } from "@react-pdf/renderer";
+import { PDFDownloadLink, Document, Page, View, Text, Image, StyleSheet } from "@react-pdf/renderer";
 
 const accent = "#00D4AA";
 const bg = "#07080A";
@@ -40,7 +40,10 @@ function ReportPdf({ orgName, date, frameworks }: { orgName: string; date: strin
     <Document>
       <Page size="A4" style={styles.page}>
         <View style={styles.header}>
-          <Text style={styles.title}>Compliance Report</Text>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 8 }}>
+            <Image source="/icon.png" style={{ width: 22, height: 22 }} />
+            <Text style={styles.title}>Compliance Report</Text>
+          </View>
           <View style={styles.accentBar} />
           <Text style={styles.subtitle}>{orgName} — {date}</Text>
         </View>
