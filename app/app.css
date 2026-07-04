@@ -56,7 +56,7 @@ body {
   100% { transform: translateX(-50%); }
 }
 .animate-scroll {
-  animation: scroll 40s linear infinite;
+  animation: scroll 25s linear infinite;
   min-width: max-content;
 }
 .mask-fade-x {

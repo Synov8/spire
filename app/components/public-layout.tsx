@@ -175,7 +175,7 @@ export function PublicFooter() {
         </div>
         <div className="mt-10 border-t border-[#1C1C24] pt-8 text-center">
           <div className="relative mb-6 overflow-hidden mask-fade-x">
-            <div className="flex w-max animate-scroll gap-4">
+            <div className="flex w-max animate-scroll gap-8">
               {[...Array(3)].flatMap(() => [
                 <a key="ts" href="https://www.tinystartups.com/startup/spire" target="_blank" rel="noopener"
                    style={{display:"inline-flex",alignItems:"center",gap:"10px",padding:"6px 16px 6px 12px",borderRadius:"12px",textDecoration:"none",fontFamily:"'Inter',system-ui,sans-serif",background:"linear-gradient(#0E0B1F,#0E0B1F) padding-box,linear-gradient(90deg,#3525E6,#D81FE0,#22B8F0) border-box",border:"2px solid transparent",color:"#fff"}}>
