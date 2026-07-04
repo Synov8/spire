@@ -214,7 +214,7 @@ function DonutSummary({ stats }: { stats: { pct: number; verified: number; faile
     { key: "pass", value: stats.verified, color: "#00D4AA", label: "Passed" },
     { key: "fail", value: stats.failed, color: "#EF4444", label: "Failed" },
     { key: "warning", value: stats.warned, color: "#F59E0B", label: "Warnings" },
-    { key: "unchecked", value: stats.unchecked, color: "#1A1D1E", label: "Unchecked" },
+    { key: "unchecked", value: stats.unchecked, color: "#5C5C66", label: "Unchecked" },
   ];
 
   const arcs = useMemo(() => {
