@@ -92,28 +92,31 @@ export default function DashboardHome({ loaderData }: Route.ComponentProps) {
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between">
-        <div>
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0">
           <h1 className="text-2xl font-bold tracking-tight text-[#F1F1F3]">Overview</h1>
           <p className="mt-1 text-sm text-[#6A6D6E]">Monitor your compliance posture and audit readiness</p>
         </div>
-        <div className="flex items-center gap-3">
-          {hasAudit && (
-            <a href="/dashboard/export" download
-              className="rounded-lg border border-[#1A1D1E] px-4 py-2 text-sm font-medium text-[#8B8B93] hover:border-[#00D4AA] hover:text-[#00D4AA] transition-all duration-200">
-              Export report
-            </a>
-          )}
-          {activeRun && (
-            <Link to={`/dashboard/audit?runId=${activeRun.runId}&token=${activeRun.token}`}
-              className="rounded-lg border border-[#00D4AA]/30 px-4 py-2 text-sm font-medium text-[#00D4AA] hover:bg-[#00D4AA]/10 transition-all duration-200">
-              View current audit
-            </Link>
-          )}
-          <button onClick={runAudit} disabled={running}
-            className="rounded-lg bg-[#00D4AA] px-4 py-2 text-sm font-medium text-black hover:bg-[#00B894] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_2px_12px_-2px_rgba(0,212,170,0.3)]">
-            {running ? "Auditing…" : "Run AI audit"}
-          </button>
+        <div className="flex items-center gap-4 shrink-0">
+          {summaryStats && <DonutSummary stats={summaryStats} />}
+          <div className="flex items-center gap-3">
+            {hasAudit && (
+              <a href="/dashboard/export" download
+                className="rounded-lg border border-[#1A1D1E] px-4 py-2 text-sm font-medium text-[#8B8B93] hover:border-[#00D4AA] hover:text-[#00D4AA] transition-all duration-200">
+                Export report
+              </a>
+            )}
+            {activeRun && (
+              <Link to={`/dashboard/audit?runId=${activeRun.runId}&token=${activeRun.token}`}
+                className="rounded-lg border border-[#00D4AA]/30 px-4 py-2 text-sm font-medium text-[#00D4AA] hover:bg-[#00D4AA]/10 transition-all duration-200">
+                View current audit
+              </Link>
+            )}
+            <button onClick={runAudit} disabled={running}
+              className="rounded-lg bg-[#00D4AA] px-4 py-2 text-sm font-medium text-black hover:bg-[#00B894] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_2px_12px_-2px_rgba(0,212,170,0.3)]">
+              {running ? "Auditing…" : "Run AI audit"}
+            </button>
+          </div>
         </div>
         {auditError && (
           <p className="mt-3 text-sm text-[#EF4444]">Failed to start audit: {auditError}</p>
@@ -144,8 +147,6 @@ export default function DashboardHome({ loaderData }: Route.ComponentProps) {
           </Link>
         </div>
       )}
-
-      {summaryStats && <DonutSummary stats={summaryStats} />}
 
       {hasAudit && (
         <section>
@@ -246,8 +247,8 @@ function DonutSummary({ stats }: { stats: { pct: number; verified: number; faile
             style={{ outline: "none" }}
           />
         ))}
-        <text x={cx} y={cy - 3} textAnchor="middle" className="fill-[#F1F1F3]" style={{ fontSize: 22, fontWeight: 700 }}>{stats.pct}%</text>
-        <text x={cx} y={cy + 10} textAnchor="middle" className="fill-[#5C5C66]" style={{ fontSize: 6 }}>pass rate</text>
+          <text x={cx} y={cy + 2} textAnchor="middle" dominantBaseline="central" className="fill-[#F1F1F3]" style={{ fontSize: 22, fontWeight: 700 }}>{stats.pct}%</text>
+          <text x={cx} y={cy + 14} textAnchor="middle" dominantBaseline="central" className="fill-[#5C5C66]" style={{ fontSize: 6 }}>pass rate</text>
         {tooltip && (
           <g>
             <rect x={cx - 30} y={cy + 15} width={60} height={14} rx={4} fill="#1A1D1E" stroke="#2A2D2E" strokeWidth={0.5} />
