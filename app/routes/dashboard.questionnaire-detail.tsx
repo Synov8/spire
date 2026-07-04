@@ -1,5 +1,5 @@
-import { useState, useRef } from "react";
-import { useLoaderData, redirect, useFetcher } from "react-router";
+import { useState, useRef, useEffect } from "react";
+import { useLoaderData, redirect, useFetcher, useNavigate } from "react-router";
 import { db } from "~/db";
 import { questionnaire, policyCheck, control } from "~/db/schema";
 import { auth } from "~/lib/auth.server";
@@ -84,13 +84,14 @@ export default function QuestionnaireDetail({ loaderData }: Route.ComponentProps
   if (!loaderData) return <p className="text-[#5C5C66]">Questionnaire not found.</p>;
   const { questionnaire: q, hasAudit } = loaderData;
   const fetcher = useFetcher();
+  const navigate = useNavigate();
   const actionData = fetcher.data as { ok?: boolean; error?: string; questions?: QuestionItem[]; avgConfidence?: number; status?: string; questionsCount?: number; deleted?: boolean } | null;
   const fileInputRef = useRef<HTMLInputElement>(null);
+  useEffect(() => { if (actionData?.deleted) navigate("/dashboard/questionnaires"); }, [actionData, navigate]);
 
   const [questions, setQuestions] = useState<QuestionItem[]>(
     q.questions ? (q.questions as QuestionItem[]) : []
   );
-  if (actionData?.deleted) { window.location.href = "/dashboard/questionnaires"; return null; }
 
   const [editingIdx, setEditingIdx] = useState<number | null>(null);
   const [editValue, setEditValue] = useState("");
