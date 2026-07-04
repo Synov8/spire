@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { animate } from "motion";
 import { useLoaderData, Link } from "react-router";
 import { db } from "~/db";
@@ -167,15 +167,17 @@ function DonutSummary({ stats }: { stats: { pct: number; verified: number; faile
     { key: "unchecked", value: stats.unchecked, color: "#1A1D1E", label: "Unchecked" },
   ];
 
-  let offset = 0;
-  const arcs = segs
-    .filter((s) => s.value > 0)
-    .map((s) => {
-      const len = (s.value / stats.total) * circ;
-      const a = { ...s, dash: `${len} ${circ - len}`, off: -offset, len };
-      offset += len;
-      return a;
-    });
+  const arcs = useMemo(() => {
+    let offset = 0;
+    return segs
+      .filter((s) => s.value > 0)
+      .map((s) => {
+        const len = (s.value / stats.total) * circ;
+        const a = { ...s, dash: `${len} ${circ - len}`, off: -offset, len };
+        offset += len;
+        return a;
+      });
+  }, [stats.verified, stats.failed, stats.warned, stats.unchecked, stats.total, circ]);
 
   useEffect(() => {
     const anims = arcs.map((a) => {
