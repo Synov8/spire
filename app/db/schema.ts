@@ -117,7 +117,6 @@ export const policyCheck = pgTable("policy_check", {
   organizationId: text("organization_id").notNull().references(() => organization.id, { onDelete: "cascade" }),
   status: text("status").notNull(),
   detail: text("detail"),
-  needsReview: boolean("needs_review").notNull().default(false),
   lastCheckedAt: timestamp("last_checked_at").notNull().defaultNow(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
@@ -129,6 +128,8 @@ export const manualEvidence = pgTable("manual_evidence", {
   category: text("category").notNull(),
   title: text("title").notNull(),
   content: text("content"),
+  fileUrl: text("file_url"),
+  originalFilename: text("original_filename"),
   status: text("status").notNull().default("pending"),
   submittedAt: timestamp("submitted_at").notNull().defaultNow(),
   reviewedAt: timestamp("reviewed_at"),

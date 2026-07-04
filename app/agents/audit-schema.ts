@@ -18,7 +18,7 @@
 import { z } from "zod";
 
 export const ControlVerdictSchema = z.object({
-  status: z.enum(["pass", "fail", "warning", "needs-human-input"]),
+  status: z.enum(["pass", "fail", "warning", "unknown"]),
   detail: z.string().describe("What was checked and the rationale"),
   evidenceSources: z.array(z.string()).nullable().describe("APIs/tools used to check this control"),
   suggestedAction: z.string().nullable().describe("What the user should do to close this gap"),
