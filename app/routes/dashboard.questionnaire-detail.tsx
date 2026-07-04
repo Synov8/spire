@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { redirect, useNavigate, useFetcher } from "react-router";
+import { redirect, useRevalidator, useFetcher } from "react-router";
 import { useRealtimeRunsWithTag } from "@trigger.dev/react-hooks";
 import { db } from "~/db";
 import { questionnaire, policyCheck, control } from "~/db/schema";
@@ -94,15 +94,15 @@ export async function action({ request, params }: Route.ActionArgs) {
 export default function QuestionnaireDetail({ loaderData }: Route.ComponentProps) {
   if (!loaderData) return <p className="text-[#5C5C66]">Questionnaire not found.</p>;
   const { questionnaire: q, hasAudit, tag, accessToken } = loaderData;
-  const navigate = useNavigate();
+  const revalidator = useRevalidator();
   const fetcher = useFetcher();
   const uploading = fetcher.state !== "idle";
   const actionErr = fetcher.data && typeof fetcher.data === "object" && "error" in fetcher.data ? (fetcher.data as { error: string }).error : null;
   useEffect(() => {
     if (fetcher.data && typeof fetcher.data === "object" && "ok" in fetcher.data && (fetcher.data as any).ok) {
-      navigate(".", { replace: true });
+      revalidator.revalidate();
     }
-  }, [fetcher.data, navigate]);
+  }, [fetcher.data, revalidator]);
 
   const runEnabled = !!accessToken;
   const { runs } = useRealtimeRunsWithTag(tag, {
@@ -114,9 +114,9 @@ export default function QuestionnaireDetail({ loaderData }: Route.ComponentProps
   const isProcessing = runProcessing || q.status === "processing";
   useEffect(() => {
     if (latestRun && latestRun.status === "COMPLETED") {
-      navigate(".", { replace: true });
+      revalidator.revalidate();
     }
-  }, [latestRun, navigate]);
+  }, [latestRun, revalidator]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [questions, setQuestions] = useState<QuestionItem[]>(
