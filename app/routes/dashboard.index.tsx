@@ -217,7 +217,6 @@ function DonutSummary({ stats }: { stats: { pct: number; verified: number; faile
     { key: "fail", value: stats.failed, color: "#EF4444", label: "Failed" },
     { key: "warning", value: stats.warned, color: "#F59E0B", label: "Warnings" },
     { key: "unknown", value: stats.unknown, color: "#6A6D6E", label: "Unknown" },
-    { key: "unchecked", value: stats.unchecked, color: "#2A2D2E", label: "Unchecked" },
   ];
 
   const arcs = useMemo(() => {
@@ -230,7 +229,7 @@ function DonutSummary({ stats }: { stats: { pct: number; verified: number; faile
         offset += len;
         return a;
       });
-  }, [stats.verified, stats.failed, stats.warned, stats.unknown, stats.unchecked, stats.total, circ]);
+  }, [stats.verified, stats.failed, stats.warned, stats.unknown, stats.total, circ]);
 
   useEffect(() => {
     const anims = arcs.map((a) => {
@@ -244,7 +243,14 @@ function DonutSummary({ stats }: { stats: { pct: number; verified: number; faile
   return (
     <div className="relative shrink-0" onMouseLeave={() => setHovered(null)}>
       <div className="relative h-56 w-56">
-        <svg viewBox="6 6 88 88" className="h-full w-full">
+        <svg viewBox="0 0 100 100" className="h-full w-full drop-shadow-[0_4px_12px_rgba(0,212,170,0.15)]">
+          <defs>
+            <filter id="glow">
+              <feGaussianBlur stdDeviation="1.5" result="blur" />
+              <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+            </filter>
+          </defs>
+          <circle cx={cx} cy={cy} r={r + 1} fill="none" stroke="#1A1D1E" strokeWidth={sw + 2} />
           {arcs.map((a) => (
             <circle
               id={`arc-${a.key}`}
@@ -252,8 +258,10 @@ function DonutSummary({ stats }: { stats: { pct: number; verified: number; faile
               cx={cx} cy={cy} r={r} fill="none"
               stroke={a.color} strokeWidth={sw}
               strokeDasharray={a.dash} strokeDashoffset={a.off}
+              strokeLinecap="round"
               transform={`rotate(-90 ${cx} ${cy})`}
-              className="cursor-pointer transition-opacity hover:opacity-80"
+              filter={a.key === "pass" ? "url(#glow)" : undefined}
+              className="cursor-pointer transition-all duration-300 hover:opacity-90 hover:brightness-110"
               onMouseEnter={() => setHovered({ key: a.key, label: a.label, value: a.value, total: stats.total })}
               style={{ outline: "none" }}
             />
