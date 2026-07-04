@@ -14,6 +14,7 @@ import type { Route } from "./+types/dashboard.index";
 export async function loader({ request }: Route.LoaderArgs) {
   const session = await auth.api.getSession({ headers: request.headers });
   if (!session) return { summaryStats: null, orgId: "", hasAudit: false, activeRunId: null, reportData: null, evidenceCount: 0, questionnaireCount: 0, connectedCount: 0 };
+
   const orgId = session.session.activeOrganizationId!;
   const allControls = await db.select().from(control);
   const verdicts = await db.select().from(policyCheck).where(eq(policyCheck.organizationId, orgId));
@@ -21,9 +22,10 @@ export async function loader({ request }: Route.LoaderArgs) {
   const verified = verdicts.filter((v) => v.status === "pass").length;
   const failed = verdicts.filter((v) => v.status === "fail").length;
   const warned = verdicts.filter((v) => v.status === "warning").length;
+  const unknown = verdicts.filter((v) => v.status === "unknown").length;
   const unchecked = allControls.length - verdicts.length;
   const pct = allControls.length > 0 ? Math.round((verified / allControls.length) * 100) : 0;
-  const summaryStats = verdicts.length > 0 ? { pct, verified, failed, warned, unchecked, total: allControls.length } : null;
+  const summaryStats = verdicts.length > 0 ? { pct, verified, failed, warned, unknown, unchecked, total: allControls.length } : null;
 
   const verdictByControl = new Map<string, typeof verdicts[0]>();
   for (const v of verdicts) if (v.ruleId) verdictByControl.set(v.ruleId, v);
@@ -204,7 +206,7 @@ export default function DashboardHome({ loaderData }: Route.ComponentProps) {
     </div>
   );
 }
-function DonutSummary({ stats }: { stats: { pct: number; verified: number; failed: number; warned: number; unchecked: number; total: number } }) {
+function DonutSummary({ stats }: { stats: { pct: number; verified: number; failed: number; warned: number; unknown: number; unchecked: number; total: number } }) {
   const [hovered, setHovered] = useState<{ key: string; label: string; value: number; total: number } | null>(null);
   const cx = 50, cy = 50, r = 36, sw = 10;
   const circ = 2 * Math.PI * r;
@@ -214,7 +216,8 @@ function DonutSummary({ stats }: { stats: { pct: number; verified: number; faile
     { key: "pass", value: stats.verified, color: "#00D4AA", label: "Passed" },
     { key: "fail", value: stats.failed, color: "#EF4444", label: "Failed" },
     { key: "warning", value: stats.warned, color: "#F59E0B", label: "Warnings" },
-    { key: "unchecked", value: stats.unchecked, color: "#5C5C66", label: "Unchecked" },
+    { key: "unknown", value: stats.unknown, color: "#6A6D6E", label: "Unknown" },
+    { key: "unchecked", value: stats.unchecked, color: "#2A2D2E", label: "Unchecked" },
   ];
 
   const arcs = useMemo(() => {
@@ -227,7 +230,7 @@ function DonutSummary({ stats }: { stats: { pct: number; verified: number; faile
         offset += len;
         return a;
       });
-  }, [stats.verified, stats.failed, stats.warned, stats.unchecked, stats.total, circ]);
+  }, [stats.verified, stats.failed, stats.warned, stats.unknown, stats.unchecked, stats.total, circ]);
 
   useEffect(() => {
     const anims = arcs.map((a) => {
@@ -242,8 +245,6 @@ function DonutSummary({ stats }: { stats: { pct: number; verified: number; faile
     <div className="relative shrink-0" onMouseLeave={() => setHovered(null)}>
       <div className="relative h-56 w-56">
         <svg viewBox="6 6 88 88" className="h-full w-full">
-          {/* Full background ring to show the unchecked/empty portion */}
-          <circle cx={cx} cy={cy} r={r} fill="none" stroke="#2A2D2E" strokeWidth={sw} />
           {arcs.map((a) => (
             <circle
               id={`arc-${a.key}`}
