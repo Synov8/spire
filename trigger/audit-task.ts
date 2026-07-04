@@ -99,13 +99,11 @@ export const runAudit = task({
       if (p.type === "tool-call") {
         if (p.toolName === "submitAuditReport") continue;
 
-        let parsedArgs: unknown = p.args;
-        if (typeof p.args === "string") { try { parsedArgs = JSON.parse(p.args); } catch { parsedArgs = p.args; } }
         await auditStream.append({
           type: "tool-call",
           id: ++toolIdCounter,
           toolName: p.toolName,
-          args: parsedArgs ?? {},
+          args: (p.input ?? p.args ?? {}) as Record<string, unknown>,
         });
       } else if (p.type === "tool-result") {
         if (p.toolName === "submitAuditReport") continue;
