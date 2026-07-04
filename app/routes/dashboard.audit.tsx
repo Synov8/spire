@@ -328,7 +328,7 @@ export default function AuditPage() {
   const runningToolCount = cards.filter((c) => c.type === "tool-call" && c.result === undefined).length;
   const isRunning = !hasReport && runningToolCount > 0;
 
-  if (!orgId) {
+  if (!runId && !runs?.length) {
     return (
       <div className="flex flex-1 items-center justify-center">
         <div className="text-center">

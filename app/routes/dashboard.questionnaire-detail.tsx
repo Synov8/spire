@@ -119,7 +119,7 @@ export default function QuestionnaireDetail({ loaderData, actionData }: Route.Co
 
   const displayQuestions = questions;
   const avgConfidence = displayQuestions.length > 0 ? displayQuestions.reduce((s, qa) => s + qa.confidence, 0) / displayQuestions.length : 0;
-  const isDraft = (q.status === "draft" || (!q.originalFile && displayQuestions.length === 0)) && q.status !== "processing";
+  const isDraft = (q.status === "draft" || (!q.originalFile && displayQuestions.length === 0)) && !isProcessing;
 
   const startEdit = (i: number) => { setEditingIdx(i); setEditValue(displayQuestions[i].answer); };
   const saveEdit = () => {
@@ -185,7 +185,7 @@ export default function QuestionnaireDetail({ loaderData, actionData }: Route.Co
       )}
 
       {/* Processing state */}
-      {q.status === "processing" && (
+      {isProcessing && (
         <div className="rounded-xl border border-[#F59E0B]/20 bg-[#F59E0B]/[0.04] px-5 py-4">
           <div className="flex items-center gap-3">
             <span className="h-3 w-3 animate-spin rounded-full border-2 border-[#F59E0B]/30 border-t-[#F59E0B]" />
