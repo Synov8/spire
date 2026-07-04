@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect } from "react";
-import { useLoaderData, redirect, useFetcher, useNavigate } from "react-router";
+import { useState, useRef } from "react";
+import { redirect } from "react-router";
 import { db } from "~/db";
 import { questionnaire, policyCheck, control } from "~/db/schema";
 import { auth } from "~/lib/auth.server";
@@ -47,7 +47,7 @@ export async function action({ request, params }: Route.ActionArgs) {
 
     if (intent === "delete") {
       await db.delete(questionnaire).where(eq(questionnaire.id, params.id));
-      return { ok: true, deleted: true };
+      return redirect("/dashboard/questionnaires");
     }
 
     const fileEntry = formData.get("file");
@@ -79,22 +79,18 @@ export async function action({ request, params }: Route.ActionArgs) {
       completedAt: status === "completed" ? new Date() : undefined,
     }).where(eq(questionnaire.id, params.id));
 
-    const avg = parsed.questions.length > 0 ? Math.round(parsed.questions.reduce((s, q) => s + q.confidence, 0) / parsed.questions.length * 100) : 0;
-    return { ok: true, questions: parsed.questions, avgConfidence: avg, status, questionsCount: parsed.questions.length };
+    return redirect(`/dashboard/questionnaires/${params.id}`);
   } catch (err) {
     console.error("Questionnaire action failed:", err);
     return { ok: false, error: err instanceof Error ? err.message : "An unexpected error occurred." };
   }
 }
 
-export default function QuestionnaireDetail({ loaderData }: Route.ComponentProps) {
+export default function QuestionnaireDetail({ loaderData, actionData }: Route.ComponentProps) {
   if (!loaderData) return <p className="text-[#5C5C66]">Questionnaire not found.</p>;
   const { questionnaire: q, hasAudit } = loaderData;
-  const fetcher = useFetcher();
-  const navigate = useNavigate();
-  const actionData = fetcher.data as { ok?: boolean; error?: string; questions?: QuestionItem[]; avgConfidence?: number; status?: string; questionsCount?: number; deleted?: boolean } | null;
+  const actionErr = actionData && typeof actionData === "object" && "error" in actionData ? (actionData as { error: string }).error : null;
   const fileInputRef = useRef<HTMLInputElement>(null);
-  useEffect(() => { if (actionData?.deleted) navigate("/dashboard/questionnaires"); }, [actionData, navigate]);
 
   const [questions, setQuestions] = useState<QuestionItem[]>(
     q.questions ? (q.questions as QuestionItem[]) : []
@@ -104,7 +100,7 @@ export default function QuestionnaireDetail({ loaderData }: Route.ComponentProps
   const [editValue, setEditValue] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  const displayQuestions = actionData?.questions ?? questions;
+  const displayQuestions = questions;
   const avgConfidence = displayQuestions.length > 0 ? displayQuestions.reduce((s, qa) => s + qa.confidence, 0) / displayQuestions.length : 0;
   const isDraft = q.status === "draft" || (!q.originalFile && displayQuestions.length === 0);
 
@@ -117,11 +113,6 @@ export default function QuestionnaireDetail({ loaderData }: Route.ComponentProps
   };
   const cancelEdit = () => { setEditingIdx(null); setEditValue(""); };
 
-  const handleDelete = async () => {
-    if (!confirm("Delete this questionnaire?")) return;
-    fetcher.submit({ intent: "delete" }, { method: "POST" });
-  };
-
   const handleExport = () => {
     const exportData = { title: q.title, status: q.status, generatedAt: new Date().toISOString(), questions: displayQuestions };
     const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
@@ -133,7 +124,7 @@ export default function QuestionnaireDetail({ loaderData }: Route.ComponentProps
     URL.revokeObjectURL(url);
   };
 
-  const statusLabel = actionData?.status ?? q.status;
+  const statusLabel = q.status;
   const statusDot = statusLabel === "completed" ? "bg-[#00D4AA]" : statusLabel === "flagged" ? "bg-[#EF4444]" : "bg-[#5C5C66]";
   const statusBadge = statusLabel === "completed" ? "bg-[#00D4AA]/10 text-[#00D4AA]" : statusLabel === "flagged" ? "bg-[#EF4444]/10 text-[#EF4444]" : "bg-[#1A1D1E] text-[#5C5C66]";
 
@@ -150,11 +141,14 @@ export default function QuestionnaireDetail({ loaderData }: Route.ComponentProps
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <button type="button" onClick={handleDelete}
-            className="flex items-center gap-1.5 rounded-lg border border-[#1A1D1E] px-3.5 py-2 text-sm font-medium text-[#8B8B93] hover:border-[#EF4444]/30 hover:text-[#EF4444] transition-all">
-            <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M2 4h12M5 4V2.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 .5.5V4M4 4v9.5a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4"/></svg>
-            Delete
-          </button>
+          <form method="POST" action={`/dashboard/questionnaires/${q.id}`} onSubmit={(e) => { if (!confirm("Delete this questionnaire?")) e.preventDefault(); }} className="inline">
+            <input type="hidden" name="intent" value="delete" />
+            <button type="submit"
+              className="flex items-center gap-1.5 rounded-lg border border-[#1A1D1E] px-3.5 py-2 text-sm font-medium text-[#8B8B93] hover:border-[#EF4444]/30 hover:text-[#EF4444] transition-all">
+              <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M2 4h12M5 4V2.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 .5.5V4M4 4v9.5a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4"/></svg>
+              Delete
+            </button>
+          </form>
           {q.originalFile && (
             <button type="button" onClick={handleExport}
               className="flex items-center gap-1.5 rounded-lg border border-[#1A1D1E] px-3.5 py-2 text-sm font-medium text-[#8B8B93] transition-all hover:border-[#00D4AA] hover:text-[#00D4AA]">
@@ -169,13 +163,13 @@ export default function QuestionnaireDetail({ loaderData }: Route.ComponentProps
         </div>
       </div>
 
-      {actionData?.error && (
-        <div className="rounded-xl border border-[#EF4444]/20 bg-[#EF4444]/[0.06] px-4 py-3 text-sm text-[#EF4444]">{actionData.error}</div>
+      {actionErr && (
+        <div className="rounded-xl border border-[#EF4444]/20 bg-[#EF4444]/[0.06] px-4 py-3 text-sm text-[#EF4444]">{actionErr}</div>
       )}
 
       {/* Upload area — shown when draft or no questions */}
       {isDraft && (
-        <fetcher.Form method="POST" encType="multipart/form-data" className="space-y-4">
+        <form method="POST" encType="multipart/form-data" action={`/dashboard/questionnaires/${q.id}`} className="space-y-4">
           <div className="rounded-xl border border-dashed border-[#1A1D1E] bg-[#0B0D0E] p-6">
             {selectedFile ? (
               <div className="space-y-4">
@@ -192,14 +186,9 @@ export default function QuestionnaireDetail({ loaderData }: Route.ComponentProps
                     <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg>
                   </button>
                 </div>
-                <button type="submit" disabled={fetcher.state !== "idle"}
-                  className="w-full rounded-lg bg-[#00D4AA] py-2.5 text-sm font-medium text-black hover:bg-[#00B894] transition-all disabled:opacity-50">
-                  {fetcher.state !== "idle" ? (
-                    <span className="flex items-center justify-center gap-2">
-                      <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-black/20 border-t-black" />
-                      Processing…
-                    </span>
-                  ) : "Upload & parse questions"}
+                <button type="submit"
+                  className="w-full rounded-lg bg-[#00D4AA] py-2.5 text-sm font-medium text-black hover:bg-[#00B894] transition-all">
+                  Upload & parse questions
                 </button>
               </div>
             ) : (
@@ -219,7 +208,7 @@ export default function QuestionnaireDetail({ loaderData }: Route.ComponentProps
           {!hasAudit && (
             <p className="text-xs text-[#F59E0B] text-center">⚠ Run an AI audit from the overview page first for better answers.</p>
           )}
-        </fetcher.Form>
+        </form>
       )}
 
       {/* Confidence bar */}
