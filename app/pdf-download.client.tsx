@@ -43,6 +43,9 @@ function ReportPdf({ appUrl, orgName, date, frameworks }: { appUrl: string; orgN
           <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 8 }}>
             <Image source="/icon.png" style={{ width: 28, height: 28 }} />
             <Text style={styles.title}>Compliance Report</Text>
+            <View style={{ backgroundColor: "#00D4AA", borderRadius: 4, paddingHorizontal: 6, paddingVertical: 3 }}>
+              <Text style={{ fontSize: 7, fontWeight: "bold", color: "#000" }}>AI-GENERATED</Text>
+            </View>
           </View>
           <View style={styles.accentBar} />
           <Text style={styles.subtitle}>{orgName} — {date}</Text>

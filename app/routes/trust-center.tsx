@@ -2,8 +2,10 @@ import { Link } from "react-router";
 import { PublicLayout } from "~/components/public-layout";
 import { StructuredData } from "~/components/structured-data";
 import { organizationSchema } from "~/lib/structured-data";
+import { db } from "~/db";
+import { policyCheck, control } from "~/db/schema";
+import { eq } from "drizzle-orm";
 import type { Route } from "./+types/trust-center";
-import { spirePosture, type FrameworkPosture } from "~/data/spire-self-audit";
 
 /**
  * /trust-center — provable-by-design public trust surface.
@@ -32,6 +34,33 @@ export function meta() {
     { property: "og:description", content: "Provable security and compliance posture for Spire." },
     { property: "og:type", content: "website" },
   ];
+}
+
+export async function loader() {
+  const verdicts = await db.select().from(policyCheck).where(eq(policyCheck.organizationId, "self-audit"));
+  const controlsList = await db.select().from(control);
+
+  const soc2 = controlsList.filter((c) => c.framework === "soc2");
+  const aiAct = controlsList.filter((c) => c.framework === "ai-act");
+
+  const soc2Verdicts = verdicts.filter((v) => soc2.some((c) => c.controlId === v.ruleId));
+  const aiVerdicts = verdicts.filter((v) => aiAct.some((c) => c.controlId === v.ruleId));
+
+  const posture = {
+    generatedAt: new Date().toISOString(),
+    frameworks: {
+      soc2: {
+        passed: soc2Verdicts.filter((v) => v.status === "pass").length,
+        total: soc2.length,
+      },
+      aiAct: {
+        passed: aiVerdicts.filter((v) => v.status === "pass").length,
+        total: aiAct.length,
+      },
+    },
+  };
+
+  return { posture };
 }
 
 const SUBPROCESSORS: ReadonlyArray<{
@@ -90,44 +119,23 @@ function ProgressBar({ passed, total }: { passed: number; total: number }): Reac
   );
 }
 
-function PostureCard({
-  title,
-  frameworkKey,
-  posture,
-}: {
-  title: string;
-  frameworkKey: "soc2" | "aiAct";
-  posture: FrameworkPosture;
-}) {
+function PostureCard({ title, passed, total }: { title: string; passed: number; total: number }) {
   return (
     <div className="rounded-xl border border-[#1C1C24] bg-[#111116] p-6">
       <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[#5C5C66]">
         {title}
       </p>
       <p className="mt-2 text-3xl font-bold tracking-tight text-[#F1F1F3]">
-        {posture.passed}
-        <span className="text-base font-normal text-[#5C5C66]"> / {posture.total}</span>
+        {passed}
+        <span className="text-base font-normal text-[#5C5C66]"> / {total}</span>
       </p>
-      <ProgressBar passed={posture.passed} total={posture.total} />
-      <dl className="mt-4 space-y-1 text-xs text-[#5C5C66]">
-        <div>
-          <dt className="inline">Stage: </dt>
-          <dd className="inline text-[#8B8B93]">{posture.stage}</dd>
-        </div>
-        <div>
-          <dt className="inline">Last evaluated: </dt>
-          <dd className="inline">
-            <time dateTime={posture.lastEvaluated} className="text-[#8B8B93]">
-              {new Date(posture.lastEvaluated).toUTCString()}
-            </time>
-          </dd>
-        </div>
-      </dl>
+      <ProgressBar passed={passed} total={total} />
     </div>
   );
 }
 
-export default function TrustCenter() {
+export default function TrustCenter({ loaderData }: Route.ComponentProps) {
+  const { posture } = loaderData;
   return (
     <PublicLayout>
       {/* JSON-LD: Organization (legal entity Synov8 Ltd., contact points, sameAs) */}
@@ -154,44 +162,18 @@ export default function TrustCenter() {
             <h2 className="text-2xl font-bold tracking-tight text-[#F1F1F3] md:text-3xl">
               Posture snapshot
             </h2>
-            <div className="flex flex-col items-end gap-1">
-              <button
-                type="button"
-                aria-disabled="true"
-                aria-describedby="rerun-audit-status"
-                className="cursor-not-allowed rounded-lg border border-[#1C1C24] px-4 py-2 text-sm text-[#5C5C66]"
-              >
-                Re-run audit
-              </button>
-              <p id="rerun-audit-status" className="text-xs text-[#5C5C66]">
-                Live re-evaluation is gated behind Spire-admin access.
-              </p>
-            </div>
           </div>
           <p className="mt-2 text-sm text-[#8B8B93]">
             Snapshot from{" "}
-            <time dateTime={spirePosture.generatedAt} className="text-[#F1F1F3]">
-              {new Date(spirePosture.generatedAt).toUTCString()}
+            <time dateTime={posture.generatedAt} className="text-[#F1F1F3]">
+              {new Date(posture.generatedAt).toUTCString()}
             </time>
             . Provability is end-to-end: Spire's audit engine runs against Spire's organization.
           </p>
           <div className="mt-8 grid gap-6 md:grid-cols-2">
-            <PostureCard
-              title="SOC 2"
-              frameworkKey="soc2"
-              posture={spirePosture.frameworks.soc2}
-            />
-            <PostureCard
-              title="EU AI Act"
-              frameworkKey="aiAct"
-              posture={spirePosture.frameworks.aiAct}
-            />
+            <PostureCard title="SOC 2" passed={posture.frameworks.soc2.passed} total={posture.frameworks.soc2.total} />
+            <PostureCard title="EU AI Act" passed={posture.frameworks.aiAct.passed} total={posture.frameworks.aiAct.total} />
           </div>
-          <ul className="mt-6 space-y-2 text-xs text-[#5C5C66]">
-            {spirePosture.notes.map((note) => (
-              <li key={note}>• {note}</li>
-            ))}
-          </ul>
         </div>
       </section>
 

@@ -259,6 +259,7 @@ export default function AuditPage() {
             <span className={`h-2 w-2 rounded-full ${hasReport ? "bg-[#00D4AA]" : isRunning ? "bg-[#00D4AA] animate-pulse" : "bg-[#5C5C66]"}`} />
             <h1 className="text-sm font-medium text-[#F1F1F3]">
               {hasReport ? "Audit complete" : isRunning ? "Running compliance audit" : "Initialising…"}
+              {hasReport && <span className="rounded bg-[#00D4AA]/10 px-1.5 py-0.5 text-[9px] font-semibold text-[#00D4AA]">AI-generated</span>}
             </h1>
           </div>
           <span className="text-xs text-[#5C5C66]">{cards.length} steps</span>
