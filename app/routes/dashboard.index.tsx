@@ -134,7 +134,6 @@ export default function DashboardHome({ loaderData }: Route.ComponentProps) {
             </button>
             {DownloadReportButton && reportData && <DownloadReportButton
               appUrl={reportData.appUrl} orgName={reportData.orgName} date={reportData.date} frameworks={reportData.frameworks}
-              className="rounded-lg border border-[#1A1D1E] px-5 py-2.5 text-sm font-medium text-[#8B8B93] hover:border-[#00D4AA] hover:text-[#00D4AA] transition-all"
             />}
           </div>
           {auditError && (

@@ -1,8 +1,8 @@
+import { useState } from "react";
 import { PDFDownloadLink, Document, Page, View, Text, Image, Link, StyleSheet } from "@react-pdf/renderer";
 
 const accent = "#00D4AA";
 const bg = "#07080A";
-const surface = "#0B0D0E";
 const border = "#1A1D1E";
 const textPrimary = "#F1F1F3";
 const textSecondary = "#8B8B93";
@@ -87,14 +87,63 @@ function ReportPdf({ appUrl, orgName, date, frameworks }: { appUrl: string; orgN
   );
 }
 
-export function DownloadReportButton({ appUrl, orgName, date, frameworks, className }: { appUrl: string; orgName: string; date: string; frameworks: { framework: string; controls: { controlId: string; title: string; status: string; detail: string | null }[] }[]; className?: string }) {
+export function DownloadReportButton({ appUrl, orgName, date, frameworks }: { appUrl: string; orgName: string; date: string; frameworks: { framework: string; controls: { controlId: string; title: string; status: string; detail: string | null }[] }[] }) {
+  const [open, setOpen] = useState(false);
+
+  const soc2Frameworks = frameworks.filter((f) => f.framework === "soc2");
+  const aiFrameworks = frameworks.filter((f) => f.framework === "ai-act");
+
   return (
-    <PDFDownloadLink
-      document={<ReportPdf appUrl={appUrl} orgName={orgName} date={date} frameworks={frameworks} />}
-      fileName={`spire-compliance-report-${date}.pdf`}
-      className={className}
-    >
-      {({ loading }: { loading: boolean }) => (loading ? "Preparing…" : "Download report")}
-    </PDFDownloadLink>
+    <div className="relative">
+      <div className="flex">
+        <PDFDownloadLink
+          document={<ReportPdf appUrl={appUrl} orgName={orgName} date={date} frameworks={frameworks} />}
+          fileName={`spire-compliance-report-${date}.pdf`}
+          className="rounded-l-lg border-r-0 border border-[#1A1D1E] px-5 py-2.5 text-sm font-medium text-[#8B8B93] hover:border-[#00D4AA] hover:text-[#00D4AA] transition-all"
+        >
+          {({ loading }: { loading: boolean }) => (loading ? "Preparing…" : "Download report")}
+        </PDFDownloadLink>
+        <button onClick={() => setOpen(!open)}
+          className="rounded-r-lg border border-[#1A1D1E] px-2.5 py-2.5 text-[#8B8B93] hover:border-[#00D4AA] hover:text-[#00D4AA] transition-all"
+        >
+          <svg className={`h-3 w-3 transition-transform ${open ? "rotate-180" : ""}`} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <path d="M4 6l4 4 4-4" />
+          </svg>
+        </button>
+      </div>
+      {open && (
+        <>
+          <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
+          <div className="absolute right-0 top-full z-20 mt-1 w-48 overflow-hidden rounded-lg border border-[#1A1D1E] bg-[#0B0D0E] py-1 shadow-lg">
+            <div className="px-4 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-[#5C5C66]">Export as</div>
+            <PDFDownloadLink
+              document={<ReportPdf appUrl={appUrl} orgName={orgName} date={date} frameworks={frameworks} />}
+              fileName={`spire-compliance-report-${date}.pdf`}
+              className="block w-full px-4 py-2 text-left text-xs text-[#8B8B93] hover:bg-[#141718] hover:text-[#F1F1F3] transition-colors"
+            >
+              {({ loading }: { loading: boolean }) => (loading ? "Preparing…" : "Full report")}
+            </PDFDownloadLink>
+            {soc2Frameworks.length > 0 && (
+              <PDFDownloadLink
+                document={<ReportPdf appUrl={appUrl} orgName={orgName} date={date} frameworks={soc2Frameworks} />}
+                fileName={`spire-soc2-report-${date}.pdf`}
+                className="block w-full px-4 py-2 text-left text-xs text-[#8B8B93] hover:bg-[#141718] hover:text-[#F1F1F3] transition-colors"
+              >
+                {({ loading }: { loading: boolean }) => (loading ? "Preparing…" : "SOC 2 only")}
+              </PDFDownloadLink>
+            )}
+            {aiFrameworks.length > 0 && (
+              <PDFDownloadLink
+                document={<ReportPdf appUrl={appUrl} orgName={orgName} date={date} frameworks={aiFrameworks} />}
+                fileName={`spire-ai-act-report-${date}.pdf`}
+                className="block w-full px-4 py-2 text-left text-xs text-[#8B8B93] hover:bg-[#141718] hover:text-[#F1F1F3] transition-colors"
+              >
+                {({ loading }: { loading: boolean }) => (loading ? "Preparing…" : "EU AI Act only")}
+              </PDFDownloadLink>
+            )}
+          </div>
+        </>
+      )}
+    </div>
   );
 }
