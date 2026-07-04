@@ -97,15 +97,19 @@ export default function DashboardHome({ loaderData }: Route.ComponentProps) {
       {summaryStats && (
         <div className="flex flex-col items-center gap-6">
           <DonutSummary stats={summaryStats} />
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            <Link to="/dashboard/review"
+              className="rounded-lg bg-[#00D4AA] px-5 py-2.5 text-sm font-medium text-black hover:bg-[#00B894] transition-all shadow-[0_2px_12px_-2px_rgba(0,212,170,0.3)]">
+              Review findings
+            </Link>
             {activeRun && (
               <Link to={`/dashboard/audit?runId=${activeRun.runId}&token=${activeRun.token}`}
-                className="rounded-lg border border-[#00D4AA]/30 px-5 py-2.5 text-sm font-medium text-[#00D4AA] hover:bg-[#00D4AA]/10 transition-all">
+                className="rounded-lg border border-[#1A1D1E] px-5 py-2.5 text-sm font-medium text-[#8B8B93] hover:border-[#00D4AA] hover:text-[#00D4AA] transition-all">
                 View current audit
               </Link>
             )}
             <button onClick={() => setConfirmAudit(true)} disabled={running}
-              className="rounded-lg bg-[#00D4AA] px-5 py-2.5 text-sm font-medium text-black hover:bg-[#00B894] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_2px_12px_-2px rgba(0,212,170,0.3)]">
+              className="rounded-lg border border-[#1A1D1E] px-5 py-2.5 text-sm font-medium text-[#8B8B93] hover:border-[#EF4444] hover:text-[#EF4444] transition-all disabled:opacity-50">
               {running ? "Auditing…" : "New audit"}
             </button>
             <a href="/dashboard/export" download
