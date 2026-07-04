@@ -1,5 +1,5 @@
-import { useState, useMemo } from "react";
-import { PDFDownloadLink, Document, Page, View, Text, Image, Link, StyleSheet } from "@react-pdf/renderer";
+import { useState, useMemo, useRef, useEffect } from "react";
+import { pdf, Document, Page, View, Text, Image, Link, StyleSheet } from "@react-pdf/renderer";
 
 const accent = "#00D4AA";
 const bg = "#07080A";
@@ -87,61 +87,49 @@ function ReportPdf({ appUrl, orgName, date, frameworks }: { appUrl: string; orgN
   );
 }
 
-function DownloadButton({ appUrl, orgName, date, frameworks }: { appUrl: string; orgName: string; date: string; frameworks: { framework: string; controls: { controlId: string; title: string; status: string; detail: string | null }[] }[] }) {
-  return (
-    <PDFDownloadLink
-      document={<ReportPdf appUrl={appUrl} orgName={orgName} date={date} frameworks={frameworks} />}
-      fileName={`spire-compliance-report-${date}.pdf`}
-      className="rounded-l-lg border-r-0 border border-[#1A1D1E] px-5 py-2.5 text-sm font-medium text-[#8B8B93] hover:border-[#00D4AA] hover:text-[#00D4AA] transition-all"
-    >
-      {({ loading }: { loading: boolean }) => (loading ? "Preparing…" : "Download report")}
-    </PDFDownloadLink>
-  );
+function useStablePdf(doc: ReturnType<typeof ReportPdf>) {
+  const [url, setUrl] = useState<string | null>(null);
+  const ref = useRef<ReturnType<typeof pdf> | null>(null);
+
+  useEffect(() => {
+    ref.current = pdf(doc);
+    ref.current.toBlob().then((blob: Blob) => {
+      setUrl(URL.createObjectURL(blob));
+    });
+    return () => {
+      if (ref.current) ref.current.toBlob = undefined as any;
+    };
+    // Only run once — doc is assumed stable
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return url;
 }
 
 export function DownloadReportButton(props: { appUrl: string; orgName: string; date: string; frameworks: { framework: string; controls: { controlId: string; title: string; status: string; detail: string | null }[] }[] }) {
   const { appUrl, orgName, date, frameworks } = props;
   const [open, setOpen] = useState(false);
-  const soc2Frameworks = useMemo(() => frameworks.filter((f) => f.framework === "soc2"), [frameworks]);
-  const aiFrameworks = useMemo(() => frameworks.filter((f) => f.framework === "ai-act"), [frameworks]);
 
-  const mainBtn = useMemo(() => <DownloadButton appUrl={appUrl} orgName={orgName} date={date} frameworks={frameworks} />, [appUrl, orgName, date, frameworks]);
+  const fullDoc = useMemo(() => <ReportPdf appUrl={appUrl} orgName={orgName} date={date} frameworks={frameworks} />, [appUrl, orgName, date, frameworks]);
+  const soc2Doc = useMemo(() => <ReportPdf appUrl={appUrl} orgName={orgName} date={date} frameworks={frameworks.filter((f) => f.framework === "soc2")} />, [appUrl, orgName, date, frameworks]);
+  const aiDoc = useMemo(() => <ReportPdf appUrl={appUrl} orgName={orgName} date={date} frameworks={frameworks.filter((f) => f.framework === "ai-act")} />, [appUrl, orgName, date, frameworks]);
 
-  const dropdownItems = useMemo(() => (
-    <>
-      <div className="px-4 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-[#5C5C66]">Export as</div>
-      <PDFDownloadLink
-        document={<ReportPdf appUrl={appUrl} orgName={orgName} date={date} frameworks={frameworks} />}
-        fileName={`spire-compliance-report-${date}.pdf`}
-        className="block w-full px-4 py-2 text-left text-xs text-[#8B8B93] hover:bg-[#141718] hover:text-[#F1F1F3] transition-colors"
-      >
-        {({ loading }: { loading: boolean }) => (loading ? "Preparing…" : "Full report")}
-      </PDFDownloadLink>
-      {soc2Frameworks.length > 0 && (
-        <PDFDownloadLink
-          document={<ReportPdf appUrl={appUrl} orgName={orgName} date={date} frameworks={soc2Frameworks} />}
-          fileName={`spire-soc2-report-${date}.pdf`}
-          className="block w-full px-4 py-2 text-left text-xs text-[#8B8B93] hover:bg-[#141718] hover:text-[#F1F1F3] transition-colors"
-        >
-          {({ loading }: { loading: boolean }) => (loading ? "Preparing…" : "SOC 2 only")}
-        </PDFDownloadLink>
-      )}
-      {aiFrameworks.length > 0 && (
-        <PDFDownloadLink
-          document={<ReportPdf appUrl={appUrl} orgName={orgName} date={date} frameworks={aiFrameworks} />}
-          fileName={`spire-ai-act-report-${date}.pdf`}
-          className="block w-full px-4 py-2 text-left text-xs text-[#8B8B93] hover:bg-[#141718] hover:text-[#F1F1F3] transition-colors"
-        >
-          {({ loading }: { loading: boolean }) => (loading ? "Preparing…" : "EU AI Act only")}
-        </PDFDownloadLink>
-      )}
-    </>
-  ), [appUrl, orgName, date, frameworks, soc2Frameworks, aiFrameworks]);
+  const fullUrl = useStablePdf(fullDoc);
+  const soc2Url = useStablePdf(soc2Doc);
+  const aiUrl = useStablePdf(aiDoc);
+  const hasSoc2 = frameworks.some((f) => f.framework === "soc2");
+  const hasAi = frameworks.some((f) => f.framework === "ai-act");
 
   return (
     <div className="relative">
       <div className="flex">
-        {mainBtn}
+        <a
+          href={fullUrl || "#"}
+          download={fullUrl ? `spire-compliance-report-${date}.pdf` : undefined}
+          className={`rounded-l-lg border-r-0 border border-[#1A1D1E] px-5 py-2.5 text-sm font-medium text-[#8B8B93] hover:border-[#00D4AA] hover:text-[#00D4AA] transition-all ${!fullUrl ? "pointer-events-none" : ""}`}
+        >
+          {fullUrl ? "Download report" : "Preparing…"}
+        </a>
         <button onClick={() => setOpen(!open)}
           className="rounded-r-lg border border-[#1A1D1E] px-2.5 py-2.5 text-[#8B8B93] hover:border-[#00D4AA] hover:text-[#00D4AA] transition-all"
         >
@@ -154,7 +142,20 @@ export function DownloadReportButton(props: { appUrl: string; orgName: string; d
         <>
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
           <div className="absolute right-0 top-full z-20 mt-1 w-48 overflow-hidden rounded-lg border border-[#1A1D1E] bg-[#0B0D0E] py-1 shadow-lg">
-            {dropdownItems}
+            <div className="px-4 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-[#5C5C66]">Export as</div>
+            <a href={fullUrl || "#"} download={fullUrl ? `spire-compliance-report-${date}.pdf` : undefined}
+              className="block w-full px-4 py-2 text-left text-xs text-[#8B8B93] hover:bg-[#141718] hover:text-[#F1F1F3] transition-colors"
+            >{fullUrl ? "Full report" : "Preparing…"}</a>
+            {hasSoc2 && (
+              <a href={soc2Url || "#"} download={soc2Url ? `spire-soc2-report-${date}.pdf` : undefined}
+                className="block w-full px-4 py-2 text-left text-xs text-[#8B8B93] hover:bg-[#141718] hover:text-[#F1F1F3] transition-colors"
+              >{soc2Url ? "SOC 2 only" : "Preparing…"}</a>
+            )}
+            {hasAi && (
+              <a href={aiUrl || "#"} download={aiUrl ? `spire-ai-act-report-${date}.pdf` : undefined}
+                className="block w-full px-4 py-2 text-left text-xs text-[#8B8B93] hover:bg-[#141718] hover:text-[#F1F1F3] transition-colors"
+              >{aiUrl ? "EU AI Act only" : "Preparing…"}</a>
+            )}
           </div>
         </>
       )}
