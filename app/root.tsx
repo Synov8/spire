@@ -48,12 +48,25 @@ export default function App() {
   return <Outlet />;
 }
 
-export function ErrorBoundary() {
+export function ErrorBoundary({ error }: { error?: Error }) {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#07080A]">
-      <div className="text-center">
+    <div className="flex min-h-screen items-center justify-center bg-[#07080A] p-8">
+      <div className="max-w-lg text-center">
         <h1 className="text-2xl font-bold text-[#F1F1F3]">Something went wrong</h1>
         <p className="mt-2 text-[#6A6D6E]">An unexpected error occurred.</p>
+        {error && (
+          <>
+            <p className="mt-4 rounded-lg border border-[#EF4444]/20 bg-[#EF4444]/[0.04] px-4 py-3 text-left text-sm font-mono text-[#EF4444] break-all">
+              {error.message}
+            </p>
+            <details className="mt-2 text-left">
+              <summary className="cursor-pointer text-xs text-[#5C5C66] hover:text-[#8B8B93]">Stack trace</summary>
+              <pre className="mt-1 overflow-x-auto rounded-lg border border-[#1A1D1E] bg-[#07080A] p-3 text-[10px] font-mono text-[#6A6D6E] leading-relaxed max-h-48 overflow-y-auto">
+                {error.stack}
+              </pre>
+            </details>
+          </>
+        )}
       </div>
     </div>
   );

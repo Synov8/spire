@@ -50,14 +50,16 @@ export async function action({ request, params }: Route.ActionArgs) {
       return { ok: true, deleted: true };
     }
 
-    const file = formData.get("file") as File;
-    if (!file) return { ok: false, error: "No file provided" };
+    const fileEntry = formData.get("file");
+    if (!fileEntry) return { ok: false, error: "No file provided" };
+    if (!(fileEntry instanceof File)) return { ok: false, error: "File field was not uploaded as a file. Try a different browser or file." };
+    if (fileEntry.size === 0) return { ok: false, error: "Empty file. Please select a non-empty file." };
 
     const agentVerdicts = await db.select().from(policyCheck).where(eq(policyCheck.organizationId, orgId));
     if (agentVerdicts.length === 0) return { ok: false, error: "Run an AI audit first so Spire has evidence to draw from." };
 
-    const buffer = await file.arrayBuffer();
-    const text = file.type === "application/pdf" ? await extractPdfText(buffer) : new TextDecoder().decode(buffer);
+    const buffer = await fileEntry.arrayBuffer();
+    const text = fileEntry.type === "application/pdf" ? await extractPdfText(buffer) : new TextDecoder().decode(buffer);
     const controlsList = await db.select().from(control);
     const verdictText = agentVerdicts.map((v) => `${v.ruleId}: ${v.status} — ${v.detail || "no detail"}`).join("\n");
     const controlsText = controlsList.map((c) => `${c.controlId} (${c.framework}): ${c.title}`).join("\n");
@@ -72,7 +74,7 @@ export async function action({ request, params }: Route.ActionArgs) {
     }
 
     await db.update(questionnaire).set({
-      title: file.name, status, originalFile: file.name,
+      title: fileEntry.name, status, originalFile: fileEntry.name,
       questions: parsed.questions as any,
       completedAt: status === "completed" ? new Date() : undefined,
     }).where(eq(questionnaire.id, params.id));
