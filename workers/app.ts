@@ -1,4 +1,14 @@
-import { createRequestHandler } from "react-router";
+import { createRequestHandler, RouterContextProvider } from "react-router";
+import { cloudflareContext } from "../app/lib/cloudflare-context.server";
+
+declare module "react-router" {
+  interface AppLoadContext {
+    cloudflare: {
+      env: Env;
+      ctx: ExecutionContext;
+    };
+  }
+}
 
 const requestHandler = createRequestHandler(
   () => import("virtual:react-router/server-build"),
@@ -20,13 +30,15 @@ p{color:#9ca3af;margin:0}
 </html>`;
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     if (env.MAINTENANCE) {
       return new Response(MAINTENANCE_PAGE, {
         status: 503,
         headers: { "content-type": "text/html" },
       });
     }
-    return requestHandler(request);
+    const context = new RouterContextProvider();
+    context.set(cloudflareContext, { env, ctx });
+    return requestHandler(request, context);
   },
 } satisfies ExportedHandler<Env>;

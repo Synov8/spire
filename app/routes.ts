@@ -3,6 +3,7 @@ import { type RouteConfig, route, index } from "@react-router/dev/routes";
 export default [
   route("api/auth/*", "routes/api/auth.ts"),
   route("api/trigger-audit", "routes/api.trigger-audit.ts"),
+  route("api/upload-evidence", "routes/api.upload-evidence.ts"),
   route("api/composio/connect", "routes/api/composio.connect.ts"),
   route("login", "routes/login.tsx"),
   route("logout", "routes/logout.tsx"),
