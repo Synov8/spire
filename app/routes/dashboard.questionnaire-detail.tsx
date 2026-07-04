@@ -5,7 +5,6 @@ import { questionnaire, policyCheck, control } from "~/db/schema";
 import { auth } from "~/lib/auth.server";
 import { eq } from "drizzle-orm";
 import { hasActiveSubscription } from "~/lib/subscription-check";
-import { parseQuestionnaire } from "~/lib/ai";
 import type { Route } from "./+types/dashboard.questionnaire-detail";
 
 type QuestionItem = { question: string; answer: string; confidence: number; category: string };
@@ -55,29 +54,26 @@ export async function action({ request, params }: Route.ActionArgs) {
     if (!(fileEntry instanceof File)) return { ok: false, error: "File field was not uploaded as a file. Try a different browser or file." };
     if (fileEntry.size === 0) return { ok: false, error: "Empty file. Please select a non-empty file." };
 
-    const agentVerdicts = await db.select().from(policyCheck).where(eq(policyCheck.organizationId, orgId));
-    if (agentVerdicts.length === 0) return { ok: false, error: "Run an AI audit first so Spire has evidence to draw from." };
+    if (fileEntry.size > 5 * 1024 * 1024) return { ok: false, error: "File too large (max 5 MB)." };
+
+    const { tasks } = await import("@trigger.dev/sdk");
 
     const buffer = await fileEntry.arrayBuffer();
-    const text = fileEntry.type === "application/pdf" ? await extractPdfText(buffer) : new TextDecoder().decode(buffer);
+    const rawText = fileEntry.type === "application/pdf" ? await extractPdfText(buffer) : new TextDecoder().decode(buffer);
+    if (rawText.trim().length < 10) return { ok: false, error: "Could not extract text from file. Is it a valid questionnaire?" };
+
+    const agentVerdicts = await db.select().from(policyCheck).where(eq(policyCheck.organizationId, orgId));
     const controlsList = await db.select().from(control);
     const verdictText = agentVerdicts.map((v) => `${v.ruleId}: ${v.status} — ${v.detail || "no detail"}`).join("\n");
     const controlsText = controlsList.map((c) => `${c.controlId} (${c.framework}): ${c.title}`).join("\n");
 
-    let parsed: Awaited<ReturnType<typeof parseQuestionnaire>>;
-    let status = "completed";
-    try {
-      parsed = await parseQuestionnaire(text, verdictText, controlsText);
-    } catch {
-      status = "flagged";
-      parsed = { questions: [] };
-    }
-
     await db.update(questionnaire).set({
-      title: fileEntry.name, status, originalFile: fileEntry.name,
-      questions: parsed.questions as any,
-      completedAt: status === "completed" ? new Date() : undefined,
+      title: fileEntry.name, originalFile: fileEntry.name, status: "processing",
     }).where(eq(questionnaire.id, params.id));
+
+    await tasks.trigger("process-questionnaire", {
+      orgId, questionnaireId: params.id, rawText, verdictText, controlsText,
+    }, { tags: [`org:${orgId}`] });
 
     return redirect(`/dashboard/questionnaires/${params.id}`);
   } catch (err) {
@@ -102,7 +98,7 @@ export default function QuestionnaireDetail({ loaderData, actionData }: Route.Co
 
   const displayQuestions = questions;
   const avgConfidence = displayQuestions.length > 0 ? displayQuestions.reduce((s, qa) => s + qa.confidence, 0) / displayQuestions.length : 0;
-  const isDraft = q.status === "draft" || (!q.originalFile && displayQuestions.length === 0);
+  const isDraft = (q.status === "draft" || (!q.originalFile && displayQuestions.length === 0)) && q.status !== "processing";
 
   const startEdit = (i: number) => { setEditingIdx(i); setEditValue(displayQuestions[i].answer); };
   const saveEdit = () => {
@@ -125,8 +121,8 @@ export default function QuestionnaireDetail({ loaderData, actionData }: Route.Co
   };
 
   const statusLabel = q.status;
-  const statusDot = statusLabel === "completed" ? "bg-[#00D4AA]" : statusLabel === "flagged" ? "bg-[#EF4444]" : "bg-[#5C5C66]";
-  const statusBadge = statusLabel === "completed" ? "bg-[#00D4AA]/10 text-[#00D4AA]" : statusLabel === "flagged" ? "bg-[#EF4444]/10 text-[#EF4444]" : "bg-[#1A1D1E] text-[#5C5C66]";
+  const statusDot = statusLabel === "completed" ? "bg-[#00D4AA]" : statusLabel === "processing" ? "bg-[#F59E0B]" : statusLabel === "flagged" ? "bg-[#EF4444]" : "bg-[#5C5C66]";
+  const statusBadge = statusLabel === "completed" ? "bg-[#00D4AA]/10 text-[#00D4AA]" : statusLabel === "processing" ? "bg-[#F59E0B]/10 text-[#F59E0B]" : statusLabel === "flagged" ? "bg-[#EF4444]/10 text-[#EF4444]" : "bg-[#1A1D1E] text-[#5C5C66]";
 
   return (
     <div className="space-y-6">
@@ -165,6 +161,19 @@ export default function QuestionnaireDetail({ loaderData, actionData }: Route.Co
 
       {actionErr && (
         <div className="rounded-xl border border-[#EF4444]/20 bg-[#EF4444]/[0.06] px-4 py-3 text-sm text-[#EF4444]">{actionErr}</div>
+      )}
+
+      {/* Processing state */}
+      {q.status === "processing" && (
+        <div className="rounded-xl border border-[#F59E0B]/20 bg-[#F59E0B]/[0.04] px-5 py-4">
+          <div className="flex items-center gap-3">
+            <span className="h-3 w-3 animate-spin rounded-full border-2 border-[#F59E0B]/30 border-t-[#F59E0B]" />
+            <div>
+              <p className="text-sm font-medium text-[#F59E0B]">Processing questionnaire…</p>
+              <p className="text-xs text-[#6A6D6E] mt-0.5">AI is parsing and investigating your questionnaire. This page will update when complete.</p>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Upload area — shown when draft or no questions */}
