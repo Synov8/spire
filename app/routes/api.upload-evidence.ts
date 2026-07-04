@@ -13,7 +13,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
   const file = formData.get("file") as File | null;
   if (!file) return Response.json({ error: "No file provided" }, { status: 400 });
 
-  const cf = context.get(cloudflareContext);
+  const cf = context.get(cloudflareContext)!;
   const key = `${orgId}/${crypto.randomUUID()}-${file.name}`;
 
   await cf.env.EVIDENCE_BUCKET.put(key, await file.bytes(), {
