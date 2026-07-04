@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { useFetcher, redirect } from "react-router";
 import { db } from "~/db";
 import { policyCheck, control, manualEvidence } from "~/db/schema";
@@ -6,6 +6,7 @@ import { auth } from "~/lib/auth.server";
 import { eq, and, desc, inArray, ne } from "drizzle-orm";
 import { hasActiveSubscription } from "~/lib/subscription-check";
 import { reviewEvaluate } from "~/agents/review-evaluate";
+import { cloudflareContext } from "~/lib/cloudflare-context.server";
 import type { Route } from "./+types/dashboard.review";
 
 export async function loader({ request }: Route.LoaderArgs) {
@@ -48,7 +49,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   return { items, submitted };
 }
 
-export async function action({ request }: Route.ActionArgs) {
+export async function action({ request, context }: Route.ActionArgs) {
   const session = await auth.api.getSession({ headers: request.headers });
   if (!session) return { ok: false };
   const orgId = session.session.activeOrganizationId!;
@@ -60,18 +61,24 @@ export async function action({ request }: Route.ActionArgs) {
   if (intent === "submit-evidence") {
     const policyCheckId = formData.get("policyCheckId") as string;
     const content = formData.get("content") as string;
-    const fileUrl = formData.get("fileUrl") as string;
-    const originalFilename = formData.get("originalFilename") as string;
 
     const original = await db.select().from(policyCheck).where(eq(policyCheck.id, policyCheckId)).limit(1).then((r) => r[0]);
     if (!original) return { ok: false };
 
+    let fileUrl: string | null = null;
+    let originalFilename: string | null = null;
     let fileContent: string | null = null;
-    if (fileUrl && originalFilename) {
-      try {
-        const resp = await fetch(fileUrl);
-        fileContent = await resp.text();
-      } catch { /* non-text file, skip content extraction */ }
+
+    const file = formData.get("file") as File | null;
+    if (file && file.size > 0) {
+      const cf = context.get(cloudflareContext)!;
+      const key = `${orgId}/${crypto.randomUUID()}-${file.name}`;
+      await cf.env.EVIDENCE_BUCKET.put(key, await file.bytes(), {
+        httpMetadata: { contentType: file.type },
+      });
+      fileUrl = `https://evidence.${new URL(request.url).hostname}/${key}`;
+      originalFilename = file.name;
+      try { fileContent = await file.text(); } catch { /* binary file */ }
     }
 
     const result = await reviewEvaluate(orgId, original.ruleId, content, fileContent, originalFilename);
@@ -87,8 +94,8 @@ export async function action({ request }: Route.ActionArgs) {
       category: "other",
       title: original.ruleId,
       content,
-      fileUrl: fileUrl || null,
-      originalFilename: originalFilename || null,
+      fileUrl,
+      originalFilename,
       status: "pending",
       submittedAt: new Date(),
     });
@@ -99,10 +106,36 @@ export async function action({ request }: Route.ActionArgs) {
   return { ok: false };
 }
 
+function extBadge(filename: string) {
+  const ext = filename.includes(".") ? filename.split(".").pop()!.toUpperCase() : "FILE";
+  const colours: Record<string, string> = {
+    PDF: "bg-[#EF4444]/10 text-[#EF4444] border-[#EF4444]/20",
+    PNG: "bg-[#3B82F6]/10 text-[#3B82F6] border-[#3B82F6]/20",
+    JPG: "bg-[#3B82F6]/10 text-[#3B82F6] border-[#3B82F6]/20",
+    JPEG: "bg-[#3B82F6]/10 text-[#3B82F6] border-[#3B82F6]/20",
+    GIF: "bg-[#8B5CF6]/10 text-[#8B5CF6] border-[#8B5CF6]/20",
+    SVG: "bg-[#F59E0B]/10 text-[#F59E0B] border-[#F59E0B]/20",
+    DOC: "bg-[#2563EB]/10 text-[#2563EB] border-[#2563EB]/20",
+    DOCX: "bg-[#2563EB]/10 text-[#2563EB] border-[#2563EB]/20",
+    XLS: "bg-[#10B981]/10 text-[#10B981] border-[#10B981]/20",
+    XLSX: "bg-[#10B981]/10 text-[#10B981] border-[#10B981]/20",
+    TXT: "bg-[#6A6D6E]/10 text-[#6A6D6E] border-[#6A6D6E]/20",
+    CSV: "bg-[#10B981]/10 text-[#10B981] border-[#10B981]/20",
+    JSON: "bg-[#F59E0B]/10 text-[#F59E0B] border-[#F59E0B]/20",
+    MD: "bg-[#3B82F6]/10 text-[#3B82F6] border-[#3B82F6]/20",
+  };
+  return (
+    <span className={`inline-flex items-center rounded border px-1.5 py-0.5 font-mono text-[10px] font-semibold leading-none ${colours[ext] || "bg-[#5C5C66]/10 text-[#5C5C66] border-[#5C5C66]/20"}`}>
+      {ext}
+    </span>
+  );
+}
+
 export default function ReviewPage({ loaderData }: Route.ComponentProps) {
   const { items, submitted } = loaderData;
   const fetcher = useFetcher();
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const [selectedFiles, setSelectedFiles] = useState<Record<string, File>>({});
 
   return (
     <div className="space-y-6">
@@ -153,54 +186,62 @@ export default function ReviewPage({ loaderData }: Route.ComponentProps) {
                 </button>
                 {isOpen && (
                   <div className="border-t border-[#1A1D1E] px-4 pb-4">
-                    <div className="mt-4 space-y-3">
+                    <fetcher.Form method="POST" encType="multipart/form-data" className="mt-4 space-y-3">
+                      <input type="hidden" name="intent" value="submit-evidence" />
+                      <input type="hidden" name="policyCheckId" value={check.id} />
+
                       <label className="mb-1.5 block text-xs font-medium text-[#5C5C66]">Your response</label>
                       <textarea
-                        id={`content-${check.id}`}
+                        name="content"
                         rows={4}
                         placeholder="Describe the evidence you have to address this finding…"
                         className="w-full rounded-lg border border-[#1A1D1E] bg-[#07080A] px-3 py-2.5 text-sm text-[#F1F1F3] placeholder-[#5C5C66] focus:border-[#00D4AA] focus:outline-none focus:ring-1 focus:ring-[#00D4AA]/20 transition-all resize-y"
                       />
+
                       <div>
                         <label className="mb-1.5 block text-xs font-medium text-[#5C5C66]">Supporting file (optional)</label>
-                        <input
-                          id={`file-${check.id}`}
-                          type="file"
-                          className="w-full text-sm text-[#6A6D6E] file:mr-3 file:rounded-lg file:border-0 file:bg-[#1A1D1E] file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-[#F1F1F3] hover:file:bg-[#2A2D2E]"
-                        />
+                        {selectedFiles[check.id] ? (
+                          <div className="flex items-center gap-2 rounded-lg border border-[#1A1D1E] bg-[#07080A] px-3 py-2">
+                            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-[#1A1D1E] text-[10px] font-semibold text-[#6A6D6E]">
+                              <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M9 1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V5l-4-4z"/><path d="M9 1v4h4"/></svg>
+                            </span>
+                            <span className="min-w-0 flex-1 truncate text-sm text-[#F1F1F3]">{selectedFiles[check.id].name}</span>
+                            {extBadge(selectedFiles[check.id].name)}
+                            <button
+                              type="button"
+                              onClick={() => setSelectedFiles((prev) => { const n = { ...prev }; delete n[check.id]; return n; })}
+                              className="shrink-0 rounded p-1 text-[#5C5C66] hover:bg-[#1A1D1E] hover:text-[#EF4444] transition-colors"
+                            >
+                              <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg>
+                            </button>
+                          </div>
+                        ) : (
+                          <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-dashed border-[#1A1D1E] bg-[#07080A] px-3 py-2.5 text-sm text-[#5C5C66] hover:border-[#00D4AA]/30 hover:text-[#8B8B93] transition-colors">
+                            <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M8 2v12M2 8h12"/></svg>
+                            Choose file…
+                            <input
+                              type="file"
+                              name="file"
+                              className="hidden"
+                              onChange={(e) => {
+                                const f = e.target.files?.[0];
+                                if (f) setSelectedFiles((prev) => ({ ...prev, [check.id]: f }));
+                              }}
+                            />
+                          </label>
+                        )}
                       </div>
+
                       <div className="flex justify-end">
                         <button
-                          onClick={async () => {
-                            const fileInput = document.getElementById(`file-${check.id}`) as HTMLInputElement;
-                            const textarea = document.getElementById(`content-${check.id}`) as HTMLTextAreaElement;
-
-                            let fileUrl = "";
-                            let originalFilename = "";
-                            if (fileInput?.files?.[0]) {
-                              const fd = new FormData();
-                              fd.append("file", fileInput.files[0]);
-                              const resp = await fetch("/api/upload-evidence", { method: "POST", body: fd });
-                              const data = await resp.json() as { fileUrl: string; originalFilename: string };
-                              fileUrl = data.fileUrl;
-                              originalFilename = data.originalFilename;
-                            }
-
-                            const formData = new FormData();
-                            formData.append("intent", "submit-evidence");
-                            formData.append("policyCheckId", check.id);
-                            formData.append("content", textarea?.value || "");
-                            formData.append("fileUrl", fileUrl);
-                            formData.append("originalFilename", originalFilename);
-                            fetcher.submit(formData, { method: "POST" });
-                          }}
+                          type="submit"
                           disabled={fetcher.state !== "idle"}
                           className="rounded-lg bg-[#00D4AA] px-5 py-2 text-sm font-medium text-black hover:bg-[#00B894] transition-all duration-200 disabled:opacity-50"
                         >
-                          {fetcher.state !== "idle" ? "Uploading…" : "Submit evidence"}
+                          {fetcher.state !== "idle" ? "Submitting…" : "Submit evidence"}
                         </button>
                       </div>
-                    </div>
+                    </fetcher.Form>
                   </div>
                 )}
               </div>
@@ -222,6 +263,21 @@ export default function ReviewPage({ loaderData }: Route.ComponentProps) {
                 <div className="mt-2 rounded-lg border border-[#1A1D1E] bg-[#07080A] px-3 py-2">
                   <p className="text-sm text-[#F1F1F3]">{item.content}</p>
                 </div>
+                {item.fileUrl && item.originalFilename && (
+                  <a
+                    href={item.fileUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-2 flex items-center gap-2 rounded-lg border border-[#1A1D1E] bg-[#07080A] px-3 py-2 hover:border-[#00D4AA]/30 transition-colors"
+                  >
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-[#1A1D1E] text-[10px] font-semibold text-[#6A6D6E]">
+                      <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M9 1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V5l-4-4z"/><path d="M9 1v4h4"/></svg>
+                    </span>
+                    <span className="min-w-0 flex-1 truncate text-sm text-[#00D4AA] hover:underline">{item.originalFilename}</span>
+                    {extBadge(item.originalFilename)}
+                    <svg className="h-3 w-3 shrink-0 text-[#5C5C66]" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M6 2l5 5-5 5"/></svg>
+                  </a>
+                )}
                 <p className="mt-2 text-[10px] text-[#5C5C66]">Submitted {new Date(item.submittedAt).toLocaleDateString()}</p>
               </div>
             ))}

@@ -13,7 +13,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   if (!session) return { controls: [], total: 0, verified: 0, failed: 0, warned: 0, unchecked: 0, orgId: "", hasAudit: false, controlStatus: {} as Record<string, string>, controlDetails: {} as Record<string, string>, activeRunId: null, summaryStats: null };
   const orgId = session.session.activeOrganizationId!;
   // if (!await hasActiveSubscription(orgId, session.user.id)) throw redirect("/dashboard/billing");
-  const allControls = await db.select().from(control).where(eq(control.framework, "soc2"));
+  const allControls = await db.select().from(control);
   const verdicts = await db.select().from(policyCheck).where(eq(policyCheck.organizationId, orgId));
 
   const verified = verdicts.filter((v) => v.status === "pass").length;
