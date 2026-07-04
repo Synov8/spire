@@ -321,11 +321,6 @@ export default function AuditPage() {
         </div>
       </div>
 
-      {isRunning && (
-        <div className="relative h-0.5 shrink-0 bg-[#1A1D1E]">
-          <div className="absolute inset-y-0 left-0 w-1/3 animate-pulse rounded-r-full bg-[#00D4AA]" />
-        </div>
-      )}
     </div>
   );
 }
