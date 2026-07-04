@@ -228,15 +228,6 @@ function ToolCallCard({ card }: { card: ToolCard }) {
             </div>
           )}
 
-          {card.toolName && (
-            <details className="mt-2">
-              <summary className="cursor-pointer text-[10px] text-[#5C5C66] hover:text-[#8B8B93]">Raw tool info</summary>
-              <pre className="mt-1 overflow-x-auto rounded-lg border border-[#1A1D1E] bg-[#07080A] p-2 text-[10px] font-mono text-[#8B8B93] leading-relaxed">
-                {JSON.stringify({ toolName: card.toolName, args: card.args }, null, 2)}
-              </pre>
-            </details>
-          )}
-
           {hasResult && resultPreview && (
             <div className="mt-2">
               <details>
