@@ -147,15 +147,9 @@ export default function ReviewPage({ loaderData }: Route.ComponentProps) {
   const [selectedFiles, setSelectedFiles] = useState<Record<string, File[]>>({});
   const [framework, setFramework] = useState<"soc2" | "ai-act">("soc2");
 
-  const frameworkItems = items.filter((it) => {
-    const fw = it.control?.framework;
-    return fw === framework || (!fw && framework === "soc2");
-  });
+  const frameworkItems = items.filter((it) => it.control?.framework === framework);
 
-  const frameworkSubmitted = submitted.filter((s: any) => {
-    const fw = s.control?.framework;
-    return fw === framework || (!fw && framework === "soc2");
-  });
+  const frameworkSubmitted = submitted.filter((s: any) => s.control?.framework === framework);
 
   return (
     <div className="space-y-6">
