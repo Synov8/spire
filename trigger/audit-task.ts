@@ -19,11 +19,9 @@ async function storeAuditReport(orgId: string, report: any) {
     await sql`DELETE FROM policy_check WHERE organization_id = ${orgId} AND (rule_id LIKE 'agent-audit%' OR rule_id = ANY(${Object.keys(report.controls)}))`;
     for (const [controlId, v] of Object.entries(report.controls)) {
       const entry = v as any;
-      const status = entry.status === "needs-human-input" ? "warning" : entry.status;
-      const reviewNeeded = status === "fail" || status === "warning" || entry.status === "needs-human-input";
       await sql`
-        INSERT INTO policy_check (id, rule_id, organization_id, status, detail, needs_review, last_checked_at, created_at)
-        VALUES (gen_random_uuid(), ${controlId}, ${orgId}, ${status}, ${entry.detail + (entry.suggestedAction ? ` ${entry.suggestedAction}` : "")}, ${reviewNeeded}, NOW(), NOW())
+        INSERT INTO policy_check (id, rule_id, organization_id, status, detail, last_checked_at, created_at)
+        VALUES (gen_random_uuid(), ${controlId}, ${orgId}, ${entry.status}, ${entry.detail + (entry.suggestedAction ? ` ${entry.suggestedAction}` : "")}, NOW(), NOW())
       `;
     }
   } catch (err) {
