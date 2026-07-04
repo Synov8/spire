@@ -74,7 +74,8 @@ function describeComposioTool(toolName: string, args: any): { app: string; actio
   }
 
   if (lower === "composio_remote_workbench") {
-    return { app: "", action: "Processing evidence…", description: "" };
+    const thought: string = args?.thought ?? "";
+    return { app: "", action: thought || "Processing evidence…", description: "" };
   }
 
   return { app: "", action: "Running audit checks…", description: "" };
@@ -157,18 +158,16 @@ let reportSubmitted = false;
 // ─── Group stream parts into tool-call cards ───
 function buildCards(parts: unknown[]): ToolCard[] {
   const cards: ToolCard[] = [];
-  const seen = new Set<string>();
+  const seenActions = new Set<string>();
 
   for (const part of parts) {
     const p: AuditChunk = typeof part === "string" ? JSON.parse(part) : part;
 
     if (p.type === "tool-call") {
-      const key = `${p.id}-${p.toolName}`;
-      if (seen.has(key)) continue;
-      seen.add(key);
-
       const entries = describeToolCall(p.toolName, (p.args ?? {}) as Record<string, unknown>);
       for (const entry of entries) {
+        if (seenActions.has(entry.action)) continue;
+        seenActions.add(entry.action);
         cards.push({
           id: p.id,
           type: "tool-call",
