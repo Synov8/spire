@@ -22,7 +22,7 @@ async function storeAuditReport(orgId: string, report: any) {
       const entry = v as any;
       await sql`
         INSERT INTO policy_check (id, rule_id, organization_id, status, detail, last_checked_at, created_at)
-        VALUES (gen_random_uuid(), ${controlId}, ${orgId}, ${entry.status}, ${entry.detail + (entry.suggestedAction && entry.suggestedAction !== "None" ? ` ${entry.suggestedAction}` : "")}, NOW(), NOW())
+        VALUES (gen_random_uuid(), ${controlId}, ${orgId}, ${entry.status}, ${entry.detail}, NOW(), NOW())
       `;
     }
   } catch (err) {
