@@ -20,7 +20,7 @@ export async function storeAuditReport(organizationId: string, report: { summary
       organizationId,
       status: v.status === "needs-human-input" ? "warning" : v.status,
       detail: v.detail + (v.suggestedAction ? ` ${v.suggestedAction}` : ""),
-      needsReview: v.status === "warning" || v.status === "needs-human-input",
+      needsReview: v.status === "fail" || v.status === "warning" || v.status === "needs-human-input",
       lastCheckedAt: new Date(),
       createdAt: new Date(),
     });

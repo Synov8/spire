@@ -1,1 +1,1 @@
-export { runAudit, auditStream } from "./audit-task";
+export { runAudit } from "./audit-task";

@@ -16,7 +16,10 @@ export async function loader({ request }: Route.LoaderArgs) {
     db.select().from(policyCheck).where(eq(policyCheck.organizationId, orgId)),
   ]);
 
-  const verdictByControl = new Map(verdicts.map((v) => [v.ruleId.replace("agent-", ""), v]));
+  const verdictByControl = new Map<string, typeof verdicts[0]>();
+  for (const v of verdicts) {
+    if (v.ruleId) verdictByControl.set(v.ruleId, v);
+  }
 
   const frameworks = [...new Set(allControls.map((c) => c.framework))];
   const frameworkSections = frameworks.map((fw) => {
@@ -29,7 +32,7 @@ export async function loader({ request }: Route.LoaderArgs) {
       else if (v?.status === "warning") warnings++;
       return { controlId: c.controlId, title: c.title, category: c.category, status: v?.status || "unchecked", detail: v?.detail || null, lastChecked: v?.lastCheckedAt || null };
     });
-    return { framework: fw, totalControls: fwControls.length, verdicts: results, summary: { verified, failed, warnings, unchecked: fwControls.length - verdicts.length } };
+    return { framework: fw, totalControls: fwControls.length, verdicts: results, summary: { verified, failed, warnings, unchecked: fwControls.length - verified - failed - warnings } };
   });
 
   return new Response(JSON.stringify({ generatedAt: new Date().toISOString(), organization: session.user.name, frameworks: frameworkSections }, null, 2), {

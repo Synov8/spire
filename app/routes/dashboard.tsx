@@ -69,8 +69,8 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
   ];
 
   return (
-    <div className="flex min-h-screen bg-[#07080A]">
-      <aside className="flex w-64 flex-col border-r border-[#1A1D1E] bg-[#0B0D0E]">
+    <div className="flex h-screen bg-[#07080A]">
+      <aside className="flex w-64 shrink-0 flex-col border-r border-[#1A1D1E] bg-[#0B0D0E]">
         {/* Logo + org switcher */}
         <div className="flex h-14 items-center gap-3 border-b border-[#1A1D1E] px-4">
           <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-[#00D4AA] to-[#00B894] text-[11px] font-bold text-black shadow-[0_2px_8px_-2px_rgba(0,212,170,0.4)]">S</div>
@@ -78,9 +78,9 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
             <div className="relative">
               <button onClick={() => setOrgOpen(!orgOpen)} className="flex w-full items-center gap-1.5 text-sm font-medium text-[#E8E8E8] hover:text-white transition-colors">
                 <span className="truncate max-w-36">{currentOrgName || "No org"}</span>
-                <span className={`text-[#4A4D4E] transition-transform duration-200 ${orgOpen ? "rotate-180" : ""}`}>{icons.chevronDown}</span>
+                {orgs.length > 1 && <span className={`text-[#4A4D4E] transition-transform duration-200 ${orgOpen ? "rotate-180" : ""}`}>{icons.chevronDown}</span>}
               </button>
-              {orgOpen && (
+              {orgOpen && orgs.length > 1 && (
                 <div className="absolute left-0 top-full z-30 mt-1 w-full overflow-hidden rounded-lg border border-[#1A1D1E] bg-[#0B0D0E] py-1 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.5)]">
                   {orgs.map((o) => (
                     <button key={o.id} onClick={async () => { setOrgOpen(false); await authClient.organization.setActive({ organizationId: o.id }); window.location.reload(); }}
@@ -135,7 +135,7 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
           </form>
         </div>
       </aside>
-      <main className="flex-1 overflow-auto">
+      <main className="flex-1 overflow-y-auto">
         {/* Subtle dot-grid background for depth (matches HeroDemo) */}
         <div className="pointer-events-none fixed inset-0 opacity-[0.025]" style={{ backgroundImage: "radial-gradient(circle, #2C2C36 1px, transparent 1px)", backgroundSize: "24px 24px" }} />
         <div className="relative mx-auto max-w-6xl p-6 lg:p-8">

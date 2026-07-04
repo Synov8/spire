@@ -2,8 +2,8 @@ import { useState } from "react";
 import { useLoaderData, useFetcher } from "react-router";
 import { auth } from "~/lib/auth.server";
 import { db } from "~/db";
-import { subscription, organization as orgTable, member } from "~/db/schema";
-import { eq } from "drizzle-orm";
+import { user as userTable, organization as orgTable, member } from "~/db/schema";
+import { eq, inArray } from "drizzle-orm";
 import type { Route } from "./+types/dashboard.settings";
 
 export async function loader({ request }: Route.LoaderArgs) {
@@ -15,12 +15,16 @@ export async function loader({ request }: Route.LoaderArgs) {
   const currentOrg = await db.select().from(orgTable).where(eq(orgTable.id, orgId)).limit(1).then((r) => r[0]);
   const invitations = await auth.api.listInvitations({ query: { organizationId: orgId }, headers: request.headers });
 
+  // Fetch user names/emails for all members
+  const userIds = membersList.map((m) => m.userId);
+  const users = userIds.length > 0 ? await db.select().from(userTable).where(inArray(userTable.id, userIds)) : [];
+  const userMap = new Map(users.map((u) => [u.id, { name: u.name, email: u.email }]));
+
   return {
     user: session.user,
-    subscription: await db.select().from(subscription).where(eq(subscription.referenceId, session.user.id)).then((r) => r[0] || null),
     orgCount: 1,
     integrationCount: 0,
-    members: membersList,
+    members: membersList.map((m) => ({ ...m, userName: userMap.get(m.userId)?.name || m.userId, userEmail: userMap.get(m.userId)?.email || "" })),
     orgName: currentOrg?.name,
     invitations: Array.isArray(invitations) ? invitations : [],
   };
@@ -61,7 +65,7 @@ export async function action({ request }: Route.ActionArgs) {
 }
 
 export default function Settings({ loaderData }: Route.ComponentProps) {
-  const { user, subscription: sub, orgCount, integrationCount, members, invitations } = loaderData;
+  const { user, orgCount, integrationCount, members, invitations } = loaderData;
   const fetcher = useFetcher();
   const [inviteEmail, setInviteEmail] = useState("");
   const inviteResult = fetcher.data as { ok?: boolean; error?: string } | null;
@@ -91,16 +95,16 @@ export default function Settings({ loaderData }: Route.ComponentProps) {
         <section className="border-b border-[#1A1D1E] p-6">
           <h2 className="text-sm font-semibold uppercase tracking-wider text-[#8B8B93]">Team members ({members.length})</h2>
           <div className="mt-4 space-y-3">
-            {members.map((m) => (
-              <div key={m.id} className="flex items-center gap-3 rounded-xl border border-[#1A1D1E] bg-[#07080A] px-4 py-3">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#1C1C24] to-[#141718] text-xs font-medium text-[#8B8B93] ring-1 ring-[#1A1D1E]">{m.userId[0]?.toUpperCase() ?? "?"}</div>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm text-[#F1F1F3]">{m.userId}</p>
-                  <p className="text-xs text-[#5C5C66] capitalize">{m.role}</p>
-                </div>
-                <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium capitalize ${m.role === "admin" ? "bg-[#00D4AA]/10 text-[#00D4AA]" : "bg-[#1A1D1E] text-[#5C5C66]"}`}>{m.role}</span>
-              </div>
-            ))}
+              {members.map((m: any) => (
+                  <div key={m.id} className="flex items-center gap-3 rounded-xl border border-[#1A1D1E] bg-[#07080A] px-4 py-3">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#1C1C24] to-[#141718] text-xs font-medium text-[#8B8B93] ring-1 ring-[#1A1D1E]">{m.userName[0]?.toUpperCase() ?? "?"}</div>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm text-[#F1F1F3]">{m.userName}</p>
+                      <p className="text-xs text-[#5C5C66]">{m.userEmail}</p>
+                    </div>
+                    <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium capitalize ${m.role === "admin" || m.role === "owner" ? "bg-[#00D4AA]/10 text-[#00D4AA]" : "bg-[#1A1D1E] text-[#5C5C66]"}`}>{m.role}</span>
+                  </div>
+                ))}
             <fetcher.Form method="POST" className="mt-4 flex items-end gap-3">
               <input type="hidden" name="intent" value="invite-member" />
               <div className="flex-1">
@@ -150,32 +154,13 @@ export default function Settings({ loaderData }: Route.ComponentProps) {
         )}
 
         {/* Subscription */}
-        <section className="border-b border-[#1A1D1E] p-6">
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-[#8B8B93]">Subscription</h2>
-          {sub ? (
-            <div className="mt-4 space-y-4">
-              <div className="flex items-center gap-3">
-                <span className="rounded-full bg-[#00D4AA]/10 px-3 py-1 text-sm font-medium capitalize text-[#00D4AA]">{sub.plan}</span>
-                <span className="rounded-full bg-[#1A1D1E] px-2.5 py-0.5 text-xs text-[#5C5C66]">{sub.status}</span>
-              </div>
-              <div className="grid gap-3 sm:grid-cols-3">
-                <div className="rounded-xl border border-[#1A1D1E] bg-[#07080A] p-4"><label className="text-xs text-[#5C5C66] uppercase tracking-wider">Billing interval</label><p className="mt-1 text-sm capitalize text-[#F1F1F3]">{sub.billingInterval || "—"}</p></div>
-                <div className="rounded-xl border border-[#1A1D1E] bg-[#07080A] p-4"><label className="text-xs text-[#5C5C66] uppercase tracking-wider">Period end</label><p className="mt-1 text-sm text-[#F1F1F3]">{sub.periodEnd ? new Date(sub.periodEnd).toLocaleDateString() : "—"}</p></div>
-                <div className="rounded-xl border border-[#1A1D1E] bg-[#07080A] p-4"><label className="text-xs text-[#5C5C66] uppercase tracking-wider">Seats</label><p className="mt-1 text-sm text-[#F1F1F3]">{sub.seats || "1"}</p></div>
-              </div>
-              {sub.cancelAtPeriodEnd && (
-                <div className="flex items-center gap-2 rounded-lg border border-[#F59E0B]/20 bg-[#F59E0B]/[0.06] px-4 py-3 text-sm text-[#F59E0B]">
-                  <svg className="h-4 w-4 shrink-0" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 5v3.5M8 11h.01"/></svg>
-                  Subscription cancels at period end
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="mt-4 rounded-xl border border-dashed border-[#1A1D1E] bg-[#07080A]/50 p-5">
-              <p className="text-sm text-[#5C5C66]">You are on the free plan.</p>
-              <a href="/pricing" className="mt-3 inline-flex items-center gap-2 rounded-lg bg-[#00D4AA] px-4 py-2 text-sm font-medium text-black hover:bg-[#00B894] transition-all duration-200 shadow-[0_2px_12px_-2px_rgba(0,212,170,0.3)]">View plans →</a>
-            </div>
-          )}
+        <section className="p-6">
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-[#8B8B93]">Billing</h2>
+          <p className="mt-2 text-sm text-[#6A6D6E]">Manage your plan, invoices, and payment methods on the billing page.</p>
+          <a href="/dashboard/billing" className="mt-4 inline-flex items-center gap-2 rounded-lg bg-[#00D4AA] px-4 py-2 text-sm font-medium text-black hover:bg-[#00B894] transition-all duration-200 shadow-[0_2px_12px_-2px_rgba(0,212,170,0.3)]">
+            Go to billing
+            <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M6 4l4 4-4 4"/></svg>
+          </a>
         </section>
 
         {/* Organization */}

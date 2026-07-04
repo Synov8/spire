@@ -4,7 +4,7 @@ import "./app.css";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -52,10 +52,10 @@ export default function App() {
 
 export function ErrorBoundary() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-950">
+    <div className="flex min-h-screen items-center justify-center bg-[#07080A]">
       <div className="text-center">
-        <h1 className="text-2xl font-bold text-white">Something went wrong</h1>
-        <p className="mt-2 text-gray-400">An unexpected error occurred.</p>
+        <h1 className="text-2xl font-bold text-[#F1F1F3]">Something went wrong</h1>
+        <p className="mt-2 text-[#6A6D6E]">An unexpected error occurred.</p>
       </div>
     </div>
   );
