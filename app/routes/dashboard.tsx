@@ -44,18 +44,23 @@ export async function loader({ request }: Route.LoaderArgs) {
 
   const subscribed = await hasActiveSubscription(orgId, session.user.id);
 
-  const reviewCount = subscribed ? await db.select({ count: policyCheck.id })
-    .from(policyCheck)
-    .where(and(eq(policyCheck.organizationId, orgId), ne(policyCheck.status, "pass")))
-    .then((rows) => rows.length) : 0;
+  let badgeCounts: Record<string, number> = {};
+  if (subscribed) {
+    const allChecks = await db.select({ status: policyCheck.status })
+      .from(policyCheck)
+      .where(and(eq(policyCheck.organizationId, orgId), ne(policyCheck.status, "pass")));
+    for (const c of allChecks) {
+      badgeCounts[c.status] = (badgeCounts[c.status] || 0) + 1;
+    }
+  }
 
   const currentOrg = orgs.find((o) => o.id === orgId);
 
-  return { user: session.user, orgId, reviewCount, subscribed, orgs, currentOrgName: currentOrg?.name ?? "" };
+  return { user: session.user, orgId, badgeCounts, subscribed, orgs, currentOrgName: currentOrg?.name ?? "" };
 }
 
 export default function Dashboard({ loaderData }: Route.ComponentProps) {
-  const { user, orgId, reviewCount, subscribed, orgs, currentOrgName } = loaderData;
+  const { user, orgId, badgeCounts, subscribed, orgs, currentOrgName } = loaderData;
   const { pathname } = useLocation();
   const [orgOpen, setOrgOpen] = useState(false);
 
@@ -63,7 +68,7 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
     { to: "/dashboard", label: "Overview", icon: icons.overview },
     { to: "/dashboard/integrations", label: "Integrations", icon: icons.integrations },
     { to: "/dashboard/questionnaires", label: "Questionnaires", icon: icons.questionnaires },
-    { to: "/dashboard/review", label: "Review", icon: icons.review, badge: reviewCount },
+    { to: "/dashboard/review", label: "Review", icon: icons.review, badges: badgeCounts },
     { to: "/dashboard/billing", label: "Billing", icon: icons.billing },
     { to: "/dashboard/settings", label: "Settings", icon: icons.settings },
   ];
@@ -111,9 +116,23 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
                   <span className={`transition-colors ${active ? "text-[#00D4AA]" : "text-[#4A4D4E] group-hover:text-[#8B8B93]"}`}>{l.icon}</span>
                   {l.label}
                 </span>
-                {l.badge !== undefined && l.badge > 0 && (
-                  <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[#F59E0B]/15 px-1.5 text-[10px] font-medium text-[#F59E0B]">
-                    {l.badge > 99 ? "99+" : l.badge}
+                {l.badges && (
+                  <span className="flex items-center gap-1">
+                    {l.badges.fail > 0 && (
+                      <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[#EF4444]/15 px-1.5 text-[10px] font-medium text-[#EF4444]">
+                        {l.badges.fail > 99 ? "99+" : l.badges.fail}
+                      </span>
+                    )}
+                    {l.badges.warning > 0 && (
+                      <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[#F59E0B]/15 px-1.5 text-[10px] font-medium text-[#F59E0B]">
+                        {l.badges.warning > 99 ? "99+" : l.badges.warning}
+                      </span>
+                    )}
+                    {l.badges.unknown > 0 && (
+                      <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[#6A6D6E]/15 px-1.5 text-[10px] font-medium text-[#6A6D6E]">
+                        {l.badges.unknown > 99 ? "99+" : l.badges.unknown}
+                      </span>
+                    )}
                   </span>
                 )}
               </Link>
