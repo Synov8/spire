@@ -1,5 +1,5 @@
 import { task } from "@trigger.dev/sdk";
-import { generateText, Output } from "ai";
+import { generateText, stepCountIs, Output } from "ai";
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import { Composio } from "@composio/core";
 import { VercelProvider } from "@composio/vercel";
@@ -44,6 +44,7 @@ export const processQuestionnaire = task({
       const result = await generateText({
         model,
         tools,
+        stopWhen: stepCountIs(200),
         system: [
           `You are a compliance investigator at Spire. You have live access to the company's connected apps via Composio tools.`,
           ``,
@@ -64,7 +65,7 @@ export const processQuestionnaire = task({
         output: Output.object({ schema: ResultSchema }),
       });
 
-      questions = result.output?.questions || [];
+      questions = result.output.questions;
     } catch (err) {
       console.error("Questionnaire processing failed:", err);
     }
