@@ -56,6 +56,8 @@ export const runAudit = task({
 
     let toolIdCounter = 0;
 
+    let auditSubmitted = false;
+
     const allTools = {
       ...tools,
       submitAuditReport: dynamicTool({
@@ -64,6 +66,7 @@ export const runAudit = task({
         execute: async (report: unknown) => {
           await auditStream.append({ type: "report-submitted" });
           await storeAuditReport(orgId, report);
+          auditSubmitted = true;
           return report;
         },
       }),
@@ -95,6 +98,8 @@ export const runAudit = task({
     });
 
     for await (const part of result.fullStream) {
+      if (auditSubmitted) break;
+
       const p = part as any;
       if (p.type === "tool-call") {
         if (p.toolName === "submitAuditReport") continue;
