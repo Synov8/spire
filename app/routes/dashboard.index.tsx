@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { animate } from "motion";
 import { useLoaderData, Link } from "react-router";
 import { db } from "~/db";
-import { control, policyCheck } from "~/db/schema";
+import { control, policyCheck, organization } from "~/db/schema";
 import { auth } from "~/lib/auth.server";
 import { auth as triggerAuth, runs } from "@trigger.dev/sdk";
 import { eq } from "drizzle-orm";
@@ -27,8 +27,9 @@ export async function loader({ request }: Route.LoaderArgs) {
   for (const v of verdicts) if (v.ruleId) verdictByControl.set(v.ruleId, v);
 
   const frameworks = [...new Set(allControls.map((c) => c.framework))];
+  const org = await db.select().from(organization).where(eq(organization.id, orgId)).limit(1).then((r) => r[0]);
   const reportData = verdicts.length > 0 ? {
-    orgName: session.user.name,
+    orgName: org?.name || session.user.name,
     date: new Date().toISOString().split("T")[0],
     frameworks: frameworks.map((fw) => ({
       framework: fw,
@@ -129,7 +130,7 @@ export default function DashboardHome({ loaderData }: Route.ComponentProps) {
               className="rounded-lg border border-[#1A1D1E] px-5 py-2.5 text-sm font-medium text-[#8B8B93] hover:border-[#EF4444] hover:text-[#EF4444] transition-all disabled:opacity-50">
               {running ? "Auditing…" : "New audit"}
             </button>
-            {reportData && <DownloadReportButton
+            {DownloadReportButton && reportData && <DownloadReportButton
               orgName={reportData.orgName} date={reportData.date} frameworks={reportData.frameworks}
               className="rounded-lg border border-[#1A1D1E] px-5 py-2.5 text-sm font-medium text-[#8B8B93] hover:border-[#00D4AA] hover:text-[#00D4AA] transition-all"
             />}

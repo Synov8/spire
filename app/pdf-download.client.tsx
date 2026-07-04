@@ -1,57 +1,84 @@
-import { PDFDownloadLink, Document, Page, View, Text } from "@react-pdf/renderer";
+import { PDFDownloadLink, Document, Page, View, Text, StyleSheet } from "@react-pdf/renderer";
 
-function statusColor(status: string): string {
-  if (status === "pass") return "#00D4AA";
-  if (status === "fail") return "#EF4444";
-  if (status === "warning") return "#F59E0B";
-  return "#999";
+const accent = "#00D4AA";
+const bg = "#07080A";
+const surface = "#0B0D0E";
+const border = "#1A1D1E";
+const textPrimary = "#F1F1F3";
+const textSecondary = "#8B8B93";
+const textMuted = "#5C5C66";
+const fail = "#EF4444";
+const warning = "#F59E0B";
+
+function statusColor(s: string): string {
+  if (s === "pass") return accent;
+  if (s === "fail") return fail;
+  if (s === "warning") return warning;
+  return textMuted;
 }
+
+const styles = StyleSheet.create({
+  page: { padding: 40, fontFamily: "Helvetica", backgroundColor: bg, color: textPrimary },
+  header: { marginBottom: 24, borderBottom: `1 solid ${border}`, paddingBottom: 16 },
+  title: { fontSize: 24, fontWeight: "bold", color: accent, marginBottom: 4 },
+  subtitle: { fontSize: 10, color: textSecondary },
+  frameworkHeader: { fontSize: 14, fontWeight: "bold", color: accent, marginBottom: 4, marginTop: 4 },
+  frameworkMeta: { fontSize: 9, color: textMuted, marginBottom: 8 },
+  tableHeader: { borderBottom: `1 solid ${border}`, paddingBottom: 4, marginBottom: 4, flexDirection: "row" },
+  tableHeaderText: { fontSize: 8, fontWeight: "bold", color: textMuted },
+  row: { flexDirection: "row", paddingVertical: 3, borderBottom: `1 solid ${border}` },
+  cellControl: { width: "18%", fontSize: 8, fontFamily: "Courier", color: textSecondary },
+  cellTitle: { width: "42%", fontSize: 8, color: textPrimary },
+  cellStatus: { width: "12%", fontSize: 8 },
+  cellDetail: { width: "28%", fontSize: 7, color: textMuted },
+  footer: { fontSize: 8, color: textMuted, marginTop: 32, borderTop: `1 solid ${border}`, paddingTop: 12 },
+  accentBar: { backgroundColor: accent, height: 3, width: 40, marginBottom: 12 },
+});
 
 function ReportPdf({ orgName, date, frameworks }: { orgName: string; date: string; frameworks: { framework: string; controls: { controlId: string; title: string; status: string; detail: string | null }[] }[] }) {
   return (
     <Document>
-      <Page size="A4" style={{ padding: 40, fontFamily: "Helvetica" }}>
-        <View style={{ marginBottom: 24 }}>
-          <Text style={{ fontSize: 22, fontWeight: "bold", marginBottom: 4 }}>Compliance Report</Text>
-          <Text style={{ fontSize: 10, color: "#666" }}>{orgName} — {date}</Text>
+      <Page size="A4" style={styles.page}>
+        <View style={styles.header}>
+          <Text style={styles.title}>Compliance Report</Text>
+          <View style={styles.accentBar} />
+          <Text style={styles.subtitle}>{orgName} — {date}</Text>
         </View>
 
         {frameworks.map((fw) => {
           const verified = fw.controls.filter((c) => c.status === "pass").length;
-          const failed = fw.controls.filter((c) => c.status === "fail").length;
+          const failedC = fw.controls.filter((c) => c.status === "fail").length;
           const warnings = fw.controls.filter((c) => c.status === "warning").length;
 
           return (
             <View key={fw.framework} style={{ marginBottom: 20 }}>
-              <Text style={{ fontSize: 14, fontWeight: "bold", marginBottom: 6, color: "#111" }}>
+              <Text style={styles.frameworkHeader}>
                 {fw.framework === "soc2" ? "SOC 2" : "EU AI Act"}
               </Text>
-              <Text style={{ fontSize: 9, color: "#666", marginBottom: 8 }}>
-                {fw.controls.length} controls — {verified} passed, {failed} failed, {warnings} warnings
+              <Text style={styles.frameworkMeta}>
+                {fw.controls.length} controls — {verified} passed, {failedC} failed, {warnings} warnings
               </Text>
 
-              <View style={{ borderBottom: "1 solid #ddd", paddingBottom: 4, marginBottom: 4, flexDirection: "row" }}>
-                <Text style={{ width: "18%", fontSize: 8, fontWeight: "bold", color: "#444" }}>Control</Text>
-                <Text style={{ width: "42%", fontSize: 8, fontWeight: "bold", color: "#444" }}>Title</Text>
-                <Text style={{ width: "12%", fontSize: 8, fontWeight: "bold", color: "#444" }}>Status</Text>
-                <Text style={{ width: "28%", fontSize: 8, fontWeight: "bold", color: "#444" }}>Detail</Text>
+              <View style={styles.tableHeader}>
+                <Text style={{ ...styles.tableHeaderText, width: "18%" }}>Control</Text>
+                <Text style={{ ...styles.tableHeaderText, width: "42%" }}>Title</Text>
+                <Text style={{ ...styles.tableHeaderText, width: "12%" }}>Status</Text>
+                <Text style={{ ...styles.tableHeaderText, width: "28%" }}>Detail</Text>
               </View>
 
               {fw.controls.map((r) => (
-                <View key={r.controlId} style={{ flexDirection: "row", paddingVertical: 3, borderBottom: "1 solid #eee" }}>
-                  <Text style={{ width: "18%", fontSize: 8, fontFamily: "Courier", color: "#333" }}>{r.controlId}</Text>
-                  <Text style={{ width: "42%", fontSize: 8, color: "#333" }}>{r.title}</Text>
-                  <Text style={{ width: "12%", fontSize: 8, color: statusColor(r.status) }}>{r.status}</Text>
-                  <Text style={{ width: "28%", fontSize: 7, color: "#666" }}>{r.detail || "—"}</Text>
+                <View key={r.controlId} style={styles.row}>
+                  <Text style={styles.cellControl}>{r.controlId}</Text>
+                  <Text style={styles.cellTitle}>{r.title}</Text>
+                  <Text style={{ ...styles.cellStatus, color: statusColor(r.status) }}>{r.status}</Text>
+                  <Text style={styles.cellDetail}>{r.detail || "—"}</Text>
                 </View>
               ))}
             </View>
           );
         })}
 
-        <Text style={{ fontSize: 8, color: "#999", marginTop: 32 }}>
-          Generated by Spire
-        </Text>
+        <Text style={styles.footer}>Generated by Spire — compliance-autopilot</Text>
       </Page>
     </Document>
   );
