@@ -31,10 +31,7 @@ export function buildAuditSchema(controlIds: string[]) {
   for (const id of controlIds) {
     controlShape[id] = ControlVerdictSchema;
   }
-  return z.object({
-    summary: z.string().describe("One-sentence compliance posture summary"),
-    controls: z.object(controlShape),
-  });
+  return z.object(controlShape);
 }
 
 export type AuditReport = z.infer<ReturnType<typeof buildAuditSchema>>;

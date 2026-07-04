@@ -10,14 +10,15 @@ import { buildAuditSchema } from "../app/agents/audit-schema";
 async function storeAuditReport(orgId: string, report: any) {
   const sql = neon(process.env.DATABASE_URL!);
   try {
-    if (!report?.controls) {
-      console.error("storeAuditReport: no controls in report", JSON.stringify(report).slice(0, 500));
+    if (!report || Object.keys(report).length === 0) {
+      console.error("storeAuditReport: empty report", JSON.stringify(report).slice(0, 500));
       return;
     }
+    const controlIds = Object.keys(report);
     // Remove stale policy checks and their orphaned manual evidence
-    await sql`DELETE FROM manual_evidence WHERE policy_check_id IN (SELECT id FROM policy_check WHERE organization_id = ${orgId} AND (rule_id LIKE 'agent-audit%' OR rule_id = ANY(${Object.keys(report.controls)})))`;
-    await sql`DELETE FROM policy_check WHERE organization_id = ${orgId} AND (rule_id LIKE 'agent-audit%' OR rule_id = ANY(${Object.keys(report.controls)}))`;
-    for (const [controlId, v] of Object.entries(report.controls)) {
+    await sql`DELETE FROM manual_evidence WHERE policy_check_id IN (SELECT id FROM policy_check WHERE organization_id = ${orgId} AND (rule_id LIKE 'agent-audit%' OR rule_id = ANY(${controlIds})))`;
+    await sql`DELETE FROM policy_check WHERE organization_id = ${orgId} AND (rule_id LIKE 'agent-audit%' OR rule_id = ANY(${controlIds}))`;
+    for (const [controlId, v] of Object.entries(report)) {
       const entry = v as any;
       await sql`
         INSERT INTO policy_check (id, rule_id, organization_id, status, detail, last_checked_at, created_at)

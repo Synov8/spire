@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import { useLoaderData, Link } from "react-router";
 import { db } from "~/db";
 import { control, policyCheck } from "~/db/schema";
@@ -144,29 +144,7 @@ export default function DashboardHome({ loaderData }: Route.ComponentProps) {
         </div>
       )}
 
-      {summaryStats && (
-        <div className="overflow-hidden rounded-2xl border border-[#1A1D1E] bg-[#0B0D0E]">
-          <div className="flex items-center gap-2 border-b border-[#1A1D1E] bg-gradient-to-r from-[#00D4AA]/[0.05] to-transparent px-5 py-3">
-            <span className="flex h-5 w-5 items-center justify-center rounded-md bg-[#00D4AA]/15 text-[10px] font-bold text-[#00D4AA]">AI</span>
-            <h2 className="text-sm font-semibold text-[#F1F1F3]">Compliance Summary</h2>
-          </div>
-          <div className="px-5 py-4">
-            <p className="text-sm leading-relaxed text-[#6A6D6E]">
-              <span className="text-2xl font-bold text-[#F1F1F3]">{summaryStats.pct}%</span>
-              <span className="mx-2 text-[#5C5C66]">pass rate —</span>
-              <span className="text-[#00D4AA]">{summaryStats.verified} passed</span>
-              <span className="mx-1.5 text-[#5C5C66]">·</span>
-              <span className="text-[#EF4444]">{summaryStats.failed} failed</span>
-              <span className="mx-1.5 text-[#5C5C66]">·</span>
-              <span className="text-[#F59E0B]">{summaryStats.warned} warnings</span>
-              <span className="mx-1.5 text-[#5C5C66]">·</span>
-              <span className="text-[#5C5C66]">{summaryStats.unchecked} unchecked</span>
-              <span className="mx-1.5 text-[#5C5C66]">out of</span>
-              <span className="text-[#F1F1F3]">{summaryStats.total} controls</span>
-            </p>
-          </div>
-        </div>
-      )}
+      {summaryStats && <DonutSummary stats={summaryStats} />}
 
       {hasAudit && (
         <section>
@@ -228,16 +206,78 @@ export default function DashboardHome({ loaderData }: Route.ComponentProps) {
     </div>
   );
 }
-function StatCard({ label, value, accent, icon }: { label: string; value: number; accent?: string | boolean; icon?: ReactNode }) {
-  const color = accent === "red" ? "text-[#EF4444]" : accent === "muted" ? "text-[#5C5C66]" : accent ? "text-[#00D4AA]" : "text-[#F1F1F3]";
-  const iconBg = accent === "red" ? "bg-[#EF4444]/10 text-[#EF4444]" : accent === "muted" ? "bg-[#1A1D1E] text-[#5C5C66]" : accent ? "bg-[#00D4AA]/10 text-[#00D4AA]" : "bg-[#1A1D1E] text-[#8B8B93]";
+function DonutSummary({ stats }: { stats: { pct: number; verified: number; failed: number; warned: number; unchecked: number; total: number } }) {
+  const [hovered, setHovered] = useState<string | null>(null);
+  const cx = 50, cy = 50, r = 36, sw = 8;
+  const circ = 2 * Math.PI * r;
+
+  type Seg = { key: string; value: number; color: string; label: string };
+  const segs: Seg[] = [
+    { key: "pass", value: stats.verified, color: "#00D4AA", label: "Passed" },
+    { key: "fail", value: stats.failed, color: "#EF4444", label: "Failed" },
+    { key: "warning", value: stats.warned, color: "#F59E0B", label: "Warnings" },
+    { key: "unchecked", value: stats.unchecked, color: "#1A1D1E", label: "Unchecked" },
+  ];
+
+  let offset = 0;
+  const arcs = segs
+    .filter((s) => s.value > 0)
+    .map((s) => {
+      const len = (s.value / stats.total) * circ;
+      const a = { ...s, dash: `${len} ${circ - len}`, off: -offset };
+      offset += len;
+      return a;
+    });
+
+  const hoveredSeg = segs.find((s) => s.key === hovered);
+  const tooltip = hoveredSeg ? `${hoveredSeg.label}: ${hoveredSeg.value}/${stats.total}` : null;
+
   return (
-    <div className="rounded-2xl border border-[#1A1D1E] bg-[#0B0D0E] p-5 transition-all duration-200 hover:border-[#1C1C24]">
-      <div className="flex items-center justify-between">
-        <p className="text-xs text-[#5C5C66] uppercase tracking-wider">{label}</p>
-        {icon && <span className={`flex h-7 w-7 items-center justify-center rounded-lg ${iconBg}`}>{icon}</span>}
+    <div className="overflow-hidden rounded-2xl border border-[#1A1D1E] bg-[#0B0D0E]">
+      <div className="flex items-center gap-2 border-b border-[#1A1D1E] bg-gradient-to-r from-[#00D4AA]/[0.05] to-transparent px-5 py-3">
+        <span className="flex h-5 w-5 items-center justify-center rounded-md bg-[#00D4AA]/15 text-[10px] font-bold text-[#00D4AA]">AI</span>
+        <h2 className="text-sm font-semibold text-[#F1F1F3]">Compliance Summary</h2>
       </div>
-      <p className={`mt-2 text-3xl font-bold ${color}`}>{value}</p>
+      <div className="flex items-center gap-8 px-5 py-6">
+        <div className="relative shrink-0">
+          <svg viewBox="0 0 100 100" className="h-28 w-28">
+            {arcs.map((a) => (
+              <circle
+                key={a.key}
+                cx={cx} cy={cy} r={r} fill="none"
+                stroke={a.color} strokeWidth={sw}
+                strokeDasharray={a.dash} strokeDashoffset={a.off}
+                transform={`rotate(-90 ${cx} ${cy})`}
+                className="cursor-pointer transition-opacity hover:opacity-80"
+                onMouseEnter={() => setHovered(a.key)}
+                onMouseLeave={() => setHovered(null)}
+                style={{ outline: "none" }}
+              />
+            ))}
+            <text x={cx} y={cy - 3} textAnchor="middle" className="fill-[#F1F1F3]" style={{ fontSize: 22, fontWeight: 700 }}>{stats.pct}%</text>
+            <text x={cx} y={cy + 10} textAnchor="middle" className="fill-[#5C5C66]" style={{ fontSize: 6 }}>pass rate</text>
+            {tooltip && (
+              <g>
+                <rect x={cx - 28} y={cy + 18} width={56} height={10} rx={3} fill="#1A1D1E" stroke="#2A2D2E" strokeWidth={0.5} />
+                <text x={cx} y={cy + 26} textAnchor="middle" className="fill-[#8B8B93]" style={{ fontSize: 5.5 }}>{tooltip}</text>
+              </g>
+            )}
+          </svg>
+        </div>
+        <div className="space-y-1.5">
+          {segs.map((s) => (
+            <div key={s.key} className="flex items-center gap-2 text-xs">
+              <span className="h-2 w-2 rounded-sm shrink-0" style={{ backgroundColor: s.color }} />
+              <span className="text-[#6A6D6E] w-16">{s.label}</span>
+              <span className="text-[#F1F1F3] font-medium tabular-nums">{s.value}</span>
+            </div>
+          ))}
+          <div className="pt-1 border-t border-[#1A1D1E] flex items-center gap-2 text-xs">
+            <span className="text-[#5C5C66] w-16">Total</span>
+            <span className="text-[#F1F1F3] font-medium tabular-nums">{stats.total}</span>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
