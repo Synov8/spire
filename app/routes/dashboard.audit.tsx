@@ -130,7 +130,7 @@ function describeToolCall(toolName: string, args: Record<string, unknown>): { ap
 
 interface ToolCard {
   id: number;
-  type: "tool-call" | "report-submitted";
+  type: "tool-call";
   action: string;
   toolName?: string;
   result?: unknown;
@@ -138,17 +138,6 @@ interface ToolCard {
 
 // ─── Individual tool-call card ───
 function ToolCallCard({ card }: { card: ToolCard }) {
-  if (card.type === "report-submitted") {
-    return (
-      <div className="flex items-center gap-2 rounded-lg border border-[#00D4AA]/20 bg-[#00D4AA]/5 px-3 py-2">
-        <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#00D4AA]">
-          <svg className="h-2.5 w-2.5 text-black" viewBox="0 0 10 8" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M1 4l3 3 5-5" /></svg>
-        </span>
-        <p className="text-xs font-medium text-[#F1F1F3]">Audit report submitted</p>
-      </div>
-    );
-  }
-
   const hasResult = card.result !== undefined;
 
   return (
@@ -163,39 +152,39 @@ function ToolCallCard({ card }: { card: ToolCard }) {
   );
 }
 
+let reportSubmitted = false;
+
 // ─── Group stream parts into tool-call cards ───
 function buildCards(parts: unknown[]): ToolCard[] {
   const cards: ToolCard[] = [];
-  const pending = new Map<number, number>();
+  const seen = new Set<string>();
 
   for (const part of parts) {
     const p: AuditChunk = typeof part === "string" ? JSON.parse(part) : part;
 
     if (p.type === "tool-call") {
-      const id = p.id;
+      const key = `${p.id}-${p.toolName}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+
       const entries = describeToolCall(p.toolName, (p.args ?? {}) as Record<string, unknown>);
       for (const entry of entries) {
-        pending.set(1, cards.length);
         cards.push({
-          id,
+          id: p.id,
           type: "tool-call",
           action: entry.action,
           toolName: p.toolName,
         });
       }
     } else if (p.type === "tool-result") {
-      const id = p.id;
       for (let i = cards.length - 1; i >= 0; i--) {
-        if (cards[i].type === "tool-call" && cards[i].id === id) {
+        if (cards[i].type === "tool-call" && cards[i].id === p.id && !cards[i].result) {
           cards[i] = { ...cards[i], result: p.result };
           break;
         }
       }
-      pending.delete(1);
-    } else if (p.type === "tool-error") {
-      pending.delete(1);
     } else if (p.type === "report-submitted") {
-      cards.push({ id: 0, type: "report-submitted", action: "" });
+      reportSubmitted = true;
     }
   }
 
@@ -225,7 +214,7 @@ export default function AuditPage() {
   });
 
   const cards = buildCards(parts ?? []);
-  const hasReport = cards.some((c) => c.type === "report-submitted");
+  const hasReport = (parts ?? []).some((p: any) => p?.type === "report-submitted" || (typeof p === "string" && p.includes('"report-submitted"')));
   const runningToolCount = cards.filter((c) => c.type === "tool-call" && c.result === undefined).length;
   const isRunning = !hasReport && runningToolCount > 0;
 
