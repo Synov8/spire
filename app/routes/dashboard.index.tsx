@@ -62,7 +62,8 @@ export async function loader({ request }: Route.LoaderArgs) {
       tag: `org:${orgId}`,
       limit: 5,
     });
-    const active = recentRuns.find((r: any) =>
+    const items: any[] = (recentRuns as any).data || [];
+    const active = items.find((r: any) =>
       ["QUEUED", "EXECUTING", "WAITING"].includes(r.status)
     );
     if (active) {

@@ -7,22 +7,19 @@ export async function loader({ request }: Route.LoaderArgs) {
   if (!session) throw redirect("/login");
   const orgId = session.session.activeOrganizationId!;
   let runs: any[] = [];
-  let debug: any = null;
   try {
     const { runs: triggerRuns } = await import("@trigger.dev/sdk");
     const result = await triggerRuns.list({ tag: `org:${orgId}`, taskIdentifier: "run-audit", limit: 50 });
-    runs = [...(result as any)];
-    debug = { type: typeof result, keys: Object.keys(result as any).slice(0, 10), length: (result as any).length, items: (result as any).items };
-  } catch (e: any) { debug = { error: e.message }; }
-  return { runs, debug };
+    runs = (result as any).data || [];
+  } catch { /* trigger not available */ }
+  return { runs };
 }
 
 export default function RunsPage({ loaderData }: Route.ComponentProps) {
-  const { runs, debug } = loaderData as any;
+  const { runs } = loaderData as any;
 
   return (
     <div className="space-y-6">
-      <pre className="overflow-x-auto rounded-lg border border-[#EF4444]/20 bg-[#EF4444]/[0.04] p-4 text-xs font-mono text-[#EF4444]">{JSON.stringify(debug, null, 2)}</pre>
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-[#F1F1F3]">Audit Runs</h1>
         <p className="mt-1 text-sm text-[#6A6D6E]">Past and current compliance audit runs</p>
