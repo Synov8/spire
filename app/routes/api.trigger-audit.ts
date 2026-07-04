@@ -44,7 +44,7 @@ export async function loader({ request, context }: Route.LoaderArgs) {
       description: c.description,
     })),
   }, {
-    tags: [`org:${orgId}`],
+    tags: [`org:${orgId}`, `audit:${orgId}`],
   });
 
   const publicToken = await triggerAuth.createPublicToken({

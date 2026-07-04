@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { animate } from "motion";
-import { useLoaderData, Link } from "react-router";
+import { useLoaderData, Link, useNavigate } from "react-router";
 import { db } from "~/db";
 import { control, policyCheck, organization, manualEvidence, questionnaire } from "~/db/schema";
 import { auth } from "~/lib/auth.server";
@@ -76,15 +76,13 @@ export async function loader({ request }: Route.LoaderArgs) {
 
 export default function DashboardHome({ loaderData }: Route.ComponentProps) {
   const { summaryStats, orgId, hasAudit, activeRunId, reportData, evidenceCount, questionnaireCount, connectedCount } = loaderData;
+  const navigate = useNavigate();
   const [running, setRunning] = useState(false);
   const [auditError, setAuditError] = useState<string | null>(null);
   const [confirmAudit, setConfirmAudit] = useState(false);
   const [hydrated, setHydrated] = useState(false);
   useEffect(() => { setHydrated(true); }, []);
-  // NOTE: useNavigate causes full-page reloads in some React Router v7 configs,
-  // so we use window.location.href for navigation instead.
 
-  // Parse activeRunId (format: "runId:token")
   const activeRun = activeRunId ? { runId: activeRunId.split(":")[0], token: activeRunId.split(":")[1] } : null;
 
   const runAudit = async () => {
@@ -98,8 +96,7 @@ export default function DashboardHome({ loaderData }: Route.ComponentProps) {
         setRunning(false);
         return;
       }
-      const data = await res.json() as { runId: string; publicToken: string };
-      window.location.href = `/dashboard/audit?runId=${data.runId}&token=${data.publicToken}`;
+      navigate("/dashboard/audit");
     } catch (e) {
       setAuditError(String(e));
       setRunning(false);

@@ -1,11 +1,21 @@
-import { useRef } from "react";
-import { useSearchParams, Link } from "react-router";
-import { useRealtimeStream } from "@trigger.dev/react-hooks";
+import { useRef, useEffect, useState } from "react";
+import { Link, useLoaderData } from "react-router";
+import { useRealtimeRunsWithTag, useRealtimeStream } from "@trigger.dev/react-hooks";
+import { auth } from "~/lib/auth.server";
 import type { AuditChunk } from "~/lib/streams";
 import type { Route } from "./+types/dashboard.audit";
 
 export async function loader({ request }: Route.LoaderArgs) {
-  return null;
+  const session = await auth.api.getSession({ headers: request.headers });
+  const orgId = session?.session.activeOrganizationId;
+  let accessToken: string | null = null;
+  if (orgId) {
+    try {
+      const { auth: triggerAuth } = await import("@trigger.dev/sdk");
+      accessToken = await triggerAuth.createPublicToken({ scopes: { read: { tags: [`audit:${orgId}`] } } });
+    } catch { /* trigger not available */ }
+  }
+  return { orgId, accessToken };
 }
 
 // ─── App colours ───
@@ -292,14 +302,24 @@ function buildCards(parts: unknown[]): ToolCard[] {
 }
 
 export default function AuditPage() {
-  const [searchParams] = useSearchParams();
-  const runId = searchParams.get("runId");
-  const token = searchParams.get("token");
+  const { orgId, accessToken } = useLoaderData() as { orgId: string | null | undefined; accessToken: string | null };
   const mainRef = useRef<HTMLDivElement>(null);
+  const [runId, setRunId] = useState<string | null>(null);
+
+  const { runs } = useRealtimeRunsWithTag(orgId ? `audit:${orgId}` : "", {
+    accessToken: accessToken || undefined,
+    enabled: !!orgId && !!accessToken,
+  });
+  useEffect(() => {
+    if (runs && runs.length > 0 && !runId) {
+      const active = runs.find((r: any) => ["QUEUED", "EXECUTING", "WAITING"].includes(r.status));
+      if (active) setRunId(active.id);
+    }
+  }, [runs, runId]);
 
   const { parts, error } = useRealtimeStream(runId ?? "", "audit", {
-    accessToken: token ?? "",
-    enabled: !!runId && !!token,
+    accessToken: accessToken || undefined,
+    enabled: !!runId && !!accessToken,
     timeoutInSeconds: 600,
   });
 
@@ -308,7 +328,7 @@ export default function AuditPage() {
   const runningToolCount = cards.filter((c) => c.type === "tool-call" && c.result === undefined).length;
   const isRunning = !hasReport && runningToolCount > 0;
 
-  if (!runId) {
+  if (!orgId) {
     return (
       <div className="flex flex-1 items-center justify-center">
         <div className="text-center">

@@ -1,5 +1,6 @@
-import { useState, useRef } from "react";
-import { redirect } from "react-router";
+import { useState, useRef, useEffect } from "react";
+import { useSearchParams, redirect, useNavigate } from "react-router";
+import { useRealtimeRunsWithTag } from "@trigger.dev/react-hooks";
 import { db } from "~/db";
 import { questionnaire, policyCheck, control } from "~/db/schema";
 import { auth } from "~/lib/auth.server";
@@ -31,7 +32,13 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   const q = await db.select().from(questionnaire).where(eq(questionnaire.id, params.id)).then((r) => r[0] || null);
   if (!q) return null;
   const hasAudit = await db.select({ id: policyCheck.id }).from(policyCheck).where(eq(policyCheck.organizationId, orgId)).limit(1).then((r) => r.length > 0);
-  return { questionnaire: q, hasAudit };
+  const tag = `questionnaire:${params.id}`;
+  let accessToken: string | null = null;
+  try {
+    const { auth: triggerAuth } = await import("@trigger.dev/sdk");
+    accessToken = await triggerAuth.createPublicToken({ scopes: { read: { tags: [tag] } } });
+  } catch { /* trigger not available */ }
+  return { questionnaire: q, hasAudit, tag, accessToken };
 }
 
 export async function action({ request, params }: Route.ActionArgs) {
@@ -67,13 +74,13 @@ export async function action({ request, params }: Route.ActionArgs) {
     const verdictText = agentVerdicts.map((v) => `${v.ruleId}: ${v.status} — ${v.detail || "no detail"}`).join("\n");
     const controlsText = controlsList.map((c) => `${c.controlId} (${c.framework}): ${c.title}`).join("\n");
 
+    const handle =     await tasks.trigger("process-questionnaire", {
+      orgId, questionnaireId: params.id, rawText, verdictText, controlsText,
+    }, { tags: [`org:${orgId}`, `questionnaire:${params.id}`] });
+
     await db.update(questionnaire).set({
       title: fileEntry.name, originalFile: fileEntry.name, status: "processing",
     }).where(eq(questionnaire.id, params.id));
-
-    await tasks.trigger("process-questionnaire", {
-      orgId, questionnaireId: params.id, rawText, verdictText, controlsText,
-    }, { tags: [`org:${orgId}`] });
 
     return redirect(`/dashboard/questionnaires/${params.id}`);
   } catch (err) {
@@ -84,7 +91,21 @@ export async function action({ request, params }: Route.ActionArgs) {
 
 export default function QuestionnaireDetail({ loaderData, actionData }: Route.ComponentProps) {
   if (!loaderData) return <p className="text-[#5C5C66]">Questionnaire not found.</p>;
-  const { questionnaire: q, hasAudit } = loaderData;
+  const { questionnaire: q, hasAudit, tag, accessToken } = loaderData;
+  const navigate = useNavigate();
+
+  const runEnabled = !!accessToken;
+  const { runs } = useRealtimeRunsWithTag(tag, {
+    accessToken: accessToken || undefined,
+    enabled: runEnabled,
+  });
+  const latestRun = runs?.[0];
+  const isProcessing = latestRun && ["PENDING", "RUNNING", "QUEUED", "WAITING"].includes(latestRun.status);
+  useEffect(() => {
+    if (latestRun && latestRun.status === "COMPLETED") {
+      navigate(".", { replace: true });
+    }
+  }, [latestRun, navigate]);
   const actionErr = actionData && typeof actionData === "object" && "error" in actionData ? (actionData as { error: string }).error : null;
   const fileInputRef = useRef<HTMLInputElement>(null);
 
