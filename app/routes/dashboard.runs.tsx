@@ -8,9 +8,9 @@ export async function loader({ request }: Route.LoaderArgs) {
   const orgId = session.session.activeOrganizationId!;
   let runs: any[] = [];
   try {
-    const { runs: triggerRuns, auth: triggerAuth } = await import("@trigger.dev/sdk");
+    const { runs: triggerRuns } = await import("@trigger.dev/sdk");
     const result = await triggerRuns.list({ tag: `org:${orgId}`, taskIdentifier: "run-audit", limit: 50 });
-    runs = (result as any).items || [];
+    runs = [...(result as any)];
   } catch { /* trigger not available */ }
   return { runs };
 }
