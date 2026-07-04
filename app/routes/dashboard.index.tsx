@@ -6,8 +6,7 @@ import { control, policyCheck } from "~/db/schema";
 import { auth } from "~/lib/auth.server";
 import { auth as triggerAuth, runs } from "@trigger.dev/sdk";
 import { eq } from "drizzle-orm";
-import { ReportPdf } from "~/components/report-pdf";
-import { PDFDownloadLink } from "~/pdf-download.client";
+import { DownloadReportButton } from "~/pdf-download.client";
 import type { Route } from "./+types/dashboard.index";
 
 export async function loader({ request }: Route.LoaderArgs) {
@@ -130,13 +129,10 @@ export default function DashboardHome({ loaderData }: Route.ComponentProps) {
               className="rounded-lg border border-[#1A1D1E] px-5 py-2.5 text-sm font-medium text-[#8B8B93] hover:border-[#EF4444] hover:text-[#EF4444] transition-all disabled:opacity-50">
               {running ? "Auditing…" : "New audit"}
             </button>
-            {reportData && (
-              <PDFDownloadLink document={<ReportPdf orgName={reportData.orgName} date={reportData.date} frameworks={reportData.frameworks} />}
-                fileName={`spire-compliance-report-${reportData.date}.pdf`}
-                className="rounded-lg border border-[#1A1D1E] px-5 py-2.5 text-sm font-medium text-[#8B8B93] hover:border-[#00D4AA] hover:text-[#00D4AA] transition-all">
-                {({ loading }: { loading: boolean }) => (loading ? "Preparing…" : "Download report")}
-              </PDFDownloadLink>
-            )}
+            {reportData && <DownloadReportButton
+              orgName={reportData.orgName} date={reportData.date} frameworks={reportData.frameworks}
+              className="rounded-lg border border-[#1A1D1E] px-5 py-2.5 text-sm font-medium text-[#8B8B93] hover:border-[#00D4AA] hover:text-[#00D4AA] transition-all"
+            />}
           </div>
           {auditError && (
             <p className="text-sm text-[#EF4444]">Failed to start audit: {auditError}</p>
