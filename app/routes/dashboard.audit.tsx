@@ -206,17 +206,27 @@ export default function AuditPage() {
   useEffect(() => {
     if (runs && runs.length > 0 && !runId && !urlRunId) {
       const active = runs.find((r: any) => ["QUEUED", "EXECUTING", "WAITING"].includes(r.status));
-      setRunId(active ? active.id : runs[0].id);
+      if (active) setRunId(active.id);
     }
   }, [runs, runId, urlRunId]);
 
-  const { parts, error } = useRealtimeStream(runId ?? "", "audit", {
+  const { parts: rawParts, error } = useRealtimeStream(runId ?? "", "audit", {
     accessToken: accessToken || undefined,
     enabled: !!runId && !!accessToken,
     timeoutInSeconds: 600,
   });
 
-  const cards = buildCards(parts ?? []);
+  // Dedupe parts by their unique identifier (id for tool-calls, type+id for others)
+  const seenParts = new Set<string>();
+  const parts = (rawParts ?? []).filter((p: any) => {
+    const chunk = typeof p === "string" ? JSON.parse(p) : p;
+    const key = chunk.type === "tool-call" || chunk.type === "tool-result" ? `${chunk.type}-${chunk.id}` : chunk.type;
+    if (seenParts.has(key)) return false;
+    seenParts.add(key);
+    return true;
+  });
+
+  const cards = buildCards(parts);
   const hasReport = (parts ?? []).some((p: any) => p?.type === "report-submitted" || (typeof p === "string" && p.includes('"report-submitted"')));
   const runningToolCount = cards.filter((c) => c.type === "tool-call" && c.result === undefined).length;
   const isRunning = !hasReport && runningToolCount > 0;
