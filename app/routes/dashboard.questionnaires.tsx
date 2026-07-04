@@ -47,7 +47,7 @@ export default function Questionnaires({ loaderData }: Route.ComponentProps) {
           <h1 className="text-2xl font-bold tracking-tight text-[#F1F1F3]">Questionnaires</h1>
           <p className="mt-1 text-sm text-[#6A6D6E]">Upload security questionnaires and let AI auto-fill answers</p>
         </div>
-        <button onClick={async () => {
+        <button type="button" onClick={async () => {
           fetcher.submit({}, { method: "POST" });
         }} disabled={fetcher.state !== "idle"}
           className="rounded-lg bg-[#00D4AA] px-4 py-2 text-sm font-medium text-black hover:bg-[#00B894] transition-all duration-200 shadow-[0_2px_12px_-2px_rgba(0,212,170,0.3)]">

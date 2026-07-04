@@ -71,7 +71,7 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
           <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-[#00D4AA] to-[#00B894] text-[11px] font-bold text-black shadow-[0_2px_8px_-2px_rgba(0,212,170,0.4)]">S</div>
           <div className="flex-1 truncate">
             <div className="relative">
-              <button onClick={() => setOrgOpen(!orgOpen)} className="flex w-full items-center gap-1.5 text-sm font-medium text-[#E8E8E8] hover:text-white transition-colors">
+              <button type="button" onClick={() => setOrgOpen(!orgOpen)} className="flex w-full items-center gap-1.5 text-sm font-medium text-[#E8E8E8] hover:text-white transition-colors">
                 <span className="truncate max-w-36">{currentOrgName || "No org"}</span>
                 {orgs.length > 1 && <span className={`text-[#4A4D4E] transition-transform duration-200 ${orgOpen ? "rotate-180" : ""}`}>{icons.chevronDown}</span>}
               </button>

@@ -54,7 +54,7 @@ function Card({ app, label, desc, initial, connected, loading, onConnect, onDisc
         </div>
       </div>
       {connected ? (
-        <button onClick={() => onDisconnect?.(app)}
+        <button type="button" onClick={() => onDisconnect?.(app)}
           className="group mt-4 flex w-full items-center justify-center gap-2 rounded-lg border border-[#00D4AA]/20 bg-[#00D4AA]/[0.04] py-2 text-sm text-[#00D4AA] hover:border-[#EF4444]/30 hover:bg-[#EF4444]/[0.04] hover:text-[#EF4444] transition-all duration-200">
           <svg className="h-4 w-4 group-hover:hidden" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3.5 8.5l3 3 6-7"/></svg>
           <svg className="hidden h-4 w-4 group-hover:block" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg>
@@ -62,7 +62,7 @@ function Card({ app, label, desc, initial, connected, loading, onConnect, onDisc
           <span className="hidden group-hover:inline">Disconnect</span>
         </button>
       ) : (
-        <button onClick={() => onConnect(app)} disabled={loading === app}
+        <button type="button" onClick={() => onConnect(app)} disabled={loading === app}
           className="mt-4 w-full rounded-lg border border-[#1A1D1E] bg-[#141718] py-2 text-sm font-medium text-[#8B8B93] hover:border-[#00D4AA]/40 hover:text-[#00D4AA] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
           {loading === app ? (
             <span className="flex items-center justify-center gap-2">
@@ -136,7 +136,7 @@ export default function IntegrationsPage() {
     <div className="flex gap-8">
       {/* Category sidebar */}
       <nav className="w-44 shrink-0 space-y-1">
-        <button onClick={() => setSelectedCategory(null)}
+        <button type="button" onClick={() => setSelectedCategory(null)}
           className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition-colors ${
             activeCategory === "All"
               ? "bg-[#00D4AA]/[0.08] text-[#E8E8E8]"

@@ -27,7 +27,7 @@ export default function FAQPage() {
         <div className="mt-14 space-y-2">
           {faqs.map((faq, i) => (
             <div key={i} className="rounded-xl border border-[#1C1C24] bg-[#111116]">
-              <button onClick={() => setOpen(open === i ? null : i)} className="flex w-full items-center justify-between px-6 py-4 text-left transition-colors hover:bg-[#0A0A0C]/50 rounded-xl">
+              <button type="button" onClick={() => setOpen(open === i ? null : i)} className="flex w-full items-center justify-between px-6 py-4 text-left transition-colors hover:bg-[#0A0A0C]/50 rounded-xl">
                 <span className="text-sm font-medium text-[#F1F1F3] pr-4">{faq.q}</span>
                 <svg className={`h-4 w-4 shrink-0 text-[#5C5C66] transition-transform ${open === i ? "rotate-180" : ""}`} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M4 6l4 4 4-4" />

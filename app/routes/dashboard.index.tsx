@@ -141,7 +141,7 @@ export default function DashboardHome({ loaderData }: Route.ComponentProps) {
                 View current audit
               </Link>
             )}
-            <button onClick={() => setConfirmAudit(true)} disabled={running}
+            <button type="button" onClick={() => setConfirmAudit(true)} disabled={running}
               className="rounded-lg border border-[#1A1D1E] px-5 py-2.5 text-sm font-medium text-[#8B8B93] hover:border-[#EF4444] hover:text-[#EF4444] transition-all disabled:opacity-50">
               {running ? "Auditing…" : "New audit"}
             </button>
@@ -192,11 +192,11 @@ export default function DashboardHome({ loaderData }: Route.ComponentProps) {
               The AI will re-check every control from scratch.
             </p>
             <div className="mt-5 flex items-center justify-end gap-3">
-              <button onClick={() => setConfirmAudit(false)}
+              <button type="button" onClick={() => setConfirmAudit(false)}
                 className="rounded-lg border border-[#1A1D1E] px-4 py-2 text-xs font-medium text-[#8B8B93] hover:bg-[#141718] transition-all">
                 Cancel
               </button>
-              <button onClick={() => { setConfirmAudit(false); runAudit(); }}
+              <button type="button" onClick={() => { setConfirmAudit(false); runAudit(); }}
                 className="rounded-lg bg-[#00D4AA] px-4 py-2 text-xs font-medium text-black hover:bg-[#00B894] transition-all">
                 Run audit
               </button>

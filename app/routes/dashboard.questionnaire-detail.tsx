@@ -143,13 +143,13 @@ export default function QuestionnaireDetail({ loaderData }: Route.ComponentProps
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={handleDelete}
+          <button type="button" onClick={handleDelete}
             className="flex items-center gap-1.5 rounded-lg border border-[#1A1D1E] px-3.5 py-2 text-sm font-medium text-[#8B8B93] hover:border-[#EF4444]/30 hover:text-[#EF4444] transition-all">
             <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M2 4h12M5 4V2.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 .5.5V4M4 4v9.5a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4"/></svg>
             Delete
           </button>
           {q.originalFile && (
-            <button onClick={handleExport}
+            <button type="button" onClick={handleExport}
               className="flex items-center gap-1.5 rounded-lg border border-[#1A1D1E] px-3.5 py-2 text-sm font-medium text-[#8B8B93] transition-all hover:border-[#00D4AA] hover:text-[#00D4AA]">
               <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M8 2v10M4 8l4 4 4-4M2 14h12"/></svg>
               Export
@@ -249,8 +249,8 @@ export default function QuestionnaireDetail({ loaderData }: Route.ComponentProps
                       <textarea value={editValue} onChange={(e) => setEditValue(e.target.value)}
                         className="w-full rounded-lg border border-[#00D4AA]/30 bg-[#07080A] px-3 py-2 text-sm text-[#F1F1F3] focus:border-[#00D4AA] focus:outline-none focus:ring-1 focus:ring-[#00D4AA]/20 transition-all min-h-[80px]" />
                       <div className="flex items-center gap-2">
-                        <button onClick={saveEdit} className="rounded-lg bg-[#00D4AA] px-3 py-1.5 text-xs font-medium text-black hover:bg-[#00B894]">Save</button>
-                        <button onClick={cancelEdit} className="rounded-lg border border-[#1A1D1E] px-3 py-1.5 text-xs font-medium text-[#8B8B93] hover:text-[#F1F1F3]">Cancel</button>
+                        <button type="button" onClick={saveEdit} className="rounded-lg bg-[#00D4AA] px-3 py-1.5 text-xs font-medium text-black hover:bg-[#00B894]">Save</button>
+                        <button type="button" onClick={cancelEdit} className="rounded-lg border border-[#1A1D1E] px-3 py-1.5 text-xs font-medium text-[#8B8B93] hover:text-[#F1F1F3]">Cancel</button>
                       </div>
                     </div>
                   ) : (
@@ -269,7 +269,7 @@ export default function QuestionnaireDetail({ loaderData }: Route.ComponentProps
                       ) : (
                         <p className="mt-2 text-[10px] uppercase tracking-wider text-[#5C5C66]">Manually edited</p>
                       )}
-                      <button onClick={() => startEdit(i)} className="mt-2 text-xs text-[#5C5C66] hover:text-[#00D4AA] transition-colors">Edit answer</button>
+                      <button type="button" onClick={() => startEdit(i)} className="mt-2 text-xs text-[#5C5C66] hover:text-[#00D4AA] transition-colors">Edit answer</button>
                     </>
                   )}
                 </div>

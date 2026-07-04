@@ -266,7 +266,7 @@ export default function ReviewPage({ loaderData }: Route.ComponentProps) {
 
             return (
               <div key={ctrl.id} className="overflow-hidden rounded-xl border border-[#1A1D1E] bg-[#0B0D0E] transition-all duration-200 hover:border-[#1C1C24]">
-                <button onClick={() => setExpanded((prev) => ({ ...prev, [ctrl.controlId]: !isOpen }))}
+                <button type="button" onClick={() => setExpanded((prev) => ({ ...prev, [ctrl.controlId]: !isOpen }))}
                   className="flex w-full items-start gap-3 p-4 text-left">
                   <span className={`mt-0.5 h-2 w-2 shrink-0 rounded-full ${dot}`} />
                   <div className="min-w-0 flex-1">

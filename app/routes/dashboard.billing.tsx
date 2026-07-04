@@ -98,13 +98,13 @@ export default function BillingPage({ loaderData }: Route.ComponentProps) {
           <div className="mt-6 flex gap-3">
             {sub ? (
               <>
-                <button onClick={manageBilling} className="rounded-lg border border-[#1A1D1E] px-4 py-2 text-sm font-medium text-[#8B8B93] hover:border-[#00D4AA] hover:text-[#00D4AA] transition-all duration-200">Manage billing</button>
-                <button onClick={cancelSubscription} className="rounded-lg border border-[#EF4444]/30 px-4 py-2 text-sm font-medium text-[#EF4444] hover:border-[#EF4444]/60 hover:bg-[#EF4444]/[0.04] transition-all duration-200">Cancel subscription</button>
+                <button type="button" onClick={manageBilling} className="rounded-lg border border-[#1A1D1E] px-4 py-2 text-sm font-medium text-[#8B8B93] hover:border-[#00D4AA] hover:text-[#00D4AA] transition-all duration-200">Manage billing</button>
+                <button type="button" onClick={cancelSubscription} className="rounded-lg border border-[#EF4444]/30 px-4 py-2 text-sm font-medium text-[#EF4444] hover:border-[#EF4444]/60 hover:bg-[#EF4444]/[0.04] transition-all duration-200">Cancel subscription</button>
               </>
             ) : (
               <>
-                <button onClick={() => upgrade("starter")} className="rounded-lg border border-[#1A1D1E] px-5 py-2 text-sm font-medium text-[#F1F1F3] hover:border-[#00D4AA] hover:text-[#00D4AA] transition-all duration-200">Upgrade to Starter — £200/mo</button>
-                <button onClick={() => upgrade("growth")} className="rounded-lg bg-[#00D4AA] px-5 py-2 text-sm font-medium text-black hover:bg-[#00B894] transition-all duration-200 shadow-[0_2px_12px_-2px_rgba(0,212,170,0.3)]">Upgrade to Growth — £1,200/mo</button>
+                <button type="button" onClick={() => upgrade("starter")} className="rounded-lg border border-[#1A1D1E] px-5 py-2 text-sm font-medium text-[#F1F1F3] hover:border-[#00D4AA] hover:text-[#00D4AA] transition-all duration-200">Upgrade to Starter — £200/mo</button>
+                <button type="button" onClick={() => upgrade("growth")} className="rounded-lg bg-[#00D4AA] px-5 py-2 text-sm font-medium text-black hover:bg-[#00B894] transition-all duration-200 shadow-[0_2px_12px_-2px_rgba(0,212,170,0.3)]">Upgrade to Growth — £1,200/mo</button>
               </>
             )}
           </div>
