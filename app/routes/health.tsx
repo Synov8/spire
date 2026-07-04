@@ -72,8 +72,22 @@ function StatusIcon({ ok }: { ok: boolean }) {
 export default function HealthPage() {
   const { results, healthy, ts } = useLoaderData<typeof loader>();
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: "Spire Health Check",
+    description: "Live status of Spire's infrastructure dependencies",
+    about: {
+      "@type": "SoftwareApplication",
+      name: "Spire",
+      applicationCategory: "Compliance Automation",
+    },
+    dateModified: ts,
+  };
+
   return (
     <PublicLayout>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <section className="mx-auto max-w-2xl px-6 pt-20 pb-24">
         <div className="text-center">
           <span className="text-xs font-semibold uppercase tracking-[0.15em] text-[#00D4AA]">System</span>
