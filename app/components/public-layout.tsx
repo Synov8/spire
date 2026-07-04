@@ -189,7 +189,7 @@ export function PublicFooter() {
             </a>
             <a href="https://www.producthunt.com/products/spire-6?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-spire-6" target="_blank" rel="noopener noreferrer">
               <img alt="Spire - AI-powered SOC 2 &amp; EU AI Act compliance | Product Hunt" width="250" height="54" src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1183433&theme=dark&t=1782720497497" /></a>
-            <a href='https://www.sideprojectors.com/project/84002/spire' target="_blank" rel="noopener"><img src='https://www.sideprojectors.com/img/badges/badge_show_black.png' alt='Check out Spire at SideProjectors' /></a>
+            <a href='https://www.sideprojectors.com/project/84002/spire' target="_blank" rel="noopener"><img src='https://www.sideprojectors.com/img/badges/badge_show_black.png' alt='Check out Spire at SideProjectors' height={54} className="object-contain" /></a>
           </div>
           <p className="text-xs text-[#5C5C66]">
             &copy; {new Date().getFullYear()} Synov8 Ltd. &mdash; <a href="https://saascubes.com" rel="noopener" title="Listed on SaaS Cubes" className="hover:text-[#8B8B93] transition-colors">Listed on SaaS Cubes</a>
