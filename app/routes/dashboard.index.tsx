@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { animate } from "motion";
 import { useLoaderData, Link } from "react-router";
 import { db } from "~/db";
 import { control, policyCheck } from "~/db/schema";
@@ -171,32 +172,42 @@ function DonutSummary({ stats }: { stats: { pct: number; verified: number; faile
     .filter((s) => s.value > 0)
     .map((s) => {
       const len = (s.value / stats.total) * circ;
-      const a = { ...s, dash: `${len} ${circ - len}`, off: -offset };
+      const a = { ...s, dash: `${len} ${circ - len}`, off: -offset, len };
       offset += len;
       return a;
     });
 
+  useEffect(() => {
+    const anims = arcs.map((a) => {
+      const el = document.getElementById(`arc-${a.key}`);
+      if (!el) return null;
+      return animate(el, { strokeDasharray: [`0 ${circ}`, a.dash] }, { duration: 0.8, ease: "easeOut", delay: 0.15 });
+    });
+    return () => anims.forEach((a) => a?.stop());
+  }, [arcs, circ]);
+
   return (
     <div className="relative shrink-0">
-      <svg viewBox="6 6 88 88" className="h-44 w-44">
+      <svg viewBox="6 6 88 88" className="h-56 w-56">
         {arcs.map((a) => (
-          <circle
-            key={a.key}
-            cx={cx} cy={cy} r={r} fill="none"
-            stroke={a.color} strokeWidth={sw}
-            strokeDasharray={a.dash} strokeDashoffset={a.off}
-            transform={`rotate(-90 ${cx} ${cy})`}
-            className="cursor-pointer transition-opacity hover:opacity-80"
-            onMouseEnter={() => setHovered({ key: a.key, label: a.label, value: a.value, total: stats.total })}
-            onMouseLeave={() => setHovered(null)}
-            style={{ outline: "none" }}
-          />
+            <circle
+              id={`arc-${a.key}`}
+              key={a.key}
+              cx={cx} cy={cy} r={r} fill="none"
+              stroke={a.color} strokeWidth={sw}
+              strokeDasharray={a.dash} strokeDashoffset={a.off}
+              transform={`rotate(-90 ${cx} ${cy})`}
+              className="cursor-pointer transition-opacity hover:opacity-80"
+              onMouseEnter={() => setHovered({ key: a.key, label: a.label, value: a.value, total: stats.total })}
+              onMouseLeave={() => setHovered(null)}
+              style={{ outline: "none" }}
+            />
         ))}
-          <text x={cx} y={cy} textAnchor="middle" dominantBaseline="central" className="fill-[#F1F1F3]" style={{ fontSize: 32, fontWeight: 700 }}>{stats.pct}%</text>
-          <text x={cx} y={cy + 22} textAnchor="middle" dominantBaseline="central" className="fill-[#8B8B93]" style={{ fontSize: 11 }}>pass rate</text>
+          <text x={cx} y={cy} textAnchor="middle" dominantBaseline="central" className="fill-[#F1F1F3]" style={{ fontSize: 38, fontWeight: 700 }}>{stats.pct}%</text>
+          <text x={cx} y={cy + 26} textAnchor="middle" dominantBaseline="central" className="fill-[#8B8B93]" style={{ fontSize: 13 }}>pass rate</text>
       </svg>
       {hovered && (
-        <div className="absolute left-1/2 top-full mt-2 -translate-x-1/2 rounded-lg border border-[#2A2D2E] bg-[#1A1D1E] px-3 py-2 text-sm font-medium text-[#E8E8E8] whitespace-nowrap shadow-lg">
+        <div className="absolute left-1/2 top-full mt-2 -translate-x-1/2 rounded-lg border border-[#2A2D2E] bg-[#1A1D1E] px-4 py-2.5 text-sm font-medium text-[#E8E8E8] whitespace-nowrap shadow-lg">
           {hovered.label}: {hovered.value}/{hovered.total}
         </div>
       )}
