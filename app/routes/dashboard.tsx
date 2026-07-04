@@ -59,6 +59,7 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
     { to: "/dashboard/integrations", label: "Integrations", icon: icons.integrations },
     { to: "/dashboard/questionnaires", label: "Questionnaires", icon: icons.questionnaires },
     { to: "/dashboard/review", label: "Review", icon: icons.review },
+    { to: "/dashboard/runs", label: "Audits", icon: icons.overview },
     { to: "/dashboard/billing", label: "Billing", icon: icons.billing },
     { to: "/dashboard/settings", label: "Settings", icon: icons.settings },
   ];

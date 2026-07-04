@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState } from "react";
-import { Link, useLoaderData } from "react-router";
+import { Link, useLoaderData, useSearchParams } from "react-router";
 import { useRealtimeRunsWithTag, useRealtimeStream } from "@trigger.dev/react-hooks";
 import { auth } from "~/lib/auth.server";
 import type { AuditChunk } from "~/lib/streams";
@@ -193,8 +193,10 @@ function buildCards(parts: unknown[]): ToolCard[] {
 
 export default function AuditPage() {
   const { orgId, accessToken } = useLoaderData() as { orgId: string | null | undefined; accessToken: string | null };
+  const [searchParams] = useSearchParams();
+  const urlRunId = searchParams.get("runId");
   const mainRef = useRef<HTMLDivElement>(null);
-  const [runId, setRunId] = useState<string | null>(null);
+  const [runId, setRunId] = useState<string | null>(urlRunId);
 
   const { runs } = useRealtimeRunsWithTag(orgId ? `audit:${orgId}` : "", {
     accessToken: accessToken || undefined,
@@ -203,11 +205,11 @@ export default function AuditPage() {
   const [showRuns, setShowRuns] = useState(false);
 
   useEffect(() => {
-    if (runs && runs.length > 0 && !runId) {
+    if (runs && runs.length > 0 && !runId && !urlRunId) {
       const active = runs.find((r: any) => ["QUEUED", "EXECUTING", "WAITING"].includes(r.status));
       setRunId(active ? active.id : runs[0].id);
     }
-  }, [runs, runId]);
+  }, [runs, runId, urlRunId]);
 
   const { parts, error } = useRealtimeStream(runId ?? "", "audit", {
     accessToken: accessToken || undefined,
@@ -246,28 +248,7 @@ export default function AuditPage() {
               {hasReport ? "Audit complete" : isRunning ? "Running compliance audit" : "Initialising…"}
             </h1>
           </div>
-          <div className="relative">
-            <button onClick={() => setShowRuns(!showRuns)} className="flex items-center gap-1 text-xs text-[#5C5C66] hover:text-[#8B8B93] transition-colors">
-              {cards.length} steps
-              <svg className={`h-3 w-3 transition-transform ${showRuns ? "rotate-180" : ""}`} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M4 6l4 4 4-4"/></svg>
-            </button>
-            {showRuns && runs && (
-              <>
-                <div className="fixed inset-0 z-10" onClick={() => setShowRuns(false)} />
-                <div className="absolute left-0 top-full z-20 mt-1 w-56 overflow-hidden rounded-lg border border-[#1A1D1E] bg-[#0B0D0E] py-1 shadow-lg">
-                  <div className="px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-[#5C5C66]">Past runs</div>
-                  {runs.map((r: any) => (
-                    <button key={r.id} onClick={() => { setRunId(r.id); setShowRuns(false); }}
-                      className={`flex w-full items-center gap-2 px-3 py-2 text-left text-xs transition-colors ${r.id === runId ? "bg-[#00D4AA]/10 text-[#00D4AA]" : "text-[#8B8B93] hover:bg-[#141718]"}`}>
-                      <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${r.status === "COMPLETED" ? "bg-[#00D4AA]" : r.status === "FAILED" ? "bg-[#EF4444]" : "bg-[#F59E0B]"}`} />
-                      <span className="flex-1 truncate">{r.id?.slice(0, 16)}…</span>
-                      <span className="shrink-0 text-[10px] text-[#5C5C66]">{r.status?.toLowerCase()}</span>
-                    </button>
-                  ))}
-                </div>
-              </>
-            )}
-          </div>
+          <span className="text-xs text-[#5C5C66]">{cards.length} steps</span>
         </div>
         <div className="flex items-center gap-4">
           {hasReport && (

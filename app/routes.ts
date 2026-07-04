@@ -17,6 +17,7 @@ export default [
     route("review", "routes/dashboard.review.tsx"),
     route("billing", "routes/dashboard.billing.tsx"),
     route("audit", "routes/dashboard.audit.tsx"),
+    route("runs", "routes/dashboard.runs.tsx"),
     route("settings", "routes/dashboard.settings.tsx"),
   ]),
   route("pricing", "routes/pricing.tsx"),
