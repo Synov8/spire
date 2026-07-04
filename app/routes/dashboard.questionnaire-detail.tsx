@@ -258,7 +258,6 @@ export default function QuestionnaireDetail({ loaderData }: Route.ComponentProps
               </label>
             )}
           </div>
-          {uploading && <p className="text-xs text-[#F59E0B] text-center">Uploading and processing…</p>}
           {!hasAudit && (
             <p className="text-xs text-[#F59E0B] text-center">⚠ Run an AI audit from the overview page first for better answers.</p>
           )}
