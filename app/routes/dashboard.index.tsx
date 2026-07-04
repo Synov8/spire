@@ -242,6 +242,8 @@ function DonutSummary({ stats }: { stats: { pct: number; verified: number; faile
     <div className="relative shrink-0" onMouseLeave={() => setHovered(null)}>
       <div className="relative h-56 w-56">
         <svg viewBox="6 6 88 88" className="h-full w-full">
+          {/* Full background ring to show the unchecked/empty portion */}
+          <circle cx={cx} cy={cy} r={r} fill="none" stroke="#2A2D2E" strokeWidth={sw} />
           {arcs.map((a) => (
             <circle
               id={`arc-${a.key}`}
