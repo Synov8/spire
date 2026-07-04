@@ -18,41 +18,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   return { orgId, accessToken };
 }
 
-// ─── App colours ───
-const APP_COLOURS: Record<string, string> = {
-  GitHub: "bg-[#2DBA4E]/10 text-[#2DBA4E] border-[#2DBA4E]/20",
-  Stripe: "bg-[#635BFF]/10 text-[#7C73FF] border-[#635BFF]/20",
-  Notion: "bg-white/10 text-white border-white/20",
-  Cloudflare: "bg-[#F38020]/10 text-[#F38020] border-[#F38020]/20",
-  Neon: "bg-[#00E599]/10 text-[#00E599] border-[#00E599]/20",
-  Resend: "bg-[#FF6C2C]/10 text-[#FF6C2C] border-[#FF6C2C]/20",
-  Gmail: "bg-[#EA4335]/10 text-[#EA4335] border-[#EA4335]/20",
-  Discord: "bg-[#5865F2]/10 text-[#5865F2] border-[#5865F2]/20",
-  Slack: "bg-[#4A154B]/10 text-[#E01E5A] border-[#E01E5A]/20",
-  Google: "bg-[#4285F4]/10 text-[#4285F4] border-[#4285F4]/20",
-  AWS: "bg-[#FF9900]/10 text-[#FF9900] border-[#FF9900]/20",
-  Vercel: "bg-[#FFFFFF]/10 text-[#FFFFFF] border-[#FFFFFF]/20",
-  Jira: "bg-[#0052CC]/10 text-[#2684FF] border-[#0052CC]/20",
-  Linear: "bg-[#5E6AD2]/10 text-[#5E6AD2] border-[#5E6AD2]/20",
-  Sentry: "bg-[#FB4226]/10 text-[#FB4226] border-[#FB4226]/20",
-  Datadog: "bg-[#632CA6]/10 text-[#632CA6] border-[#632CA6]/20",
-  Figma: "bg-[#F24E1E]/10 text-[#F24E1E] border-[#F24E1E]/20",
-  OpenAI: "bg-[#74AA9C]/10 text-[#74AA9C] border-[#74AA9C]/20",
-};
-
-function appColour(app: string): string {
-  return APP_COLOURS[app] || "bg-[#00D4AA]/10 text-[#00D4AA] border-[#00D4AA]/20";
-}
-
-function AppBadge({ app }: { app: string }) {
-  return (
-    <span className={`inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-[10px] font-semibold leading-none ${appColour(app)}`}>
-      {app}
-    </span>
-  );
-}
-
-// ─── Tool name parsing (moved from trigger/audit-task.ts) ───
+// ─── Tool name parsing ───
 
 const APP_LABELS: Record<string, string> = {
   github: "GitHub", stripe: "Stripe", notion: "Notion",
@@ -67,9 +33,7 @@ function describeComposioTool(toolName: string, args: any): { app: string; actio
   const lower = toolName.toLowerCase();
 
   if (lower === "composio_manage_connections") {
-    const toolkits: string[] = args?.toolkits ?? [];
-    const apps = toolkits.map((t: string) => APP_LABELS[t.toLowerCase()] || t.charAt(0).toUpperCase() + t.slice(1));
-    return { app: apps.join(", "), action: "Checking connections…", description: `Verifying ${apps.length} integrations` };
+    return { app: "", action: "Checking connections…", description: "" };
   }
 
   if (lower === "composio_search_tools") {
@@ -77,17 +41,12 @@ function describeComposioTool(toolName: string, args: any): { app: string; actio
   }
 
   if (lower === "composio_get_tool_schemas") {
-    const slugs: string[] = args?.tool_slugs ?? [];
-    const apps = [...new Set(slugs.map(slugApp))];
-    return { app: apps.join(", "), action: "Loading tool schemas…", description: `${slugs.length} tools` };
+    return { app: "", action: "Loading tool schemas…", description: "" };
   }
 
   if (lower === "composio_multi_execute_tool") {
-    const tools: Array<{ tool_slug?: string }> = args?.tools ?? [];
     const thought: string = args?.thought ?? "";
-    const apps = [...new Set(tools.map((t) => slugApp(t.tool_slug || "")))];
-    const short = thought ? (thought.length > 50 ? thought.slice(0, 50) + "…" : thought) : `Probing ${apps.length} apps`;
-    return { app: apps.join(", "), action: short, description: `${tools.length} tools` };
+    return { app: "", action: thought || "Gathering evidence…", description: "" };
   }
 
   if (lower === "composio_remote_workbench") {
@@ -95,12 +54,6 @@ function describeComposioTool(toolName: string, args: any): { app: string; actio
   }
 
   return { app: "", action: "Running audit checks…", description: "" };
-}
-
-function slugApp(slug: string): string {
-  if (!slug) return "";
-  const prefix = slug.split("_")[0]?.toLowerCase();
-  return APP_LABELS[prefix] || prefix?.toUpperCase() || slug;
 }
 
 function describeAction(actionName: string, args: Record<string, unknown>): string {
@@ -154,11 +107,8 @@ function describeToolCall(toolName: string, args: Record<string, unknown>): { ap
 interface ToolCard {
   id: number;
   type: "tool-call" | "report-submitted";
-  app: string;
   action: string;
-  description: string;
   toolName?: string;
-  args?: unknown;
   result?: unknown;
 }
 
@@ -180,9 +130,7 @@ function ToolCallCard({ card }: { card: ToolCard }) {
   return (
     <div className={`flex items-center gap-2 rounded-lg border border-[#1A1D1E] px-3 py-2 ${hasResult ? "" : "border-l-2 border-l-[#00D4AA]"}`}>
       <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${hasResult ? "bg-[#5C5C66]" : "bg-[#00D4AA] animate-pulse"}`} />
-      {card.app && <AppBadge app={card.app} />}
-      <p className="min-w-0 flex-1 truncate text-xs text-[#8B8B93]">{card.action}</p>
-      {card.description && <span className="shrink-0 text-[10px] text-[#5C5C66]">{card.description}</span>}
+      <p className="min-w-0 flex-1 text-xs text-[#8B8B93]">{card.action}</p>
     </div>
   );
 }
@@ -203,11 +151,8 @@ function buildCards(parts: unknown[]): ToolCard[] {
         cards.push({
           id,
           type: "tool-call",
-          app: entry.app,
           action: entry.action,
-          description: entry.description,
           toolName: p.toolName,
-          args: p.args,
         });
       }
     } else if (p.type === "tool-result") {
@@ -222,7 +167,7 @@ function buildCards(parts: unknown[]): ToolCard[] {
     } else if (p.type === "tool-error") {
       pending.delete(1);
     } else if (p.type === "report-submitted") {
-      cards.push({ id: 0, type: "report-submitted", app: "", action: "", description: "", toolName: "", args: {} });
+      cards.push({ id: 0, type: "report-submitted", action: "" });
     }
   }
 
