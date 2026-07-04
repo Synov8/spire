@@ -251,8 +251,8 @@ function DonutSummary({ stats }: { stats: { pct: number; verified: number; faile
           <text x={cx} y={cy + 13} textAnchor="middle" dominantBaseline="central" className="fill-[#8B8B93]" style={{ fontSize: 7 }}>pass rate</text>
         {tooltip && (
           <g>
-            <rect x={cx - 30} y={cy + 15} width={60} height={14} rx={4} fill="#1A1D1E" stroke="#2A2D2E" strokeWidth={0.5} />
-            <text x={cx} y={cy + 25} textAnchor="middle" className="fill-[#E8E8E8]" style={{ fontSize: 7, fontWeight: 500 }}>{tooltip}</text>
+            <rect x={cx - 40} y={cy + 15} width={80} height={18} rx={5} fill="#1A1D1E" stroke="#2A2D2E" strokeWidth={0.5} />
+            <text x={cx} y={cy + 27} textAnchor="middle" className="fill-[#E8E8E8]" style={{ fontSize: 9, fontWeight: 500 }}>{tooltip}</text>
           </g>
         )}
       </svg>
