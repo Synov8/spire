@@ -126,10 +126,10 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
           </form>
         </div>
       </aside>
-      <main className="flex-1 overflow-y-auto">
+      <main className="flex flex-1 flex-col overflow-y-auto">
         {/* Subtle dot-grid background for depth (matches HeroDemo) */}
         <div className="pointer-events-none fixed inset-0 opacity-[0.025]" style={{ backgroundImage: "radial-gradient(circle, #2C2C36 1px, transparent 1px)", backgroundSize: "24px 24px" }} />
-        <div className="relative mx-auto max-w-6xl p-6 lg:p-8">
+        <div className="relative mx-auto flex w-full max-w-6xl flex-1 flex-col p-6 lg:p-8">
           <Outlet context={{ orgId, subscribed }} />
         </div>
       </main>

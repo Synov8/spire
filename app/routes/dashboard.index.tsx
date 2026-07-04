@@ -74,7 +74,7 @@ export default function DashboardHome({ loaderData }: Route.ComponentProps) {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-full gap-8 py-12">
+    <div className="flex flex-1 flex-col items-center justify-center gap-8 py-12">
       <div className="text-center">
         <h1 className="text-2xl font-bold tracking-tight text-[#F1F1F3]">Overview</h1>
         <p className="mt-1 text-sm text-[#6A6D6E]">Compliance posture and audit readiness</p>
