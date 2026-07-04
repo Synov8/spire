@@ -1,16 +1,18 @@
 import { useState, useEffect, useMemo } from "react";
 import { animate } from "motion";
+import { PDFDownloadLink } from "@react-pdf/renderer";
 import { useLoaderData, Link } from "react-router";
 import { db } from "~/db";
 import { control, policyCheck } from "~/db/schema";
 import { auth } from "~/lib/auth.server";
 import { auth as triggerAuth, runs } from "@trigger.dev/sdk";
 import { eq } from "drizzle-orm";
+import { ReportPdf } from "~/components/report-pdf";
 import type { Route } from "./+types/dashboard.index";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const session = await auth.api.getSession({ headers: request.headers });
-  if (!session) return { summaryStats: null, orgId: "", hasAudit: false, activeRunId: null };
+  if (!session) return { summaryStats: null, orgId: "", hasAudit: false, activeRunId: null, reportData: null };
   const orgId = session.session.activeOrganizationId!;
   const allControls = await db.select().from(control);
   const verdicts = await db.select().from(policyCheck).where(eq(policyCheck.organizationId, orgId));
@@ -21,6 +23,22 @@ export async function loader({ request }: Route.LoaderArgs) {
   const unchecked = allControls.length - verdicts.length;
   const pct = allControls.length > 0 ? Math.round((verified / allControls.length) * 100) : 0;
   const summaryStats = verdicts.length > 0 ? { pct, verified, failed, warned, unchecked, total: allControls.length } : null;
+
+  const verdictByControl = new Map<string, typeof verdicts[0]>();
+  for (const v of verdicts) if (v.ruleId) verdictByControl.set(v.ruleId, v);
+
+  const frameworks = [...new Set(allControls.map((c) => c.framework))];
+  const reportData = verdicts.length > 0 ? {
+    orgName: session.user.name,
+    date: new Date().toISOString().split("T")[0],
+    frameworks: frameworks.map((fw) => ({
+      framework: fw,
+      controls: allControls.filter((c) => c.framework === fw).map((c) => {
+        const v = verdictByControl.get(c.controlId);
+        return { controlId: c.controlId, title: c.title, status: v?.status || "unchecked", detail: v?.detail || null };
+      }),
+    })),
+  } : null;
 
   let activeRunId: string | null = null;
   try {
@@ -40,11 +58,11 @@ export async function loader({ request }: Route.LoaderArgs) {
     }
   } catch { /* skip */ }
 
-  return { summaryStats, orgId, hasAudit: verdicts.length > 0, activeRunId };
+  return { summaryStats, orgId, hasAudit: verdicts.length > 0, activeRunId, reportData };
 }
 
 export default function DashboardHome({ loaderData }: Route.ComponentProps) {
-  const { summaryStats, orgId, hasAudit, activeRunId } = loaderData;
+  const { summaryStats, orgId, hasAudit, activeRunId, reportData } = loaderData;
   const [running, setRunning] = useState(false);
   const [auditError, setAuditError] = useState<string | null>(null);
   const [confirmAudit, setConfirmAudit] = useState(false);
@@ -112,10 +130,13 @@ export default function DashboardHome({ loaderData }: Route.ComponentProps) {
               className="rounded-lg border border-[#1A1D1E] px-5 py-2.5 text-sm font-medium text-[#8B8B93] hover:border-[#EF4444] hover:text-[#EF4444] transition-all disabled:opacity-50">
               {running ? "Auditing…" : "New audit"}
             </button>
-            <a href="/dashboard/export"
-              className="rounded-lg border border-[#1A1D1E] px-5 py-2.5 text-sm font-medium text-[#8B8B93] hover:border-[#00D4AA] hover:text-[#00D4AA] transition-all">
-              Download report
-            </a>
+            {reportData && (
+              <PDFDownloadLink document={<ReportPdf orgName={reportData.orgName} date={reportData.date} frameworks={reportData.frameworks} />}
+                fileName={`spire-compliance-report-${reportData.date}.pdf`}
+                className="rounded-lg border border-[#1A1D1E] px-5 py-2.5 text-sm font-medium text-[#8B8B93] hover:border-[#00D4AA] hover:text-[#00D4AA] transition-all">
+                {({ loading }) => (loading ? "Preparing…" : "Download report")}
+              </PDFDownloadLink>
+            )}
           </div>
           {auditError && (
             <p className="text-sm text-[#EF4444]">Failed to start audit: {auditError}</p>
