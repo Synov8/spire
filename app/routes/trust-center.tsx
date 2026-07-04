@@ -205,15 +205,6 @@ export default function TrustCenter() {
               </div>
             ))}
           </div>
-          <div
-            className="mt-8 rounded-lg border border-[#F59E0B]/20 bg-[#F59E0B]/5 p-5"
-          >
-            <p className="text-sm font-medium text-[#F59E0B]">Penetration testing</p>
-            <p className="mt-1 text-sm text-[#8B8B93]">
-              Penetration testing cadence: planned for H2 2026; historical reports not yet
-              published. We&apos;ll publish the first report after the formal engagement completes.
-            </p>
-          </div>
         </div>
       </section>
 

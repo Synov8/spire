@@ -35,18 +35,18 @@ export type SpirePostureSnapshot = {
 };
 
 export const spirePosture: SpirePostureSnapshot = {
-  generatedAt: "2026-07-04T20:00:00Z",
+  generatedAt: "2026-07-04T21:30:00Z",
   frameworks: {
     soc2: {
-      passed: 35,
+      passed: 46,
       total: 56,
-      lastEvaluated: "2026-07-04T20:00:00Z",
+      lastEvaluated: "2026-07-04T21:30:00Z",
       stage: "Preparing for formal SOC 2 certification",
     },
     aiAct: {
-      passed: 6,
+      passed: 7,
       total: 10,
-      lastEvaluated: "2026-07-04T20:00:00Z",
+      lastEvaluated: "2026-07-04T21:30:00Z",
       stage: "Evaluating compliance — most requirements met",
     },
   },
@@ -54,6 +54,6 @@ export const spirePosture: SpirePostureSnapshot = {
     "SOC 2 controls are continuously monitored via Spire's compliance agent.",
     "EU AI Act compliance is assessed per the AI Governance framework.",
     "Spire's own audit posture is updated every 7 days by re-running the agent against Spire's infrastructure.",
-    "Penetration testing and formal SOC 2 certification are in progress.",
+    "Formal SOC 2 certification is in progress.",
   ],
 };
