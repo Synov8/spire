@@ -158,7 +158,7 @@ let reportSubmitted = false;
 // ─── Group stream parts into tool-call cards ───
 function buildCards(parts: unknown[]): ToolCard[] {
   const cards: ToolCard[] = [];
-  const seenActions = new Set<string>();
+  let lastAction = "";
 
   for (const part of parts) {
     const p: AuditChunk = typeof part === "string" ? JSON.parse(part) : part;
@@ -166,8 +166,8 @@ function buildCards(parts: unknown[]): ToolCard[] {
     if (p.type === "tool-call") {
       const entries = describeToolCall(p.toolName, (p.args ?? {}) as Record<string, unknown>);
       for (const entry of entries) {
-        if (seenActions.has(entry.action)) continue;
-        seenActions.add(entry.action);
+        if (entry.action === lastAction) continue;
+        lastAction = entry.action;
         cards.push({
           id: p.id,
           type: "tool-call",
