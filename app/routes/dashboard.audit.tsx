@@ -63,7 +63,7 @@ const APP_LABELS: Record<string, string> = {
   vercel: "Vercel", google: "Google", openai: "OpenAI",
 };
 
-function describeComposioTool(toolName: string, args: any): { app: string; action: string; description: string; progress?: string } {
+function describeComposioTool(toolName: string, args: any): { app: string; action: string; description: string } {
   const lower = toolName.toLowerCase();
 
   if (lower === "composio_manage_connections") {
@@ -73,7 +73,7 @@ function describeComposioTool(toolName: string, args: any): { app: string; actio
   }
 
   if (lower === "composio_search_tools") {
-    return { app: "Composio", action: "Finding relevant tools…", description: "" };
+    return { app: "", action: "Finding relevant tools…", description: "" };
   }
 
   if (lower === "composio_get_tool_schemas") {
@@ -85,18 +85,16 @@ function describeComposioTool(toolName: string, args: any): { app: string; actio
   if (lower === "composio_multi_execute_tool") {
     const tools: Array<{ tool_slug?: string }> = args?.tools ?? [];
     const thought: string = args?.thought ?? "";
-    const metric: string = args?.current_step_metric ?? "";
     const apps = [...new Set(tools.map((t) => slugApp(t.tool_slug || "")))];
     const short = thought ? (thought.length > 50 ? thought.slice(0, 50) + "…" : thought) : `Probing ${apps.length} apps`;
-    return { app: apps.join(", "), action: short, description: `${tools.length} tools`, progress: metric };
+    return { app: apps.join(", "), action: short, description: `${tools.length} tools` };
   }
 
   if (lower === "composio_remote_workbench") {
-    const thought: string = args?.thought ?? "";
-    return { app: "Composio", action: thought || "Processing evidence…", description: "" };
+    return { app: "", action: "Processing evidence…", description: "" };
   }
 
-  return { app: "Composio", action: "Running audit checks…", description: "" };
+  return { app: "", action: "Running audit checks…", description: "" };
 }
 
 function slugApp(slug: string): string {
@@ -159,7 +157,6 @@ interface ToolCard {
   app: string;
   action: string;
   description: string;
-  progress?: string;
   toolName?: string;
   args?: unknown;
   result?: unknown;
@@ -169,70 +166,23 @@ interface ToolCard {
 function ToolCallCard({ card }: { card: ToolCard }) {
   if (card.type === "report-submitted") {
     return (
-      <div className="flex items-center gap-3 rounded-xl border border-[#00D4AA]/20 bg-[#00D4AA]/5 px-4 py-3">
-        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#00D4AA]">
-          <svg className="h-3 w-3 text-black" viewBox="0 0 10 8" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M1 4l3 3 5-5" />
-          </svg>
+      <div className="flex items-center gap-2 rounded-lg border border-[#00D4AA]/20 bg-[#00D4AA]/5 px-3 py-2">
+        <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#00D4AA]">
+          <svg className="h-2.5 w-2.5 text-black" viewBox="0 0 10 8" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M1 4l3 3 5-5" /></svg>
         </span>
-        <div>
-          <p className="text-sm font-medium text-[#F1F1F3]">Audit report submitted</p>
-          <p className="text-xs text-[#5C5C66]">Results saved to your compliance dashboard</p>
-        </div>
+        <p className="text-xs font-medium text-[#F1F1F3]">Audit report submitted</p>
       </div>
     );
   }
 
   const hasResult = card.result !== undefined;
-  const resultPreview = hasResult
-    ? JSON.stringify(card.result).slice(0, 300)
-    : null;
 
   return (
-    <div className="rounded-xl border border-[#1A1D1E] bg-[#0B0D0E] px-4 py-3 transition-all duration-300">
-      <div className="flex items-start gap-3">
-        <span className={`mt-1 h-2 w-2 shrink-0 rounded-full ${hasResult ? "bg-[#00D4AA]" : "bg-[#00D4AA] animate-pulse"}`} />
-
-        <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-2">
-            {card.app && <AppBadge app={card.app} />}
-            {!card.app && card.toolName && (
-              <span className="inline-flex items-center gap-1 rounded-md border border-[#5C5C66]/30 bg-[#5C5C66]/10 px-1.5 py-0.5 text-[10px] font-semibold leading-none text-[#5C5C66]">
-                {card.toolName}
-              </span>
-            )}
-            <p className="text-xs font-medium text-[#F1F1F3]">{card.action}</p>
-          </div>
-
-          {card.description && (
-            <p className="mt-1 text-[11px] text-[#6A6D6E] leading-relaxed">{card.description}</p>
-          )}
-
-          {card.progress && (() => {
-            const match = card.progress!.match(/(\d+)\/(\d+)/);
-            const pct = match ? Math.round((+match[1] / +match[2]) * 100) : 0;
-            return (
-              <div className="mt-1.5 flex items-center gap-2 text-[10px] text-[#5C5C66]">
-                <div className="h-1 flex-1 overflow-hidden rounded-full bg-[#1A1D1E]">
-                  <div className="h-full rounded-full bg-[#00D4AA] transition-all duration-500" style={{ width: `${pct}%` }} />
-                </div>
-                <span className="shrink-0">{card.progress}</span>
-              </div>
-            );
-          })()}
-
-          {hasResult && resultPreview && (
-            <div className="mt-2">
-              <details>
-                <summary className="cursor-pointer text-[10px] text-[#5C5C66] hover:text-[#8B8B93]">Result</summary>
-                <pre className="mt-1 overflow-x-auto rounded-lg border border-[#1A1D1E] bg-[#07080A] p-2 text-[10px] font-mono text-[#8B8B93] leading-relaxed">
-                  {resultPreview}
-                </pre>
-              </details>
-            </div>
-          )}
-        </div>
-      </div>
+    <div className={`flex items-center gap-2 rounded-lg border border-[#1A1D1E] px-3 py-2 ${hasResult ? "" : "border-l-2 border-l-[#00D4AA]"}`}>
+      <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${hasResult ? "bg-[#5C5C66]" : "bg-[#00D4AA] animate-pulse"}`} />
+      {card.app && <AppBadge app={card.app} />}
+      <p className="min-w-0 flex-1 truncate text-xs text-[#8B8B93]">{card.action}</p>
+      {card.description && <span className="shrink-0 text-[10px] text-[#5C5C66]">{card.description}</span>}
     </div>
   );
 }
@@ -256,7 +206,6 @@ function buildCards(parts: unknown[]): ToolCard[] {
           app: entry.app,
           action: entry.action,
           description: entry.description,
-          progress: (entry as any).progress,
           toolName: p.toolName,
           args: p.args,
         });
@@ -273,7 +222,7 @@ function buildCards(parts: unknown[]): ToolCard[] {
     } else if (p.type === "tool-error") {
       pending.delete(1);
     } else if (p.type === "report-submitted") {
-      cards.push({ id: 0, type: "report-submitted", app: "", action: "", description: "" });
+      cards.push({ id: 0, type: "report-submitted", app: "", action: "", description: "", toolName: "", args: {} });
     }
   }
 
