@@ -311,7 +311,7 @@ function Scene2Evidence({ onReady }: { onReady?: () => void }) {
       <ul ref={scope} className="mt-3 flex-1 space-y-1.5 overflow-y-auto scrollbar-thin">
         {EVIDENCE_STREAM.map((item) => (
           <li key={`${item.integration}-${item.text}`}
-            className="flex items-center gap-1.5 rounded-md border border-[#1C1C24] bg-[#0E0E14] px-2 py-1.5 opacity-0 -translate-x-2 min-w-0"
+            className="flex items-center gap-1.5 rounded-md border border-[#1C1C24] bg-[#0E0E14] px-1.5 py-1.5 opacity-0"
           >
             <span className="flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded bg-[#00D4AA]/10 text-[7px] font-bold text-[#00D4AA]">{item.integration[0]}</span>
             <span className="min-w-0 flex-1 truncate text-[10px] text-[#B0B0B8]">{item.text}</span>
