@@ -198,6 +198,7 @@ export function PublicFooter() {
                   <img alt="Spire - AI-powered SOC 2 &amp; EU AI Act compliance | Product Hunt" width="250" height="54" src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1183433&theme=dark&t=1782720497497" className="h-full w-auto" /></a>,
                 <a key="sp" href='https://www.sideprojectors.com/project/84002/spire' target="_blank" rel="noopener" className="flex h-[54px] shrink-0 items-center"><img src='https://www.sideprojectors.com/img/badges/badge_show_black.png' alt='Check out Spire at SideProjectors' className="h-full w-auto" /></a>,
                 <a key="sc" href="https://saascubes.com" rel="noopener" title="Listed on SaaS Cubes" className="flex h-[54px] shrink-0 items-center"><img src="https://saascubes.com/images/badges/badge-dark.png" alt="Listed on SaaS Cubes" className="h-full w-auto" /></a>,
+                <a key="sf" href="https://startupfa.me/s/spire?utm_source=spire.synov8studio.com" target="_blank" rel="noopener" className="flex h-[54px] shrink-0 items-center"><img src="https://startupfa.me/badges/featured-badge-small.webp" alt="Spire - Featured on Startup Fame" width="224" height="36" className="h-[36px] w-auto" /></a>,
               ])}
             </div>
           </div>
