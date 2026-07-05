@@ -34,8 +34,8 @@ const features = [
     title: "AI compliance agent with on-demand audits",
     desc: "Spire's audit agent probes your connected APIs, evaluates each control against the evidence those APIs return, and produces a structured pass/fail/warning report. The audit streams live as NDJSON so you can watch every verdict land.",
     items: [
-      "Runs against all 56 SOC 2 common criteria — not just the subset you have integrations for",
-      "Plus 10 EU AI Act articles (transparency, logging, human oversight, risk management, accuracy, governance)",
+      "Runs against all 56 SOC 2 common criteria and 10 EU AI Act articles — 66 controls total",
+      "Each verdict is streamed live so you can watch evidence being collected in real time",
       "Each verdict cites the specific evidence that backs it, with the source API call recorded",
       "Controls it can't verify automatically are flagged with a recommended next step for your team",
       "Re-run anytime — new evidence and new integrations are picked up on the next pass",
@@ -43,7 +43,7 @@ const features = [
   },
   {
     title: "Auto-fills security questionnaires from live evidence",
-    desc: "Upload any vendor questionnaire — PDF, DOCX, CSV, HTML, Markdown, plain text. The agent maps each question to your evidence and writes a confidence-scored answer grounded in your real data, not generic SOC 2 knowledge.",
+    desc: "Upload any vendor questionnaire — PDF, TXT, CSV, HTML, Markdown. The agent investigates your connected integrations for evidence, maps each question to what it finds, and writes a confidence-scored answer grounded in your real data, not generic SOC 2 knowledge.",
     items: [
       "Confidence score per question — 0 to 100%",
       "Every answer references the actual evidence backing it (or is flagged when evidence is absent)",
@@ -69,9 +69,7 @@ const features = [
 // leave less likely to churn or leave a negative review.
 const honestNonClaims = [
   "We don't replace your auditor — we make their job faster by handing them provable, source-backed evidence and a structured export.",
-  "EU AI Act mapping is partial today. Controls Spire can't yet verify are honestly tagged 'Mapping emerging' or 'Pending mapping' in the control explorer — we don't dress up incomplete coverage as complete.",
   "We're not SOC 2 certified yet. Our own posture snapshot lives at /trust-center and we're working toward formal certification — no false claims, no borrowed logos.",
-  "Penetration testing is planned for H2 2026. We're collecting evidence toward that engagement — not claiming a pre-existing report that doesn't exist.",
   "We don't lock you in. Every evidence item is permanently exportable as JSON. If you cancel, your data is yours to take with you.",
 ];
 

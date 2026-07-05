@@ -68,6 +68,10 @@ export function ErrorBoundary({ error }: { error?: Error }) {
             </details>
           </>
         )}
+        <div className="mt-6 flex items-center gap-3">
+          <a href="/" className="rounded-lg bg-[#00D4AA] px-5 py-2.5 text-sm font-medium text-black hover:bg-[#00B894] transition-colors">Go home</a>
+          <a href="/dashboard" className="rounded-lg border border-[#1A1D1E] px-5 py-2.5 text-sm font-medium text-[#8B8B93] hover:border-[#00D4AA] hover:text-[#00D4AA] transition-colors">Dashboard</a>
+        </div>
       </div>
     </div>
   );

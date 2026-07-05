@@ -139,7 +139,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
       />
 
       {/* HERO — §4.2: headline + subhead + CTA on left, animated demo on right at md+, stacked on mobile */}
-      <section className="mx-auto max-w-6xl px-6 pt-24 pb-16">
+      <section className="mx-auto max-w-7xl px-6 pt-24 pb-16">
         <div className="grid items-center gap-12 md:grid-cols-2 md:gap-16">
           <div className="text-center md:text-left">
             <h1 className="text-5xl font-extrabold leading-[1.08] tracking-tight md:text-6xl lg:text-7xl">
@@ -162,6 +162,9 @@ export default function Home({ loaderData }: Route.ComponentProps) {
             </div>
             <p className="mt-9 text-[10px] font-semibold uppercase tracking-[0.15em] text-[#5C5C66]">
               AWS · GitHub · Stripe · Vercel · Cloudflare · +{INTEGRATION_NAMES.length - 5} more
+            </p>
+            <p className="mt-2 text-[10px] text-[#4A4D4E]">
+              Featured on Tiny Startups · Product Hunt · SideProjectors · SaaS Cubes
             </p>
           </div>
           <div className="w-full">
