@@ -1,5 +1,6 @@
-import { Link } from "react-router";
+import { Link, useFetcher } from "react-router";
 import { PublicLayout } from "~/components/public-layout";
+import { Resend } from "resend";
 
 export function meta() {
   return [
@@ -10,7 +11,38 @@ export function meta() {
   ];
 }
 
+export async function action({ request }: { request: Request }) {
+  const formData = await request.formData();
+  const email = formData.get("email") as string;
+  const company = formData.get("company") as string;
+  const message = formData.get("message") as string;
+
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    return { ok: false, error: "Email service not configured" };
+  }
+
+  const resend = new Resend(apiKey);
+
+  const { error } = await resend.emails.send({
+    from: "Spire Contact <noreply@synov8studio.com>",
+    to: "hello@synov8studio.com",
+    replyTo: email,
+    subject: `New demo request from ${company}`,
+    html: `<p><strong>Email:</strong> ${email}</p><p><strong>Company:</strong> ${company}</p><p><strong>Message:</strong></p><p>${message}</p>`,
+  });
+
+  if (error) {
+    console.error("contact form error", error);
+    return { ok: false, error: "Failed to send message" };
+  }
+
+  return { ok: true };
+}
+
 export default function ContactPage() {
+  const fetcher = useFetcher<{ ok: boolean; error?: string }>();
+
   return (
     <PublicLayout>
 
@@ -30,26 +62,33 @@ export default function ContactPage() {
           <div className="rounded-xl border border-[#1C1C24] bg-[#111116] p-8">
             <h2 className="text-lg font-bold text-[#F1F1F3]">Book a demo</h2>
             <p className="mt-2 text-sm text-[#8B8B93]">See Spire working with your actual infrastructure. 15 minutes, no commitment.</p>
-            <form onSubmit={(e) => e.preventDefault()} className="mt-6 space-y-4">
-              <div>
-                <label className="mb-1 block text-xs uppercase tracking-wider text-[#8B8B93]">Work email</label>
-                <input type="email" required placeholder="you@company.com"
-                  className="w-full rounded-lg border border-[#1C1C24] bg-[#0A0A0C] px-3 py-2.5 text-sm text-[#F1F1F3] placeholder-[#5C5C66] focus:border-[#00D4AA] focus:outline-none transition-colors" />
-              </div>
-              <div>
-                <label className="mb-1 block text-xs uppercase tracking-wider text-[#8B8B93]">Company</label>
-                <input type="text" required placeholder="Your company"
-                  className="w-full rounded-lg border border-[#1C1C24] bg-[#0A0A0C] px-3 py-2.5 text-sm text-[#F1F1F3] placeholder-[#5C5C66] focus:border-[#00D4AA] focus:outline-none transition-colors" />
-              </div>
-              <div>
-                <label className="mb-1 block text-xs uppercase tracking-wider text-[#8B8B93]">What are you working on?</label>
-                <textarea rows={3} placeholder="Preparing for SOC 2, responding to enterprise security reviews..."
-                  className="w-full rounded-lg border border-[#1C1C24] bg-[#0A0A0C] px-3 py-2.5 text-sm text-[#F1F1F3] placeholder-[#5C5C66] focus:border-[#00D4AA] focus:outline-none transition-colors resize-none" />
-              </div>
-              <button type="submit" className="w-full rounded-lg bg-[#00D4AA] py-2.5 text-sm font-medium text-black hover:bg-[#00B894] transition-colors">
-                Book a 15-minute demo
-              </button>
-            </form>
+            {fetcher.data?.ok ? (
+              <p className="mt-6 text-sm text-[#00D4AA]">Thanks! We'll be in touch shortly.</p>
+            ) : (
+              <fetcher.Form method="post" className="mt-6 space-y-4">
+                <div>
+                  <label className="mb-1 block text-xs uppercase tracking-wider text-[#8B8B93]">Work email</label>
+                  <input type="email" name="email" required placeholder="you@company.com"
+                    className="w-full rounded-lg border border-[#1C1C24] bg-[#0A0A0C] px-3 py-2.5 text-sm text-[#F1F1F3] placeholder-[#5C5C66] focus:border-[#00D4AA] focus:outline-none transition-colors" />
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs uppercase tracking-wider text-[#8B8B93]">Company</label>
+                  <input type="text" name="company" required placeholder="Your company"
+                    className="w-full rounded-lg border border-[#1C1C24] bg-[#0A0A0C] px-3 py-2.5 text-sm text-[#F1F1F3] placeholder-[#5C5C66] focus:border-[#00D4AA] focus:outline-none transition-colors" />
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs uppercase tracking-wider text-[#8B8B93]">What are you working on?</label>
+                  <textarea name="message" rows={3} required placeholder="Preparing for SOC 2, responding to enterprise security reviews..."
+                    className="w-full rounded-lg border border-[#1C1C24] bg-[#0A0A0C] px-3 py-2.5 text-sm text-[#F1F1F3] placeholder-[#5C5C66] focus:border-[#00D4AA] focus:outline-none transition-colors resize-none" />
+                </div>
+                {fetcher.data?.error && (
+                  <p className="text-sm text-red-400">{fetcher.data.error}</p>
+                )}
+                <button type="submit" disabled={fetcher.state !== "idle"} className="w-full rounded-lg bg-[#00D4AA] py-2.5 text-sm font-medium text-black hover:bg-[#00B894] transition-colors disabled:opacity-50">
+                  {fetcher.state !== "idle" ? "Sending..." : "Book a 15-minute demo"}
+                </button>
+              </fetcher.Form>
+            )}
           </div>
 
           <div className="space-y-6">
