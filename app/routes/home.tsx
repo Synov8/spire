@@ -1,7 +1,6 @@
 import { Link } from "react-router";
 import { useEffect, useState } from "react";
 import { PublicLayout } from "~/components/public-layout";
-import { TrustStrip } from "~/components/trust-strip";
 import { HeroDemo } from "~/components/hero-demo";
 import { ControlExplorer } from "~/components/control-explorer";
 import { HomeFaq } from "~/components/home-faq";
@@ -141,7 +140,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
 
       {/* HERO — §4.2: headline + subhead + CTA on left, animated demo on right at md+, stacked on mobile */}
       <section className="mx-auto max-w-6xl px-6 pt-24 pb-16">
-        <div className="grid items-center gap-12 md:grid-cols-2 md:gap-10">
+        <div className="grid items-center gap-12 md:grid-cols-2 md:gap-16">
           <div className="text-center md:text-left">
             <h1 className="text-5xl font-extrabold leading-[1.08] tracking-tight md:text-6xl lg:text-7xl">
               Stop losing enterprise deals<br />
@@ -151,7 +150,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
               Spire connects to {INTEGRATION_NAMES.length} integrations via read-only OAuth — AWS, GitHub, Stripe,
               BambooHR, Workday, Okta, Snyk, Salesforce, and many more — spanning cloud, identity, source
               code, payment, email, HR, observability, security, and CRM. We collect audit-ready evidence
-              24/7 and auto-fill enterprise security questionnaires — typically in hours, not weeks.
+               24/7 and auto-fill enterprise security questionnaires — typically in minutes, not weeks.
             </p>
             <div className="mt-10 flex flex-wrap items-center justify-center gap-4 md:justify-start">
               <Link
@@ -171,8 +170,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
         </div>
       </section>
 
-      {/* TRUST STRIP — 9 integration names + 4 listing-program badges (see home-overhaul-spec.md §4.3 + §16) */}
-      <TrustStrip />
+
 
       {/* PROBLEM */}
       <section className="mx-auto max-w-5xl px-6 py-24">

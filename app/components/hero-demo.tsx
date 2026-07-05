@@ -44,7 +44,7 @@ import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import { forwardRef, useEffect, useRef, useState, type ReactNode } from "react";
 import { INTEGRATION_NAMES } from "~/lib/integration-data";
 
-const SCENE_MS = 12_000;
+const SCENE_MS = 7_000;
 
 const SCENE_URLS = [
   "spire.synov8studio.com/connections",
@@ -638,7 +638,7 @@ const DemoFrame = forwardRef<
           <span className="h-2.5 w-2.5 rounded-full bg-[#2C2C36]" />
         </div>
         {/* Faux URL bar */}
-        <div className="ml-1.5 flex-1 rounded-md bg-[#1C1C24] px-2.5 py-1">
+        <div className="ml-1.5 flex-1 rounded-md bg-[#1C1C24] px-2 py-0.5">
           <span className="font-mono text-[9.5px] text-[#5C5C66]">
             {SCENE_URLS[sceneIdx]}
           </span>

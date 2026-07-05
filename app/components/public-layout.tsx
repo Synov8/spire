@@ -1,7 +1,8 @@
 import { Link, useLocation } from "react-router";
-import { useState, type ReactNode } from "react";
+import { useState, useEffect, type ReactNode } from "react";
 import { allPosts } from "content-collections";
 import { INTEGRATION_NAMES } from "~/lib/integration-data";
+import { authClient } from "~/lib/auth-client";
 
 const navLinks = [
   { to: "/features", label: "Features" },
@@ -21,6 +22,10 @@ function isActive(pathname: string, to: string) {
 export function PublicNav() {
   const { pathname } = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [authed, setAuthed] = useState(false);
+  useEffect(() => {
+    authClient.getSession().then((s: any) => setAuthed(!!s?.data)).catch(() => {});
+  }, []);
 
   return (
     <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
@@ -41,10 +46,10 @@ export function PublicNav() {
           </Link>
         ))}
         <Link
-          to="/login"
+          to={authed ? "/dashboard" : "/login"}
           className="rounded-lg border border-[#1C1C24] px-4 py-2 text-sm font-medium text-[#8B8B93] hover:border-[#00D4AA] hover:text-[#00D4AA] transition-colors"
         >
-          Sign in
+          {authed ? "Dashboard" : "Sign in"}
         </Link>
       </div>
 
@@ -80,11 +85,11 @@ export function PublicNav() {
               </Link>
             ))}
             <Link
-              to="/login"
+              to={authed ? "/dashboard" : "/login"}
               onClick={() => setMenuOpen(false)}
               className="mt-4 rounded-lg bg-[#00D4AA] px-8 py-3 text-lg font-medium text-black hover:bg-[#00B894] transition-colors"
             >
-              Sign in
+              {authed ? "Dashboard" : "Sign in"}
             </Link>
           </nav>
         </div>
