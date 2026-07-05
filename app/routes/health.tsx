@@ -1,3 +1,7 @@
+export function meta() {
+  return [{ title: "Health | Spire" }, { name: "description", content: "System health check for Spire infrastructure dependencies" }];
+}
+
 import { useLoaderData } from "react-router";
 import { PublicLayout } from "~/components/public-layout";
 import { neon } from "@neondatabase/serverless";
