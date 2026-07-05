@@ -67,19 +67,19 @@ export function ErrorBoundary({ error }: { error?: Error }) {
               {error.message}
             </p>
             <details className="mt-2 text-left">
-              <summary className="cursor-pointer text-xs text-[#5C5C66] hover:text-[#8B8B93]">Stack trace</summary>
-              <div className="relative mt-1">
-                <pre className="overflow-x-auto rounded-lg border border-[#1A1D1E] bg-[#07080A] p-3 text-[10px] font-mono text-[#6A6D6E] leading-relaxed max-h-48 overflow-y-auto">
-                  {error.stack}
-                </pre>
-                <button type="button" onClick={copyStack} className="absolute right-2 top-2 rounded border border-[#1A1D1E] bg-[#0B0D0E] px-1.5 py-1 text-[#5C5C66] hover:border-[#00D4AA] hover:text-[#00D4AA] transition-colors">
+              <summary className="inline-flex cursor-pointer items-center gap-2 text-xs text-[#5C5C66] hover:text-[#8B8B93]">
+                Stack trace
+                <button type="button" onClick={(e) => { e.stopPropagation(); copyStack(); }} className="rounded border border-[#1A1D1E] px-1 py-0.5 hover:border-[#00D4AA] hover:text-[#00D4AA] transition-colors">
                   {copied ? (
-                    <svg className="h-3 w-3" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M3.5 8.5l3 3 6-7"/></svg>
+                    <svg className="h-2.5 w-2.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3.5 8.5l3 3 6-7"/></svg>
                   ) : (
-                    <svg className="h-3 w-3" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="10" height="10" rx="1"/><path d="M5 3V2a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-1"/></svg>
+                    <svg className="h-2.5 w-2.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="10" height="10" rx="1"/><path d="M5 3V2a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-1"/></svg>
                   )}
                 </button>
-              </div>
+              </summary>
+              <pre className="mt-1 overflow-x-auto rounded-lg border border-[#1A1D1E] bg-[#07080A] p-3 text-[10px] font-mono text-[#6A6D6E] leading-relaxed max-h-48 overflow-y-auto">
+                {error.stack}
+              </pre>
             </details>
           </>
         )}
