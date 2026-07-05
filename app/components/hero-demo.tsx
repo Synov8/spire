@@ -308,7 +308,7 @@ function Scene2Evidence({ onReady }: { onReady?: () => void }) {
         <motion.span key={displayCount} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="text-lg font-bold tabular-nums text-[#F1F1F3]">{displayCount}</motion.span>
         <span className="text-[10px] text-[#8B8B93]">evidence items</span>
       </div>
-      <ul ref={scope} className="mt-3 min-h-0 flex-1 space-y-1 overflow-y-auto scrollbar-thin">
+      <ul ref={scope} className="mt-3 min-h-0 flex-1 space-y-1 overflow-y-auto scrollbar-thin" style={{ maxHeight: "100%" }}>
         {EVIDENCE_STREAM.map((item) => (
           <li key={`${item.integration}-${item.text}`}
             className="flex items-center gap-1.5 rounded-md border border-[#1C1C24] bg-[#0E0E14] px-1.5 py-1.5 opacity-0"
@@ -578,7 +578,7 @@ const DemoFrame = forwardRef<
   return (
     <div
       ref={ref}
-      className="relative flex aspect-[4/3] w-full flex-col overflow-hidden rounded-2xl border border-[#1C1C24] bg-[#0A0A0C] shadow-[0_20px_70px_-15px_rgba(0,212,170,0.12)]"
+      className="relative flex aspect-[5/4] w-full flex-col overflow-hidden rounded-2xl border border-[#1C1C24] bg-[#0A0A0C] shadow-[0_20px_70px_-15px_rgba(0,212,170,0.12)]"
       aria-label={ariaLabel}
     >
       {/* Dot grid background */}
