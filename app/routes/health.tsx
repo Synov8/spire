@@ -61,7 +61,9 @@ export async function loader() {
       const { tasks, runs } = await import("@trigger.dev/sdk");
       const nonce = crypto.randomUUID();
       const handle = await tasks.trigger("health-check", { nonce }, { tags: ["health-check"] });
-      for await (const run of runs.subscribeToRun(handle.id)) {
+      for (let i = 0; i < 15; i++) {
+        await new Promise((r) => setTimeout(r, 100));
+        const run = await runs.retrieve(handle.id);
         if (run.isCompleted) {
           const output = run as any;
           if (output?.output?.nonce === nonce) return;
@@ -69,6 +71,7 @@ export async function loader() {
         }
         if (run.isFailed || run.isCancelled) throw new Error("run failed");
       }
+      throw new Error("timeout");
     }),
   ]);
 
