@@ -139,7 +139,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
       />
 
       {/* HERO — §4.2: headline + subhead + CTA on left, animated demo on right at md+, stacked on mobile */}
-      <section className="mx-auto max-w-7xl px-6 pt-20 pb-16 md:pt-24 md:pb-20">
+      <section className="mx-auto flex min-h-[calc(100vh-5rem)] max-w-7xl flex-col justify-center px-6 pt-10 pb-16 md:pt-16">
         <div className="grid items-center gap-8 md:grid-cols-2 md:gap-12">
           <div className="text-center md:text-left">
             <h1 className="text-4xl font-extrabold leading-[1.08] tracking-tight md:text-5xl lg:text-6xl">

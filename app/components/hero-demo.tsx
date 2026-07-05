@@ -44,7 +44,7 @@ import { motion, AnimatePresence, useReducedMotion, useAnimate, stagger } from "
 import { forwardRef, useEffect, useRef, useState, type ReactNode } from "react";
 import { INTEGRATION_NAMES } from "~/lib/integration-data";
 
-const SCENE_MS = 10_000;
+const SCENE_MS = 2_500;
 
 const SCENE_URLS = [
   "spire.synov8studio.com/connections",
@@ -149,18 +149,16 @@ function FileIcon({ className }: { className?: string }) {
 // ─── Scene 1 (animated) ──────────────────────────────────────────────────────
 
 function Scene1Animated({ onReady }: { onReady?: () => void }) {
-  useEffect(() => { onReady?.(); }, []);
-  // Connecting → connected flow plays on EVERY mount, including the first
-  // page load. Each row starts in the connecting state (spinner +
-  // "Connecting…" label); the useEffect below sets up the staggered
-  // setTimeout chain that flips row i to "connected" at 200 + i * 350 ms.
-  // Total stagger window: ~4.75 s for 14 integrations (vs the previous
-  // 15 s ~10 s of dead time before rotation).
   const [connected, setConnected] = useState<boolean[]>(() =>
     Array(HERO_DEMO_INTEGRATION_NAMES.length).fill(false),
   );
+  const [scope2, animate2] = useAnimate();
+  const s1Ready = useRef(false);
 
   useEffect(() => {
+    // Animate rows appearing
+    animate2("li", { opacity: 1, x: 0 }, { delay: stagger(0.06), duration: 0.3 });
+    // Stagger the connecting → connected state
     const timers = HERO_DEMO_INTEGRATION_NAMES.map((_, i) =>
       setTimeout(() => {
         setConnected((prev) => {
@@ -170,7 +168,9 @@ function Scene1Animated({ onReady }: { onReady?: () => void }) {
         });
       }, 200 + i * 350),
     );
-    return () => timers.forEach(clearTimeout);
+    // Signal ready after last connection completes
+    const done = setTimeout(() => { if (!s1Ready.current) { s1Ready.current = true; onReady?.(); } }, 200 + HERO_DEMO_INTEGRATION_NAMES.length * 350);
+    return () => { timers.forEach(clearTimeout); clearTimeout(done); };
   }, []);
 
   const connectedCount = connected.filter(Boolean).length;
@@ -336,7 +336,12 @@ function Scene2Evidence({ onReady }: { onReady?: () => void }) {
 // ─── Scene 3: Questionnaire with typewriter ──────────────────────────────────
 
 function Scene3Questionnaire({ onReady }: { onReady?: () => void }) {
-  useEffect(() => { onReady?.(); }, []);
+  const s3Ready = useRef(false);
+  useEffect(() => {
+    const totalMs = FILL_QUESTIONS.reduce((sum, q) => sum + q.a.length * TYPE_MS + PAUSE_MS, 0);
+    const id = setTimeout(() => { if (!s3Ready.current) { s3Ready.current = true; onReady?.(); } }, totalMs);
+    return () => clearTimeout(id);
+  }, []);
   const [tick, setTick] = useState(0);
 
   useEffect(() => {
@@ -456,7 +461,11 @@ function Scene3Questionnaire({ onReady }: { onReady?: () => void }) {
 // ─── Scene 4: Audit pack file-list assembly ──────────────────────────────────
 
 function Scene4Export({ onReady }: { onReady?: () => void }) {
-  useEffect(() => { onReady?.(); }, []);
+  const s4Ready = useRef(false);
+  useEffect(() => {
+    const id = setTimeout(() => { if (!s4Ready.current) { s4Ready.current = true; onReady?.(); } }, 7_500);
+    return () => clearTimeout(id);
+  }, []);
   const [assembledCount, setAssembledCount] = useState(0);
   const [progress, setProgress] = useState(0);
 
