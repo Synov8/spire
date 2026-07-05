@@ -146,6 +146,8 @@ export default function QuestionnaireDetail({ loaderData }: Route.ComponentProps
   };
   const cancelEdit = () => { setEditingIdx(null); setEditValue(""); };
 
+  const pdfUrl = useQuestionnairePdf?.(q.title || "Questionnaire", new Date().toISOString().split("T")[0], displayQuestions) ?? null;
+
   const statusLabel = q.status;
   const statusDot = statusLabel === "completed" ? "bg-[#00D4AA]" : statusLabel === "processing" ? "bg-[#F59E0B]" : statusLabel === "flagged" ? "bg-[#EF4444]" : "bg-[#5C5C66]";
   const statusBadge = statusLabel === "completed" ? "bg-[#00D4AA]/10 text-[#00D4AA]" : statusLabel === "processing" ? "bg-[#F59E0B]/10 text-[#F59E0B]" : statusLabel === "flagged" ? "bg-[#EF4444]/10 text-[#EF4444]" : "bg-[#1A1D1E] text-[#5C5C66]";
@@ -171,8 +173,8 @@ export default function QuestionnaireDetail({ loaderData }: Route.ComponentProps
               Delete
             </button>
           </form>
-          {q.originalFile && pdfUrl && (
-            <a href={pdfUrl} download={`${(q.title || "questionnaire").replace(/[^a-zA-Z0-9]/g, "_")}.pdf`
+          {q.originalFile && (typeof pdfUrl !== "undefined" && pdfUrl) && (
+            <a href={pdfUrl} download={`${(q.title || "questionnaire").replace(/[^a-zA-Z0-9]/g, "_")}.pdf`}
               className="flex items-center gap-1.5 rounded-lg border border-[#1A1D1E] px-3.5 py-2 text-sm font-medium text-[#8B8B93] transition-all hover:border-[#00D4AA] hover:text-[#00D4AA]">
               <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M8 2v10M4 8l4 4 4-4M2 14h12"/></svg>
               Export PDF
