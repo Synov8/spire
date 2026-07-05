@@ -164,10 +164,10 @@ export default function Home({ loaderData }: Route.ComponentProps) {
                 View integrations
               </Link>
             </div>
-            <p className="mt-4 text-[9px] font-semibold uppercase tracking-[0.15em] text-[#5C5C66] md:mt-6 md:text-[10px]">
+            <p className="mt-4 text-[8px] font-semibold uppercase tracking-[0.1em] text-[#5C5C66] md:mt-6 md:text-[10px] md:tracking-[0.15em]">
               GitHub · Stripe · Vercel · Cloudflare · Neon · +{INTEGRATION_NAMES.length - 5} more
             </p>
-            <p className="mt-1 text-[9px] font-semibold uppercase tracking-[0.15em] text-[#5C5C66] md:mt-1.5 md:text-[10px]">
+            <p className="mt-1 text-[8px] font-semibold uppercase tracking-[0.1em] text-[#5C5C66] md:mt-1.5 md:text-[10px] md:tracking-[0.15em]">
               Featured on Tiny Startups · Product Hunt · SideProjectors · SaaS Cubes
             </p>
           </div>

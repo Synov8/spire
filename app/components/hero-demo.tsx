@@ -599,13 +599,13 @@ const DemoFrame = forwardRef<
           <span className="h-2.5 w-2.5 rounded-full bg-[#2C2C36]" />
         </div>
         {/* Faux URL bar */}
-        <div className="ml-1.5 flex-1 rounded-md bg-[#1C1C24] px-2 py-0.5">
-          <span className="font-mono text-[9.5px] text-[#5C5C66]">
+        <div className="ml-1.5 min-w-0 flex-1 overflow-hidden rounded-md bg-[#1C1C24] px-2 py-0.5">
+          <span className="block truncate font-mono text-[9.5px] text-[#5C5C66]">
             {SCENE_URLS[sceneIdx]}
           </span>
         </div>
         {/* Honesty label */}
-        <span className="whitespace-nowrap text-[9px] font-semibold uppercase tracking-[0.08em] text-[#5C5C66]">
+        <span className="hidden sm:inline text-[9px] font-semibold uppercase tracking-[0.08em] text-[#5C5C66]">
           Demo · simulated
         </span>
       </div>
