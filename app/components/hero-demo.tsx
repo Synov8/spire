@@ -282,28 +282,20 @@ function Scene1Static() {
 
 // ─── Scene 2: Evidence streaming ─────────────────────────────────────────────
 
+const rowVariants = {
+  hidden: { opacity: 0, x: 16 },
+  visible: (i: number) => ({ opacity: 1, x: 0, transition: { delay: i * 0.7, duration: 0.3 } }),
+};
+
 function Scene2Evidence() {
-  const [visibleCount, setVisibleCount] = useState(0);
   const [displayCount, setDisplayCount] = useState(0);
 
-  useEffect(() => {
-    // rowInterval tightened from 1_500 to 1_100 to fit within the new
-    // 12 s SCENE_MS window (8 rows × 1100 + 400 lead = 9.2 s < 12 s).
-    const rowInterval = 700; // ms between rows
-    const timers = EVIDENCE_STREAM.map((_, i) =>
-      setTimeout(() => setVisibleCount(i + 1), 400 + i * rowInterval),
-    );
-    return () => timers.forEach(clearTimeout);
-  }, []);
-
-  const totalEvidence = 247; // representative total
+  const totalEvidence = 247;
   const targetCount = Math.min(
-    Math.round((visibleCount / EVIDENCE_STREAM.length) * totalEvidence),
+    Math.round((EVIDENCE_STREAM.length / EVIDENCE_STREAM.length) * totalEvidence),
     totalEvidence,
   );
 
-  // Smooth interpolation toward the target so the counter ramps up
-  // continuously instead of jumping in ~31-step increments per row.
   useEffect(() => {
     const id = setInterval(() => {
       setDisplayCount((prev) => {
@@ -328,46 +320,42 @@ function Scene2Evidence() {
         </span>
       </div>
 
-      {/* Counter */}
-      <div className="mt-3 flex items-baseline gap-2">
+      {/* Count badge */}
+      <div className="mt-2 flex items-baseline gap-1.5">
         <motion.span
           key={displayCount}
-          initial={{ opacity: 0.5, y: -2 }}
+          initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.15 }}
-          className="font-mono text-3xl font-bold text-[#00D4AA]"
+          className="text-lg font-bold tabular-nums text-[#F1F1F3]"
         >
           {displayCount}
         </motion.span>
         <span className="text-[10px] text-[#8B8B93]">evidence items</span>
       </div>
 
-      {/* Streaming rows */}
+      {/* Streaming rows — all rendered, staggered via motion variants */}
       <div className="mt-3 flex-1 space-y-1.5 overflow-y-auto scrollbar-thin">
-        <AnimatePresence>
-          {EVIDENCE_STREAM.slice(0, visibleCount).map((item) => (
-            <motion.div
-              key={`${item.integration}-${item.text}`}
-              initial={{ opacity: 0, x: 16 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.3 }}
-              className="flex items-center gap-2 rounded-md border border-[#1C1C24] bg-[#0E0E14] px-2.5 py-1.5"
-            >
-              {/* Integration initial badge */}
-              <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded bg-[#00D4AA]/10 text-[8px] font-bold text-[#00D4AA]">
-                {item.integration[0]}
-              </span>
-              {/* Evidence text */}
-              <span className="flex-1 truncate text-[11px] text-[#B0B0B8]">
-                {item.text}
-              </span>
-              {/* Control ref badge */}
-              <span className="rounded bg-[#00D4AA]/10 px-1.5 py-0.5 font-mono text-[9px] text-[#00D4AA]">
-                {item.control}
-              </span>
-            </motion.div>
-          ))}
-        </AnimatePresence>
+        {EVIDENCE_STREAM.map((item, i) => (
+          <motion.div
+            key={`${item.integration}-${item.text}`}
+            custom={i}
+            variants={rowVariants}
+            initial="hidden"
+            animate="visible"
+            className="flex items-center gap-2 rounded-md border border-[#1C1C24] bg-[#0E0E14] px-2.5 py-1.5"
+          >
+            <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded bg-[#00D4AA]/10 text-[8px] font-bold text-[#00D4AA]">
+              {item.integration[0]}
+            </span>
+            <span className="flex-1 truncate text-[11px] text-[#B0B0B8]">
+              {item.text}
+            </span>
+            <span className="rounded bg-[#00D4AA]/10 px-1.5 py-0.5 font-mono text-[9px] text-[#00D4AA]">
+              {item.control}
+            </span>
+          </motion.div>
+        ))}
       </div>
 
       {/* Footer */}
