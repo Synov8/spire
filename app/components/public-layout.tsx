@@ -200,6 +200,7 @@ export function PublicFooter() {
                 <a key="sc" href="https://saascubes.com" rel="noopener" title="Listed on SaaS Cubes" className="flex h-[54px] shrink-0 items-center"><img src="https://saascubes.com/images/badges/badge-dark.png" alt="Listed on SaaS Cubes" className="h-full w-auto" /></a>,
                 <a key="sf" href="https://startupfa.me/s/spire?utm_source=spire.synov8studio.com" target="_blank" rel="noopener" className="flex h-[54px] shrink-0 items-center"><img src="https://startupfa.me/badges/featured-badge-small.webp" alt="Spire - Featured on Startup Fame" width="224" height="36" className="h-[36px] w-auto" /></a>,
                 <a key="wb" href="https://wired.business" target="_blank" rel="noopener" className="flex h-[54px] shrink-0 items-center"><img src="https://wired.business/badge0-dark.svg" alt="Featured on Wired Business" width="200" height="54" className="h-[54px] w-auto" /></a>,
+                <a key="uf" href="https://ufind.best/products/spire?utm_source=ufind.best" target="_blank" rel="noopener" className="flex h-[54px] shrink-0 items-center"><img src="https://ufind.best/badges/ufind-best-badge-light.svg" alt="Featured on ufind.best" width="150" className="h-[54px] w-auto" /></a>,
               ])}
             </div>
           </div>
