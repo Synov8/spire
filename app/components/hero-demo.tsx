@@ -40,7 +40,7 @@
  * Trademark guard (home-overhaul-spec.md §16) — text-only, no marks.
  */
 
-import { motion, AnimatePresence, useReducedMotion } from "motion/react";
+import { motion, AnimatePresence, useReducedMotion, useAnimate, stagger } from "motion/react";
 import { forwardRef, useEffect, useRef, useState, type ReactNode } from "react";
 import { INTEGRATION_NAMES } from "~/lib/integration-data";
 
@@ -148,7 +148,8 @@ function FileIcon({ className }: { className?: string }) {
 
 // ─── Scene 1 (animated) ──────────────────────────────────────────────────────
 
-function Scene1Animated() {
+function Scene1Animated({ onReady }: { onReady?: () => void }) {
+  useEffect(() => { onReady?.(); }, []);
   // Connecting → connected flow plays on EVERY mount, including the first
   // page load. Each row starts in the connecting state (spinner +
   // "Connecting…" label); the useEffect below sets up the staggered
@@ -189,7 +190,7 @@ function Scene1Animated() {
       </div>
 
       {/* Integration rows */}
-      <ul className="mt-3 space-y-1.5">
+      <ul className="mt-3 flex-1 space-y-1.5 overflow-y-auto scrollbar-thin">
         {HERO_DEMO_INTEGRATION_NAMES.map((name, i) => {
           const isConn = connected[i];
           return (
@@ -282,81 +283,50 @@ function Scene1Static() {
 
 // ─── Scene 2: Evidence streaming ─────────────────────────────────────────────
 
-const rowVariants = {
-  hidden: { opacity: 0, x: 16 },
-  visible: (i: number) => ({ opacity: 1, x: 0, transition: { delay: i * 0.7, duration: 0.3 } }),
-};
-
-function Scene2Evidence() {
+function Scene2Evidence({ onReady }: { onReady?: () => void }) {
   const [displayCount, setDisplayCount] = useState(0);
-
+  const [scope, animate] = useAnimate();
   const totalEvidence = 247;
-  const targetCount = Math.min(
-    Math.round((EVIDENCE_STREAM.length / EVIDENCE_STREAM.length) * totalEvidence),
-    totalEvidence,
-  );
+  const ready = useRef(false);
+
+  useEffect(() => {
+    animate("li", { opacity: 1, x: 0 }, { delay: stagger(0.7), duration: 0.3 })
+      .then(() => { if (!ready.current) { ready.current = true; onReady?.(); } });
+  }, []);
 
   useEffect(() => {
     const id = setInterval(() => {
       setDisplayCount((prev) => {
-        if (prev >= targetCount) return prev;
-        const diff = targetCount - prev;
-        return prev + Math.max(1, Math.ceil(diff * 0.1));
+        if (prev >= totalEvidence) return prev;
+        return prev + Math.max(1, Math.ceil((totalEvidence - prev) * 0.1));
       });
     }, 60);
     return () => clearInterval(id);
-  }, [targetCount]);
+  }, []);
 
   return (
     <div className="absolute inset-0 flex flex-col p-4">
-      {/* Header */}
       <div className="flex items-center justify-between">
-        <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#5C5C66]">
-          Evidence collection
-        </span>
+        <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#5C5C66]">Evidence collection</span>
         <span className="flex items-center gap-1 text-[9px] text-[#5C5C66]">
-          <span className="h-1 w-1 animate-pulse rounded-full bg-[#00D4AA]" />
-          Auto-collecting
+          <span className="h-1 w-1 animate-pulse rounded-full bg-[#00D4AA]" />Auto-collecting
         </span>
       </div>
-
-      {/* Count badge */}
       <div className="mt-2 flex items-baseline gap-1.5">
-        <motion.span
-          key={displayCount}
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.15 }}
-          className="text-lg font-bold tabular-nums text-[#F1F1F3]"
-        >
-          {displayCount}
-        </motion.span>
+        <motion.span key={displayCount} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="text-lg font-bold tabular-nums text-[#F1F1F3]">{displayCount}</motion.span>
         <span className="text-[10px] text-[#8B8B93]">evidence items</span>
       </div>
-
-      {/* Streaming rows — all rendered, staggered via motion variants */}
-      <div className="mt-3 flex-1 space-y-1.5 overflow-y-auto scrollbar-thin">
-        {EVIDENCE_STREAM.map((item, i) => (
-          <motion.div
-            key={`${item.integration}-${item.text}`}
-            custom={i}
-            variants={rowVariants}
-            initial="hidden"
-            animate="visible"
-            className="flex items-center gap-2 rounded-md border border-[#1C1C24] bg-[#0E0E14] px-2.5 py-1.5"
+      <ul ref={scope} className="mt-3 flex-1 space-y-1.5 overflow-y-auto scrollbar-thin">
+        {EVIDENCE_STREAM.map((item) => (
+          <li key={`${item.integration}-${item.text}`}
+            className="flex items-center gap-2 rounded-md border border-[#1C1C24] bg-[#0E0E14] px-2.5 py-1.5 opacity-0 translate-x-4"
           >
-            <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded bg-[#00D4AA]/10 text-[8px] font-bold text-[#00D4AA]">
-              {item.integration[0]}
-            </span>
-            <span className="flex-1 truncate text-[11px] text-[#B0B0B8]">
-              {item.text}
-            </span>
-            <span className="rounded bg-[#00D4AA]/10 px-1.5 py-0.5 font-mono text-[9px] text-[#00D4AA]">
-              {item.control}
-            </span>
-          </motion.div>
+            <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded bg-[#00D4AA]/10 text-[8px] font-bold text-[#00D4AA]">{item.integration[0]}</span>
+            <span className="flex-1 truncate text-[11px] text-[#B0B0B8]">{item.text}</span>
+            <span className="rounded bg-[#00D4AA]/10 px-1.5 py-0.5 font-mono text-[9px] text-[#00D4AA]">{item.control}</span>
+          </li>
         ))}
-      </div>
+      </ul>
 
       {/* Footer */}
       <div className="mt-auto pt-2">
@@ -368,7 +338,8 @@ function Scene2Evidence() {
 
 // ─── Scene 3: Questionnaire with typewriter ──────────────────────────────────
 
-function Scene3Questionnaire() {
+function Scene3Questionnaire({ onReady }: { onReady?: () => void }) {
+  useEffect(() => { onReady?.(); }, []);
   const [tick, setTick] = useState(0);
 
   useEffect(() => {
@@ -487,7 +458,8 @@ function Scene3Questionnaire() {
 
 // ─── Scene 4: Audit pack file-list assembly ──────────────────────────────────
 
-function Scene4Export() {
+function Scene4Export({ onReady }: { onReady?: () => void }) {
+  useEffect(() => { onReady?.(); }, []);
   const [assembledCount, setAssembledCount] = useState(0);
   const [progress, setProgress] = useState(0);
 
@@ -695,13 +667,22 @@ export function HeroDemo() {
   }, [isStatic, isDesktop]);
 
   // Scene rotation — only on desktop, motion-OK, AND in viewport.
+  // Uses onAnimationComplete from AnimatePresence to sync with stagger completion.
+  const [sceneReady, setSceneReady] = useState(false);
   useEffect(() => {
     if (isStatic || !isDesktop || !inView) return;
-    const id = setInterval(() => {
+    if (!sceneReady) return;
+    const id = setTimeout(() => {
+      setSceneReady(false);
       setSceneIdx((i) => (i + 1) % SCENE_RENDERERS.length);
     }, SCENE_MS);
-    return () => clearInterval(id);
-  }, [isStatic, isDesktop, inView]);
+    return () => clearTimeout(id);
+  }, [isStatic, isDesktop, inView, sceneReady]);
+
+  // Mark first scene ready immediately on mount, subsequent ones after stagger
+  useEffect(() => {
+    if (sceneIdx === 0) setSceneReady(true);
+  }, [sceneIdx]);
 
   // No-JS fallback: a small inline stylesheet inside <noscript> overrides
   // motion library's inline `opacity: 0` / `transform` styles so the
@@ -750,7 +731,7 @@ export function HeroDemo() {
           transition={{ duration: 0.5, ease: "easeOut" }}
           className="absolute inset-x-0 top-0 bottom-6"
         >
-          <Renderer />
+          <Renderer onReady={() => setSceneReady(true)} />
         </motion.div>
       </AnimatePresence>
       </DemoFrame>
