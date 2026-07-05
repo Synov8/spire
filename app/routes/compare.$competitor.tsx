@@ -1,4 +1,9 @@
-import { redirect, useParams } from "react-router";
+import { redirect, useParams, type MetaArgs } from "react-router";
+
+export function meta({ params }: MetaArgs) {
+  const name = params.competitor?.replace("-", " ").replace(/\b\w/g, (c: string) => c.toUpperCase());
+  return [{ title: `Spire vs ${name} | Comparison` }, { name: "description", content: `How Spire compares to ${name} for SOC 2 and EU AI Act compliance.` }];
+}
 
 const slugMap: Record<string, string> = {
   vanta: "spire-vs-vanta-comparison",
