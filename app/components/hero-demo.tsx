@@ -149,16 +149,12 @@ function FileIcon({ className }: { className?: string }) {
 // ─── Scene 1 (animated) ──────────────────────────────────────────────────────
 
 function Scene1Animated({ onReady }: { onReady?: () => void }) {
+  const s1Ready = useRef(false);
   const [connected, setConnected] = useState<boolean[]>(() =>
     Array(HERO_DEMO_INTEGRATION_NAMES.length).fill(false),
   );
-  const [scope2, animate2] = useAnimate();
-  const s1Ready = useRef(false);
 
   useEffect(() => {
-    // Animate rows appearing
-    animate2("li", { opacity: 1, x: 0 }, { delay: stagger(0.06), duration: 0.3 });
-    // Stagger the connecting → connected state
     const timers = HERO_DEMO_INTEGRATION_NAMES.map((_, i) =>
       setTimeout(() => {
         setConnected((prev) => {
@@ -168,8 +164,7 @@ function Scene1Animated({ onReady }: { onReady?: () => void }) {
         });
       }, 200 + i * 350),
     );
-    // Signal ready after last connection completes
-    const done = setTimeout(() => { if (!s1Ready.current) { s1Ready.current = true; onReady?.(); } }, 200 + HERO_DEMO_INTEGRATION_NAMES.length * 350);
+    const done = setTimeout(() => { if (!s1Ready.current) { s1Ready.current = true; onReady?.(); } }, 200 + HERO_DEMO_INTEGRATION_NAMES.length * 350 + 500);
     return () => { timers.forEach(clearTimeout); clearTimeout(done); };
   }, []);
 
@@ -190,7 +185,7 @@ function Scene1Animated({ onReady }: { onReady?: () => void }) {
       </div>
 
       {/* Integration rows */}
-      <ul className="mt-3 flex-1 space-y-1.5 overflow-y-auto scrollbar-thin">
+      <ul className="mt-3 flex-1 space-y-1.5 overflow-y-auto scrollbar-thin" style={{ opacity: 1 }}>
         {HERO_DEMO_INTEGRATION_NAMES.map((name, i) => {
           const isConn = connected[i];
           return (
