@@ -146,7 +146,7 @@ export default function QuestionnaireDetail({ loaderData }: Route.ComponentProps
   };
   const cancelEdit = () => { setEditingIdx(null); setEditValue(""); };
 
-  const pdfUrl = useQuestionnairePdf?.(q.title || "Questionnaire", new Date().toISOString().split("T")[0], displayQuestions) ?? null;
+  const pdfUrl = useQuestionnairePdf?.(window.location.origin, q.title || "Questionnaire", new Date().toISOString().split("T")[0], displayQuestions) ?? null;
 
   const statusLabel = q.status;
   const statusDot = statusLabel === "completed" ? "bg-[#00D4AA]" : statusLabel === "processing" ? "bg-[#F59E0B]" : statusLabel === "flagged" ? "bg-[#EF4444]" : "bg-[#5C5C66]";
