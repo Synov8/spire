@@ -44,7 +44,7 @@ import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import { forwardRef, useEffect, useRef, useState, type ReactNode } from "react";
 import { INTEGRATION_NAMES } from "~/lib/integration-data";
 
-const SCENE_MS = 6_500;
+const SCENE_MS = 10_000;
 
 const SCENE_URLS = [
   "spire.synov8studio.com/connections",
@@ -289,7 +289,7 @@ function Scene2Evidence() {
   useEffect(() => {
     // rowInterval tightened from 1_500 to 1_100 to fit within the new
     // 12 s SCENE_MS window (8 rows × 1100 + 400 lead = 9.2 s < 12 s).
-    const rowInterval = 600; // ms between rows
+    const rowInterval = 700; // ms between rows
     const timers = EVIDENCE_STREAM.map((_, i) =>
       setTimeout(() => setVisibleCount(i + 1), 400 + i * rowInterval),
     );
@@ -515,7 +515,7 @@ function Scene4Export() {
     const startedAt = Date.now();
     const progressId = setInterval(() => {
       const elapsed = Date.now() - startedAt;
-      const pct = Math.min(elapsed / 5_500, 1);
+      const pct = Math.min(elapsed / 7_000, 1);
       setProgress(Math.round(pct * 100));
     }, 60);
 
