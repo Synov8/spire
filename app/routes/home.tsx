@@ -139,35 +139,35 @@ export default function Home({ loaderData }: Route.ComponentProps) {
       />
 
       {/* HERO — §4.2: headline + subhead + CTA on left, animated demo on right at md+, stacked on mobile */}
-      <section className="mx-auto flex min-h-[calc(100vh-5rem)] max-w-7xl flex-col justify-center overflow-x-hidden px-5 pt-10 pb-16 md:px-6 md:pt-16">
-        <div className="grid items-center gap-8 md:grid-cols-2 md:gap-12">
+      <section className="mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-7xl flex-col justify-center overflow-x-hidden px-4 pt-8 pb-12 md:px-6 md:pt-16">
+        <div className="grid items-center gap-6 md:grid-cols-2 md:gap-12">
           <div className="text-center md:text-left">
-            <h1 className="text-3xl font-extrabold leading-[1.08] tracking-tight md:text-5xl lg:text-6xl">
+            <h1 className="text-2xl font-extrabold leading-[1.1] tracking-tight md:text-5xl lg:text-6xl">
               Stop losing enterprise deals<br />
               <span className="text-[#00D4AA]">to SOC 2, AI Act, and security questionnaires</span>
             </h1>
-            <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-[#8B8B93] md:mx-0 md:text-lg">
+            <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-[#8B8B93] md:mx-0 md:mt-4 md:text-lg">
               Spire connects to {INTEGRATION_NAMES.length} integrations via read-only OAuth. Collects audit-ready evidence
               24/7 and auto-fills security questionnaires in minutes.
             </p>
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-3 md:justify-start">
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-2 md:mt-8 md:gap-3 md:justify-start">
               <Link
                 to="/dashboard/questionnaires/upload"
-                className="rounded-lg bg-[#00D4AA] px-5 py-2.5 text-sm font-semibold text-black hover:bg-[#00B894] transition-colors"
+                className="rounded-lg bg-[#00D4AA] px-4 py-2 text-xs font-semibold text-black hover:bg-[#00B894] transition-colors md:px-5 md:py-2.5 md:text-sm"
               >
                 Upload a questionnaire <ArrowRight />
               </Link>
               <Link
                 to="/integrations"
-                className="rounded-lg border border-[#1C1C24] px-5 py-2.5 text-sm font-medium text-[#8B8B93] hover:border-[#00D4AA] hover:text-[#00D4AA] transition-colors"
+                className="rounded-lg border border-[#1C1C24] px-4 py-2 text-xs font-medium text-[#8B8B93] hover:border-[#00D4AA] hover:text-[#00D4AA] transition-colors md:px-5 md:py-2.5 md:text-sm"
               >
                 View integrations
               </Link>
             </div>
-            <p className="mt-6 text-[10px] font-semibold uppercase tracking-[0.15em] text-[#5C5C66]">
+            <p className="mt-4 text-[9px] font-semibold uppercase tracking-[0.15em] text-[#5C5C66] md:mt-6 md:text-[10px]">
               GitHub · Stripe · Vercel · Cloudflare · Neon · +{INTEGRATION_NAMES.length - 5} more
             </p>
-            <p className="mt-1.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-[#5C5C66]">
+            <p className="mt-1 text-[9px] font-semibold uppercase tracking-[0.15em] text-[#5C5C66] md:mt-1.5 md:text-[10px]">
               Featured on Tiny Startups · Product Hunt · SideProjectors · SaaS Cubes
             </p>
           </div>
