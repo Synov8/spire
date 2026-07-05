@@ -202,6 +202,7 @@ export function PublicFooter() {
                 <a key="wb" href="https://wired.business" target="_blank" rel="noopener" className="flex h-[54px] shrink-0 items-center"><img src="https://wired.business/badge0-dark.svg" alt="Featured on Wired Business" width="200" height="54" className="h-[54px] w-auto" /></a>,
                 <a key="uf" href="https://ufind.best/products/spire?utm_source=ufind.best" target="_blank" rel="noopener" className="flex h-[54px] shrink-0 items-center"><img src="https://ufind.best/badges/ufind-best-badge-light.svg" alt="Featured on ufind.best" width="150" className="h-[54px] w-auto" /></a>,
                 <a key="sd" href="https://sumodir.com" target="_blank" rel="dofollow" className="flex h-[54px] shrink-0 items-center"><img src="https://sumodir.com/badge.png" alt="Featured on SumoDir" width="200" height="54" className="h-[54px] w-auto" /></a>,
+                <a key="dt" href="https://dofollow.tools" target="_blank" rel="noopener" className="flex h-[54px] shrink-0 items-center"><img src="https://dofollow.tools/badge/badge_dark.svg" alt="Featured on Dofollow.Tools" width="200" height="54" className="h-[54px] w-auto" /></a>,
               ])}
             </div>
           </div>
