@@ -5,6 +5,7 @@ export function meta({ loaderData }: Route.MetaArgs) {
 
 import { useState, useRef, useEffect } from "react";
 import { redirect, useRevalidator, useFetcher } from "react-router";
+import { useQuestionnairePdf } from "~/pdf-download.client";
 import { useRealtimeRunsWithTag } from "@trigger.dev/react-hooks";
 import { db } from "~/db";
 import { questionnaire, policyCheck, control } from "~/db/schema";
@@ -145,17 +146,6 @@ export default function QuestionnaireDetail({ loaderData }: Route.ComponentProps
   };
   const cancelEdit = () => { setEditingIdx(null); setEditValue(""); };
 
-  const handleExport = () => {
-    const exportData = { title: q.title, status: q.status, generatedAt: new Date().toISOString(), questions: displayQuestions };
-    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${(q.title || "questionnaire").replace(/[^a-zA-Z0-9]/g, "_")}-export.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
   const statusLabel = q.status;
   const statusDot = statusLabel === "completed" ? "bg-[#00D4AA]" : statusLabel === "processing" ? "bg-[#F59E0B]" : statusLabel === "flagged" ? "bg-[#EF4444]" : "bg-[#5C5C66]";
   const statusBadge = statusLabel === "completed" ? "bg-[#00D4AA]/10 text-[#00D4AA]" : statusLabel === "processing" ? "bg-[#F59E0B]/10 text-[#F59E0B]" : statusLabel === "flagged" ? "bg-[#EF4444]/10 text-[#EF4444]" : "bg-[#1A1D1E] text-[#5C5C66]";
@@ -181,12 +171,12 @@ export default function QuestionnaireDetail({ loaderData }: Route.ComponentProps
               Delete
             </button>
           </form>
-          {q.originalFile && (
-            <button type="button" onClick={handleExport}
+          {q.originalFile && pdfUrl && (
+            <a href={pdfUrl} download={`${(q.title || "questionnaire").replace(/[^a-zA-Z0-9]/g, "_")}.pdf`
               className="flex items-center gap-1.5 rounded-lg border border-[#1A1D1E] px-3.5 py-2 text-sm font-medium text-[#8B8B93] transition-all hover:border-[#00D4AA] hover:text-[#00D4AA]">
               <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M8 2v10M4 8l4 4 4-4M2 14h12"/></svg>
-              Export
-            </button>
+              Export PDF
+            </a>
           )}
           <span className={`flex shrink-0 items-center gap-1.5 text-sm px-3 py-1.5 rounded-full ${statusBadge}`}>
             <span className={`h-1.5 w-1.5 rounded-full ${statusDot}`} />
