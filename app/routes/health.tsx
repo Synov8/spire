@@ -26,11 +26,18 @@ export async function loader() {
     }),
 
     check("Payments", async () => {
-      if (!process.env.STRIPE_SECRET_KEY) throw new Error("missing key");
-      const r = await fetch("https://api.stripe.com/v1/balance", {
-        headers: { Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}` },
-      });
-      if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
+      const key = process.env.STRIPE_SECRET_KEY;
+      if (!key) throw new Error("missing key");
+      const priceIds = ["STARTER", "STARTER_ANNUAL", "GROWTH", "GROWTH_ANNUAL", "ENTERPRISE", "ENTERPRISE_ANNUAL"]
+        .map((k) => process.env[`STRIPE_${k}_PRICE_ID`])
+        .filter(Boolean) as string[];
+      if (priceIds.length === 0) throw new Error("no price IDs configured");
+      for (const priceId of priceIds) {
+        const r = await fetch(`https://api.stripe.com/v1/prices/${priceId}`, {
+          headers: { Authorization: `Bearer ${key}` },
+        });
+        if (!r.ok) throw new Error(`price ${priceId}: ${r.status}`);
+      }
     }),
 
     check("Email", async () => {
