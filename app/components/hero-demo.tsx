@@ -44,7 +44,7 @@ import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import { forwardRef, useEffect, useRef, useState, type ReactNode } from "react";
 import { INTEGRATION_NAMES } from "~/lib/integration-data";
 
-const SCENE_MS = 7_000;
+const SCENE_MS = 4_500;
 
 const SCENE_URLS = [
   "spire.synov8studio.com/connections",

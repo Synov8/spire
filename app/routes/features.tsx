@@ -19,7 +19,7 @@ const features = [
     title: "Continuous evidence from your stack",
     desc: `Read-only OAuth — no agents, no sidecars, no config to maintain. ${INTEGRATION_NAMES.length} integrations spanning cloud, identity, source code, payment, email, HR, observability, security, CRM, and docs.`,
     items: [
-      "Cloud & infra — AWS, Microsoft Azure, Vercel, Cloudflare, DigitalOcean",
+      "Cloud & infra — Vercel, Cloudflare, DigitalOcean, Neon",
       "Source code — GitHub, GitLab",
       "Identity — Okta, Clerk, 1Password",
       "HR / HCM — BambooHR, Workday, Gusto, Rippling, Personio",

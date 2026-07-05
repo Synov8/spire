@@ -33,7 +33,7 @@ const FINAL_CTA_BY_ROLE: Record<BuyerRole, { eyebrow: string; headlineTail: stri
   cto: {
     eyebrow: "For engineering leaders",
     headlineTail: "your biggest audit delay?",
-    sub: "Replace manual evidence gathering with a CI-friendly pipeline that maps your AWS, GitHub, and Vercel activity to SOC 2 controls automatically.",
+    sub: "Replace manual evidence gathering with a CI-friendly pipeline that maps your GitHub, Stripe, and Cloudflare activity to SOC 2 controls automatically.",
   },
   security: {
     eyebrow: "For security leads",
@@ -147,7 +147,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
               <span className="text-[#00D4AA]">to SOC 2, AI Act, and security questionnaires</span>
             </h1>
             <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-[#8B8B93] md:mx-0">
-              Spire connects to {INTEGRATION_NAMES.length} integrations via read-only OAuth — AWS, GitHub, Stripe,
+              Spire connects to {INTEGRATION_NAMES.length} integrations via read-only OAuth — GitHub, Stripe,
               BambooHR, Workday, Okta, Snyk, Salesforce, and many more — spanning cloud, identity, source
               code, payment, email, HR, observability, security, and CRM. We collect audit-ready evidence
                24/7 and auto-fill enterprise security questionnaires — typically in minutes, not weeks.
@@ -161,9 +161,9 @@ export default function Home({ loaderData }: Route.ComponentProps) {
               </Link>
             </div>
             <p className="mt-9 text-[10px] font-semibold uppercase tracking-[0.15em] text-[#5C5C66]">
-              AWS · GitHub · Stripe · Vercel · Cloudflare · +{INTEGRATION_NAMES.length - 5} more
+              GitHub · Stripe · Vercel · Cloudflare · Neon · +{INTEGRATION_NAMES.length - 5} more
             </p>
-            <p className="mt-2 text-[10px] text-[#4A4D4E]">
+            <p className="mt-1.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-[#5C5C66]">
               Featured on Tiny Startups · Product Hunt · SideProjectors · SaaS Cubes
             </p>
           </div>
@@ -314,7 +314,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
         <h2 className="mt-3 text-4xl font-bold tracking-tight md:text-5xl">Three steps to continuous compliance</h2>
         <div className="mt-14 grid gap-6 md:grid-cols-3">
           {[
-            ["Connect your systems", `AWS, GitHub, Stripe, BambooHR, Workday, Okta, Snyk, Datadog, and ${Math.max(0, INTEGRATION_NAMES.length - 8)} more. All read-only.`],
+            ["Connect your systems", `GitHub, Stripe, Cloudflare, Neon, Datadog, Sentry, Notion, Resend, and ${Math.max(0, INTEGRATION_NAMES.length - 8)} more. All read-only.`],
             ["We map your compliance", "Controls, evidence, and risks are built automatically from live system data."],
             ["Continuous readiness", "Audit readiness becomes a background process. Questionnaires fill themselves."],
           ].map(([title, desc], i) => (
