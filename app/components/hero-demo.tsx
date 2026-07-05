@@ -606,7 +606,7 @@ const DemoFrame = forwardRef<
         </div>
         {/* Honesty label */}
         <span className="whitespace-nowrap text-[9px] font-semibold uppercase tracking-[0.08em] text-[#5C5C66]">
-          Representative · not live data
+          Demo · simulated
         </span>
       </div>
 
@@ -667,23 +667,16 @@ export function HeroDemo() {
     return () => io.disconnect();
   }, [isStatic, isDesktop]);
 
-  // Scene rotation — only on desktop, motion-OK, AND in viewport.
-  // Uses onAnimationComplete from AnimatePresence to sync with stagger completion.
+  // Scene rotation — fires SCENE_MS after the current scene signals it's ready (onReady).
   const [sceneReady, setSceneReady] = useState(false);
   useEffect(() => {
-    if (isStatic || !isDesktop || !inView) return;
-    if (!sceneReady) return;
+    if (isStatic || !isDesktop || !inView || !sceneReady) return;
     const id = setTimeout(() => {
       setSceneReady(false);
       setSceneIdx((i) => (i + 1) % SCENE_RENDERERS.length);
     }, SCENE_MS);
     return () => clearTimeout(id);
   }, [isStatic, isDesktop, inView, sceneReady]);
-
-  // Mark first scene ready immediately on mount, subsequent ones after stagger
-  useEffect(() => {
-    if (sceneIdx === 0) setSceneReady(true);
-  }, [sceneIdx]);
 
   // No-JS fallback: a small inline stylesheet inside <noscript> overrides
   // motion library's inline `opacity: 0` / `transform` styles so the
