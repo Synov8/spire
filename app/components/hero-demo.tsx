@@ -343,7 +343,7 @@ function Scene2Evidence() {
       </div>
 
       {/* Streaming rows */}
-      <div className="mt-3 flex-1 space-y-1.5 overflow-hidden">
+      <div className="mt-3 flex-1 space-y-1.5 overflow-y-auto scrollbar-thin">
         <AnimatePresence>
           {EVIDENCE_STREAM.slice(0, visibleCount).map((item) => (
             <motion.div
