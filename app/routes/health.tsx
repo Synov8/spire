@@ -54,9 +54,20 @@ export async function loader() {
     }),
 
     check("Background jobs", async () => {
-      const { runs } = await import("@trigger.dev/sdk");
-      const result = await runs.list({ limit: 1 });
-      if (!(result as any).data) throw new Error("unexpected response");
+      const { tasks, runs } = await import("@trigger.dev/sdk");
+      const nonce = crypto.randomUUID();
+      const handle = await tasks.trigger("health-check", { nonce }, { tags: ["health-check"] });
+      for (let i = 0; i < 10; i++) {
+        const run = await runs.retrieve(handle.id);
+        if (run.isCompleted) {
+          const output = run as any;
+          if (output?.output?.nonce === nonce) return;
+          throw new Error("output mismatch");
+        }
+        if (run.isFailed || run.isCancelled) throw new Error("run failed");
+        await new Promise((r) => setTimeout(r, 1000));
+      }
+      throw new Error("timeout");
     }),
   ]);
 
