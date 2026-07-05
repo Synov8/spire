@@ -1,3 +1,4 @@
+import { useState, useCallback } from "react";
 import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
 import type { Route } from "./+types/root";
 import "./app.css";
@@ -50,6 +51,11 @@ export default function App() {
 
 export function ErrorBoundary({ error }: { error?: Error }) {
   const isDev = import.meta.env.DEV;
+  const [copied, setCopied] = useState(false);
+  const copyStack = useCallback(() => {
+    if (!error?.stack) return;
+    navigator.clipboard.writeText(error.stack).then(() => { setCopied(true); setTimeout(() => setCopied(false), 1500); }).catch(() => {});
+  }, [error]);
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#07080A] p-8">
       <div className="max-w-lg text-center">
@@ -66,6 +72,9 @@ export function ErrorBoundary({ error }: { error?: Error }) {
                 {error.stack}
               </pre>
             </details>
+            <button type="button" onClick={copyStack} className="mt-2 rounded border border-[#1A1D1E] px-3 py-1 text-xs text-[#5C5C66] hover:border-[#00D4AA] hover:text-[#00D4AA] transition-colors">
+              {copied ? "Copied!" : "Copy stack trace"}
+            </button>
           </>
         )}
         <div className="mt-6 flex items-center justify-center gap-3">
