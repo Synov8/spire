@@ -308,7 +308,7 @@ function Scene2Evidence({ onReady }: { onReady?: () => void }) {
         <motion.span key={displayCount} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="text-lg font-bold tabular-nums text-[#F1F1F3]">{displayCount}</motion.span>
         <span className="text-[10px] text-[#8B8B93]">evidence items</span>
       </div>
-      <ul ref={scope} className="mt-3 flex-1 space-y-1.5 overflow-y-auto scrollbar-thin">
+      <ul ref={scope} className="mt-3 min-h-0 flex-1 space-y-1 overflow-y-auto scrollbar-thin">
         {EVIDENCE_STREAM.map((item) => (
           <li key={`${item.integration}-${item.text}`}
             className="flex items-center gap-1.5 rounded-md border border-[#1C1C24] bg-[#0E0E14] px-1.5 py-1.5 opacity-0"
