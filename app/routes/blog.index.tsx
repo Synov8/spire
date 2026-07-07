@@ -1,8 +1,10 @@
-import { Link } from "react-router";
+import { Link, useSearchParams } from "react-router";
 import { allPosts } from "content-collections";
 import { PublicLayout } from "~/components/public-layout";
 import { StructuredData } from "~/components/structured-data";
 import { organizationSchema } from "~/lib/structured-data";
+
+const PER_PAGE = 6;
 
 export function meta() {
   return [
@@ -17,9 +19,14 @@ export function meta() {
 }
 
 export default function BlogIndex() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10) || 1);
+
   const posts = allPosts.sort((a, b) => new Date(b.published).getTime() - new Date(a.published).getTime());
   const featured = posts[0];
-  const rest = posts.slice(1);
+  const restAll = posts.slice(1);
+  const totalPages = Math.ceil(restAll.length / PER_PAGE);
+  const rest = restAll.slice((page - 1) * PER_PAGE, page * PER_PAGE);
 
   return (
     <PublicLayout>
@@ -53,7 +60,7 @@ export default function BlogIndex() {
 
         <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {rest.map((post) => (
-            <Link key={post.slug} to={`/blog/${post.slug}`} className="group flex flex-col rounded-xl border border-[#1C1C24] bg-[#111116] p-6 hover:border-[#00D4AA]/20 hover:bg-[#16161D] transition-all">
+            <Link key={post.slug} to={`/blog/${post.slug}`} className="group flex flex-col rounded-xl border border-[#1C1C24] bg-[#111116] p-6 hover:border-[#00D4AA]/20 hover:bg-[#16161D] transition-colors">
               <div className="flex items-center gap-2 text-xs text-[#5C5C66]">
                 <time>{new Date(post.published).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</time>
               </div>
@@ -65,6 +72,43 @@ export default function BlogIndex() {
             </Link>
           ))}
         </div>
+
+        {totalPages > 1 && (
+          <div className="mt-12 flex items-center justify-center gap-1">
+            <button
+              disabled={page <= 1}
+              onClick={() => setSearchParams({ page: String(page - 1) })}
+              className="rounded-lg border border-[#1C1C24] px-3 py-2 text-sm text-[#8B8B93] hover:border-[#00D4AA]/30 hover:text-[#F1F1F3] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+            >Previous</button>
+
+            {(() => {
+              const pages: (number | "...")[] = [];
+              const range = 1;
+              for (let i = 1; i <= totalPages; i++) {
+                if (i === 1 || i === totalPages || (i >= page - range && i <= page + range)) {
+                  pages.push(i);
+                } else if (pages[pages.length - 1] !== "...") {
+                  pages.push("...");
+                }
+              }
+              return pages.map((n) =>
+                n === "..." ? (
+                  <span key="e" className="px-1 text-sm text-[#5C5C66]">&hellip;</span>
+                ) : (
+                  <button key={n} onClick={() => setSearchParams({ page: String(n) })}
+                    className={`w-8 h-8 rounded-lg text-sm transition-colors ${n === page ? "bg-[#00D4AA]/10 text-[#00D4AA]" : "text-[#5C5C66] hover:text-[#F1F1F3]"}`}
+                  >{n}</button>
+                )
+              );
+            })()}
+
+            <button
+              disabled={page >= totalPages}
+              onClick={() => setSearchParams({ page: String(page + 1) })}
+              className="rounded-lg border border-[#1C1C24] px-3 py-2 text-sm text-[#8B8B93] hover:border-[#00D4AA]/30 hover:text-[#F1F1F3] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+            >Next</button>
+          </div>
+        )}
       </section>
 
     </PublicLayout>

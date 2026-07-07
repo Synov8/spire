@@ -1,211 +1,55 @@
-1. Product Name (working)
-ComplyOS(or “Autopilot Compliance”, “TrustLayer AI”, “AuditFlow”)
+# Spire — Product Spec
 
----
-2. One-line definition
-A continuously running AI system that automatically keeps B2B SaaS companies audit-ready (SOC 2 + AI compliance) and answers security questionnaires without human effort.
+## One-line
 
----
-3. Target user (very specific)
-Primary buyer
-Head of Engineering / CTO (Series A–C SaaS)
-Security Lead (if they have one)
-Founder (early stage, no compliance team)
+Continuously running AI compliance automation for B2B SaaS — auto-gathers evidence, evaluates controls, and fills security questionnaires from live infrastructure.
 
-Company profile
-10–500 employees
-Selling B2B SaaS to enterprise customers
-Uses cloud infrastructure (AWS/GCP/Azure)
-Has or is chasing SOC 2
-Increasing AI feature usage
+## Frameworks
 
+- SOC 2 (Trust Services Criteria — Security, Availability, Processing Integrity, Confidentiality, Privacy)
+- EU AI Act (10 mapped articles: risk management, data governance, logging, transparency, human oversight, accuracy, governance, etc.)
 
----
-4. Core problem
-Today:
-Compliance is reactive, manual, and chaotic
-Evidence is scattered across tools
-SOC 2 prep takes 2–6 months
-Security questionnaires block enterprise deals
-AI usage creates undocumented risk
+## Core workflows
 
-Result:
-lost deals
-expensive consultants
-constant fire drills before audits
+**Autonomous audit:** User clicks "New audit" → AI agent connects via Composio OAuth to their integrated tools (GitHub, Stripe, Cloudflare, Neon, etc.) → streams tool calls in real time → evaluates each control as pass / fail / warning / unknown → stores results → user reviews on dashboard.
 
+**Manual evidence + re-evaluation:** User uploads files (multi-file, R2-backed) → batch re-evaluates all non-pass controls with evidence as context.
 
----
-5. Product promise
-> “We keep you continuously audit-ready and auto-answer every security review using live system data.”
+**Questionnaire auto-fill:** User uploads security questionnaire (PDF/docx) → Trigger.dev task parses it → investigation agent uses Composio tools to gather evidence from infrastructure → drafts per-question answers with confidence scores → user reviews and PDF exports.
 
+**Trust center:** Public page displaying static compliance posture snapshot with badge counts.
 
+## Architecture
 
----
-6. Core system architecture
-6.1 Data ingestion layer
-Connects to:
-AWS / GCP / Azure
-GitHub / GitLab
-Google Workspace / Microsoft 365
-Jira / Linear
-Slack (limited metadata)
-HR systems (optional)
-Stripe (for SOC 2 evidence)
+| Layer | Technology |
+|-------|-----------|
+| Framework | React Router v8 (framework mode) |
+| Hosting | Cloudflare Workers |
+| Database | Neon Serverless Postgres + Drizzle ORM |
+| Auth | Better Auth (magic-link, organizations, Stripe subscriptions) |
+| Background jobs | Trigger.dev v4 (audit, questionnaire, health-check tasks) |
+| File storage | Cloudflare R2 (`spire-evidence` bucket) |
+| AI | OpenRouter (deepseek/deepseek-v4-flash), Vercel AI SDK streamText |
+| Integrations | Composio OAuth (30+ tools — GitHub, Stripe, Cloudflare, Neon, Notion, Resend, etc.) |
+| PDF generation | @react-pdf/renderer (client-side via `.client.ts`) |
 
+## Deliverables
 
----
-6.2 Compliance graph engine
-A continuously updated internal model:
-Assets (services, repos, infra components)
-Data flows (PII, customer data, logs)
-Access control relationships
-Policies (SOC 2, ISO 27001, GDPR, AI Act mappings)
+- Streamed audit log showing each tool call and control evaluation in real time
+- Structured control results (control ID, status, explanation, evidence citations, remediation steps)
+- PDF compliance report (per-framework, multi-framework, or full)
+- PDF questionnaire export
+- Per-question confidence scores for human review
+- Health check endpoint (DB, Stripe prices, Resend, Trigger.dev)
 
-This becomes a living compliance knowledge graph.
+## Pricing
 
----
-6.3 Policy-to-execution compiler
-Input:
-SOC 2 controls
-ISO controls
-AI Act requirements
-custom enterprise requirements
+- Starter: £200/mo
+- Growth: £1,200/mo
+- Enterprise: £3,000/mo
 
-Output:
-machine-checkable rules
-evidence requirements
-automated checks
+## What Spire is not
 
-Example:
-> “All production access must be logged and retained for 90 days”
-
-
-Becomes:
-log validation job
-retention check
-alerting rule
-
-
----
-6.4 Evidence automation engine
-Continuously collects:
-access logs
-deployment history
-code review trails
-incident reports
-infrastructure configs
-employee access changes
-
-Stores them as:
-> “audit-ready evidence objects”
-
-
-
----
-6.5 AI Questionnaire Agent
-Input:
-vendor security questionnaire (PDF, portal text, email)
-
-Process:
-parses questions
-maps to compliance graph
-auto-generates answers
-attaches evidence links
-
-Output:
-filled questionnaire
-confidence score per answer
-flagged uncertain items for human review
-
-
----
-6.6 Audit-ready “Trust Pack Generator”
-One-click export:
-SOC 2 report pack
-AI compliance documentation pack
-security posture summary
-evidence bundle (timestamped)
-
-
----
-7. Key user workflows
-Workflow A: SOC 2 readiness (continuous mode)
-1. Connect systems
-
-2. System builds compliance graph
-
-3. Dashboard shows:
-missing controls
-risk areas
-evidence gaps
-
-
-4. System auto-remediates where possible
-
-5. Alerts only when human action needed
-
-
-
----
-Workflow B: Security questionnaire autopilot
-1. User uploads questionnaire
-
-2. AI parses 50–500 questions
-
-3. Auto-fills 70–90%
-
-4. Flags uncertain answers
-
-5. Export ready response in minutes
-
-
-
----
-Workflow C: Audit preparation (old way → new way)
-Old:
-2–3 months of scrambling
-
-New:
-“Generate audit pack” button
-system outputs everything instantly
-auditor gets structured data instead of PDFs
-
----
-8. Differentiation (critical)
-You are NOT:
-a compliance dashboard
-a checklist tool
-a reporting tool
-
-You ARE:
-> “A compliance autopilot that runs continuously inside company infrastructure”
-
-
-The key differentiator is automation + continuous state, not static reporting.
-
----
-9. Pricing model
-Starter (seed startups)
-£200–£500/month
-
-Growth SaaS (Series A–C)
-£800–£3,000/month
-
-Enterprise
-£10k–£50k/year+
-plus onboarding fees
-
-
----
-10. Moat strategy
-Your defensibility comes from:
-proprietary compliance graph per company
-historical audit evidence dataset
-integrations embedded into infrastructure
-mapping of “real-world infra → regulatory control”
-learning from failed audits across customers
-
-Over time:
-> you become the “system of record for trust”
-
+- Not a CPA firm — does not issue signed SOC 2 reports. Provides evidence automation so your auditor works faster.
+- Not a SIEM or monitoring tool — operates read-only during audit runs.
+- Not self-serve PLG yet — currently demo-led.
