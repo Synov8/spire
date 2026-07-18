@@ -78,7 +78,6 @@ export async function loader({ params }: { params: { service: string } }) {
 
   const result = await run(params.service, fn);
   return new Response(JSON.stringify({
-    healthy: result.ok,
     ...result,
     ts: new Date().toISOString(),
   }, null, 2), {
