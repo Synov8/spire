@@ -81,7 +81,7 @@ export async function loader() {
     byKey,
     checks: results,
     ts: new Date().toISOString(),
-  }), {
+  }, null, 2), {
     status: results.every(r => r.ok) ? 200 : 503,
     headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
   });
