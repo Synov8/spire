@@ -12,7 +12,7 @@ import { spirePosture, type FrameworkPosture } from "~/data/spire-self-audit";
  *   2. Live posture widget (currently snapshot-derived; future cron-driven)
  *   3. Subprocessor list
  *   4. Cryptographic & data handling
- *   5. Status & uptime (honest fallback — no status page yet)
+ *   5. Status & uptime (https://status.spire.synov8studio.com)
  *   6. Bottom CTA
  *
  * All copy is provable (no fabricated SOC 2 cert, no fake stats). The
@@ -214,17 +214,20 @@ export default function TrustCenter() {
           Status &amp; uptime
         </h2>
         <div className="mt-6 rounded-xl border border-[#1C1C24] bg-[#111116] p-6">
-          <p className="text-sm text-[#F1F1F3]">No public status page yet.</p>
+          <p className="text-sm text-[#F1F1F3]">
+            <a href="https://status.spire.synov8studio.com" target="_blank" rel="noopener"
+              className="text-[#00D4AA] hover:text-[#00B894] underline underline-offset-2"
+            >status.spire.synov8studio.com</a>
+          </p>
           <p className="mt-2 text-sm text-[#8B8B93]">
-            For incidents, contact{" "}
+            Live status of Spire's infrastructure dependencies. For incidents, contact{" "}
             <a
               href="mailto:hello@synov8studio.com"
               className="text-[#00D4AA] hover:text-[#00B894]"
             >
               hello@synov8studio.com
             </a>
-            {" "}— we commit to acknowledging within 1 business hour. We&apos;re actively evaluating
-            a status-page vendor (BetterStack / Instatus) — see the spec backlog.
+            {" "}— we commit to acknowledging within 1 business hour.
           </p>
         </div>
       </section>
