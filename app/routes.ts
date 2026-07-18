@@ -40,5 +40,6 @@ export default [
   route("ai", "routes/ai.tsx"),
   route("health", "routes/health.tsx"),
   route("health.json", "routes/health[.]json.tsx"),
+  route("health/:service", "routes/health.$service.tsx"),
   index("routes/home.tsx"),
 ] satisfies RouteConfig;
