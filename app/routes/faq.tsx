@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Link } from "react-router";
 import { PublicLayout } from "~/components/public-layout";
+import { StructuredData } from "~/components/structured-data";
+import { organizationSchema, breadcrumbListSchema, faqPageSchema } from "~/lib/structured-data";
 import { FAQS as faqs } from "~/lib/faq-data";
 
 export function meta() {
@@ -17,6 +19,11 @@ export default function FAQPage() {
 
   return (
     <PublicLayout>
+      <StructuredData schemas={breadcrumbListSchema([
+        { name: "Home", url: "/" },
+        { name: "FAQ", url: "/faq" },
+      ])} />
+      <StructuredData schemas={faqPageSchema(faqs.map(f => ({ question: f.q, answer: f.a })))} />
 
       <section className="mx-auto max-w-3xl px-6 pt-20 pb-24">
         <div className="text-center">

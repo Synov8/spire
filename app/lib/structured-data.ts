@@ -73,6 +73,59 @@ export type Schema = {
   [key: string]: unknown;
 };
 
+// ─── WebSite (every page) ───────────────────────────────────────────────────
+
+/**
+ * WebSite schema — enables Google Sitelinks Search Box and helps AI
+ * chatbots understand the site as a whole. Included on every public page
+ * via PublicLayout.
+ */
+export function webSiteSchema(): Schema {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "Spire",
+    url: SITE_URL,
+    description:
+      "AI-powered SOC 2 and EU AI Act compliance automation for B2B SaaS.",
+    potentialAction: {
+      "@type": "SearchAction",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: `${SITE_URL}/blog?q={search_term_string}`,
+      },
+      "query-input": "required name=search_term_string",
+    },
+  };
+}
+
+// ─── BreadcrumbList (per-page) ──────────────────────────────────────────────
+
+/**
+ * BreadcrumbList schema — helps LLMs understand page hierarchy.
+ * Each route passes its breadcrumb trail. Example:
+ *
+ *   breadcrumbListSchema([
+ *     { name: "Home", url: "/" },
+ *     { name: "Blog", url: "/blog" },
+ *     { name: post.title, url: `/blog/${post.slug}` },
+ *   ])
+ */
+export type Crumb = { name: string; url: string };
+
+export function breadcrumbListSchema(crumbs: Crumb[]): Schema {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: crumbs.map((c, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: c.name,
+      item: `${SITE_URL}${c.url}`,
+    })),
+  };
+}
+
 // ─── / ────────────────────────────────────────────────────────────────────
 
 /**
@@ -100,9 +153,9 @@ export function softwareApplicationSchema(): Schema {
     provider: { "@type": "Organization", name: "Spire", url: SITE_URL },
     offers: {
       "@type": "Offer",
-      price: "0",
-      priceCurrency: "USD",
-      category: "Free tier (connect integrations, view compliance state). Paid tiers begin at £200/mo.",
+      price: "200",
+      priceCurrency: "GBP",
+      description: "Starts at £200/month. See /pricing for all plans.",
       availability: "https://schema.org/InStock",
     },
     featureList: [
@@ -282,6 +335,36 @@ export function integrationServiceSchema(
     provider: { "@type": "Organization", name: "Spire", url: SITE_URL },
     serviceType: "Read-only API evidence collection ",
     areaServed: "Global",
+  };
+}
+
+// ─── HowTo (step-by-step guides) ──────────────────────────────────────────
+
+/**
+ * HowTo schema — for step-by-step guide blog posts. LLMs preferentially
+ * cite structured HowTo content for procedural queries.
+ */
+export type HowToStep = { name: string; text: string; url?: string };
+
+export function howToSchema(
+  name: string,
+  description: string,
+  steps: HowToStep[],
+  totalTime?: string,
+): Schema {
+  return {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    name,
+    description,
+    step: steps.map((s, i) => ({
+      "@type": "HowToStep",
+      position: i + 1,
+      name: s.name,
+      text: s.text,
+      ...(s.url ? { url: s.url } : {}),
+    })),
+    ...(totalTime ? { totalTime } : {}),
   };
 }
 

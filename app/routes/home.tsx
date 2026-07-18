@@ -8,6 +8,7 @@ import { StructuredData } from "~/components/structured-data";
 import {
   softwareApplicationSchema,
   homeFaqPageSchema,
+  breadcrumbListSchema,
 } from "~/lib/structured-data";
 import {
   type BuyerRole,
@@ -133,9 +134,13 @@ export default function Home({ loaderData }: Route.ComponentProps) {
   return (
     <PublicLayout>
 
-      {/* JSON-LD: SoftwareApplication + FAQPage (5-question spec subset) */}
+      {/* JSON-LD: SoftwareApplication + FAQPage + BreadcrumbList */}
       <StructuredData
-        schemas={[softwareApplicationSchema(), homeFaqPageSchema()]}
+        schemas={[
+          softwareApplicationSchema(),
+          homeFaqPageSchema(),
+          breadcrumbListSchema([{ name: "Home", url: "/" }]),
+        ]}
       />
 
       {/* HERO — §4.2: headline + subhead + CTA on left, animated demo on right at md+, stacked on mobile */}

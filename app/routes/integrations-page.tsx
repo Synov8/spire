@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 import { PublicLayout } from "~/components/public-layout";
 import { StructuredData } from "~/components/structured-data";
-import { integrationsItemListSchema } from "~/lib/structured-data";
+import { integrationsItemListSchema, breadcrumbListSchema } from "~/lib/structured-data";
 import {
   INTEGRATION_CATEGORIES,
   INTEGRATIONS,
@@ -51,6 +51,10 @@ export default function IntegrationsPage() {
 
       {/* JSON-LD: ItemList of all integrations (each ListItem embeds nested Service) */}
       <StructuredData schemas={integrationsItemListSchema()} />
+      <StructuredData schemas={breadcrumbListSchema([
+        { name: "Home", url: "/" },
+        { name: "Integrations", url: "/integrations" },
+      ])} />
 
       <section className="mx-auto max-w-6xl px-6 pt-20 pb-24">
         <div className="mx-auto max-w-3xl text-center">

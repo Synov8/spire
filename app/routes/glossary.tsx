@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 import { PublicLayout } from "~/components/public-layout";
 import { StructuredData } from "~/components/structured-data";
-import { organizationSchema, definedTermItemListSchema } from "~/lib/structured-data";
+import { organizationSchema, definedTermItemListSchema, breadcrumbListSchema } from "~/lib/structured-data";
 
 export function meta() {
   return [
@@ -43,6 +43,10 @@ export default function Glossary() {
   return (
     <PublicLayout>
       <StructuredData schemas={[organizationSchema(), definedTermItemListSchema(entries)]} />
+      <StructuredData schemas={breadcrumbListSchema([
+        { name: "Home", url: "/" },
+        { name: "Glossary", url: "/glossary" },
+      ])} />
 
       <section className="mx-auto max-w-4xl px-6 pt-16 pb-24">
         <span className="text-xs font-semibold uppercase tracking-[0.15em] text-[#00D4AA]">Glossary</span>

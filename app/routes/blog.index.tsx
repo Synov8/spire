@@ -2,7 +2,7 @@ import { Link, useSearchParams } from "react-router";
 import { allPosts } from "content-collections";
 import { PublicLayout } from "~/components/public-layout";
 import { StructuredData } from "~/components/structured-data";
-import { organizationSchema } from "~/lib/structured-data";
+import { organizationSchema, breadcrumbListSchema } from "~/lib/structured-data";
 
 const PER_PAGE = 6;
 
@@ -31,6 +31,10 @@ export default function BlogIndex() {
   return (
     <PublicLayout>
       <StructuredData schemas={organizationSchema()} />
+      <StructuredData schemas={breadcrumbListSchema([
+        { name: "Home", url: "/" },
+        { name: "Blog", url: "/blog" },
+      ])} />
 
       <section className="mx-auto max-w-7xl px-4 sm:px-6 pt-16 sm:pt-20 pb-24">
         <div className="text-center">

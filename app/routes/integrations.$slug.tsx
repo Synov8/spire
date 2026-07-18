@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 import { PublicLayout } from "~/components/public-layout";
 import { StructuredData } from "~/components/structured-data";
-import { integrationServiceSchema } from "~/lib/structured-data";
+import { integrationServiceSchema, breadcrumbListSchema } from "~/lib/structured-data";
 import { INTEGRATIONS, INTEGRATIONS_BY_SLUG } from "~/lib/integration-data";
 import { auth } from "~/lib/auth.server";
 import type { Route } from "./+types/integrations.$slug";
@@ -60,11 +60,18 @@ export default function IntegrationSlugPage({ loaderData }: Route.ComponentProps
     <PublicLayout>
       {/* JSON-LD: per-integration Service schema (bonus — pins each integration as a discoverable Thing). */}
       <StructuredData
-        schemas={integrationServiceSchema(
-          integration.slug,
-          integration.name,
-          integration.description,
-        )}
+        schemas={[
+          integrationServiceSchema(
+            integration.slug,
+            integration.name,
+            integration.description,
+          ),
+          breadcrumbListSchema([
+            { name: "Home", url: "/" },
+            { name: "Integrations", url: "/integrations" },
+            { name: integration.name, url: `/integrations/${integration.slug}` },
+          ]),
+        ]}
       />
       {/* Hero band — small (logo + name + desc + Connect now) */}
       <section className="border-b border-[#1C1C24] bg-[#111116]/30">

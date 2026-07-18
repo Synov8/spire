@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 import { PublicLayout } from "~/components/public-layout";
 import { StructuredData } from "~/components/structured-data";
-import { organizationSchema } from "~/lib/structured-data";
+import { organizationSchema, breadcrumbListSchema } from "~/lib/structured-data";
 import { spirePosture, type FrameworkPosture } from "~/data/spire-self-audit";
 
 /**
@@ -111,6 +111,10 @@ export default function TrustCenter() {
     <PublicLayout>
       {/* JSON-LD: Organization (legal entity Synov8 Ltd., contact points, sameAs) */}
       <StructuredData schemas={organizationSchema()} />
+      <StructuredData schemas={breadcrumbListSchema([
+        { name: "Home", url: "/" },
+        { name: "Trust Center", url: "/trust-center" },
+      ])} />
       {/* Hero */}
       <section className="mx-auto max-w-4xl px-6 pt-20 pb-12 text-center">
         <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[#00D4AA]">

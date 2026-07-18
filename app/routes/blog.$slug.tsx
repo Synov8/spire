@@ -6,6 +6,7 @@ import {
   articleSchema,
   faqPageSchema,
   organizationSchema,
+  breadcrumbListSchema,
 } from "~/lib/structured-data";
 
 export function meta({ params }: { params: { slug: string } }) {
@@ -72,6 +73,11 @@ export default function BlogPost() {
       />
       <StructuredData schemas={faqPageSchema(faqItems)} />
       <StructuredData schemas={organizationSchema()} />
+      <StructuredData schemas={breadcrumbListSchema([
+        { name: "Home", url: "/" },
+        { name: "Blog", url: "/blog" },
+        { name: post.title, url: `/blog/${post.slug}` },
+      ])} />
 
       <article className="mx-auto max-w-6xl px-6 pt-16 pb-24">
         <Link to="/blog" className="text-sm text-[#8B8B93] hover:text-[#00D4AA] transition-colors">&larr; Back to blog</Link>

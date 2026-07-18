@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 import { PublicLayout } from "~/components/public-layout";
 import { StructuredData } from "~/components/structured-data";
-import { pricingProductSchemas } from "~/lib/structured-data";
+import { pricingProductSchemas, breadcrumbListSchema } from "~/lib/structured-data";
 import { useState, useEffect } from "react";
 
 import { INTEGRATION_NAMES } from "~/lib/integration-data";
@@ -62,6 +62,10 @@ export default function Pricing() {
 
       {/* JSON-LD: one Product per pricing tier (Starter / Growth / Enterprise) */}
       <StructuredData schemas={pricingProductSchemas()} />
+      <StructuredData schemas={breadcrumbListSchema([
+        { name: "Home", url: "/" },
+        { name: "Pricing", url: "/pricing" },
+      ])} />
 
       <section className="mx-auto max-w-6xl px-6 pt-20 pb-24">
         <div className="text-center">

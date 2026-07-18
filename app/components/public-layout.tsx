@@ -3,6 +3,8 @@ import { useState, useEffect, type ReactNode } from "react";
 import { allPosts } from "content-collections";
 import { INTEGRATION_NAMES } from "~/lib/integration-data";
 import { authClient } from "~/lib/auth-client";
+import { StructuredData } from "~/components/structured-data";
+import { webSiteSchema } from "~/lib/structured-data";
 
 const navLinks = [
   { to: "/features", label: "Features" },
@@ -219,6 +221,7 @@ export function PublicFooter() {
 export function PublicLayout({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen bg-[#0A0A0C]">
+      <StructuredData schemas={[webSiteSchema()]} />
       <PublicNav />
       {children}
       <PublicFooter />

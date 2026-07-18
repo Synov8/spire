@@ -1,5 +1,7 @@
 import { Link } from "react-router";
 import { PublicLayout } from "~/components/public-layout";
+import { StructuredData } from "~/components/structured-data";
+import { breadcrumbListSchema } from "~/lib/structured-data";
 import { INTEGRATION_NAMES } from "~/lib/integration-data";
 
 export function meta() {
@@ -76,6 +78,10 @@ const honestNonClaims = [
 export default function FeaturesPage() {
   return (
     <PublicLayout>
+      <StructuredData schemas={breadcrumbListSchema([
+        { name: "Home", url: "/" },
+        { name: "Features", url: "/features" },
+      ])} />
 
       <section className="mx-auto max-w-6xl px-6 pt-20 pb-24">
         <div className="mx-auto max-w-3xl text-center">
