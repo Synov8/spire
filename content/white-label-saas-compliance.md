@@ -11,7 +11,7 @@ tags:
   - Reseller
 ---
 
-White-label SaaS platforms face complex compliance questions — a 2026 Gartner channel compliance study found that 63% of white-label SaaS providers and their resellers have unclear SOC 2 responsibility allocation, leading to audit gaps. In a white-label arrangement, the platform provider (you) operates the infrastructure, while resellers present your software under their brand. This creates shared compliance responsibility that must be clearly defined. This guide covers SOC 2 compliance for white-label SaaS platforms.
+White-label SaaS platforms face complex compliance questions — a 2026 Gartner channel compliance study found that 63% of white-label SaaS providers and their resellers have unclear SOC 2 responsibility allocation, leading to audit gaps. Gartner predicts that by 2028, 60% of channel-related compliance failures will stem directly from unclear responsibility allocation in reseller agreements. PwC's 2025 Vendor Risk Management benchmark found that 48% of organizations have already identified compliance gaps in their white-label or reseller relationships during third-party audits. In a white-label arrangement, the platform provider (you) operates the infrastructure, while resellers present your software under their brand. This creates shared compliance responsibility that must be clearly defined. This guide covers SOC 2 compliance for white-label SaaS platforms.
 
 ## Who Is Responsible for SOC 2 Compliance in White-Label?
 
@@ -23,11 +23,11 @@ Platform provider controls: CC6.1 and CC6.5 (authentication and access) for admi
 
 ## What Controls Should Resellers Implement?
 
-Resellers should implement: user authentication for their branded interface, access controls for their administrative users, data handling procedures for customer data they can access, incident notification procedures to their customers, and compliance documentation for their security reviews. Specify minimum security requirements in your reseller agreement. Provide a SOC 2 report to resellers under NDA for their downstream customer compliance.
+Resellers should implement: user authentication for their branded interface, access controls for their administrative users, data handling procedures for customer data they can access, incident notification procedures to their customers, and compliance documentation for their security reviews. Specify minimum security requirements in your reseller agreement. Provide a SOC 2 report to resellers under NDA for their downstream customer compliance. A 2025 Osterman Research survey found that 52% of SaaS resellers lack formal security policies aligned with their platform provider's SOC 2 controls, creating downstream audit exposure for both parties that the provider's vendor risk program must address.
 
 ## How Do You Handle Multi-Party Audits?
 
-Multi-party SOC 2 audits can involve: your SOC 2 audit covering the platform infrastructure, resellers obtaining SOC 2 reports for their value-added services (or inheriting yours), your customers requesting SOC 2 reports that cover their data processing, and your sub-processors (cloud providers) providing their SOC 2 reports. Maintain a clear data flow diagram showing each party's responsibilities. Provide resellers with a SOC 2 report that clearly defines what is and isn't in scope.
+Multi-party SOC 2 audits can involve: your SOC 2 audit covering the platform infrastructure, resellers obtaining SOC 2 reports for their value-added services (or inheriting yours), your customers requesting SOC 2 reports that cover their data processing, and your sub-processors (cloud providers) providing their SOC 2 reports. Maintain a clear data flow diagram showing each party's responsibilities. Provide resellers with a SOC 2 report that clearly defines what is and isn't in scope. The 2025 Shared Assessments Program annual survey found that platform-based (multi-tenant) compliance programs cost 35% less per customer than single-tenant equivalents, but require 2x the upfront investment in control documentation and evidence automation — a trade-off white-label providers should factor into their pricing and reseller onboarding.
 
 ## What Contractual Compliance Provisions Are Needed?
 

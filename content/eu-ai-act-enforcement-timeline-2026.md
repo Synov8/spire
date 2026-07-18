@@ -9,7 +9,7 @@ tags:
   - Enforcement
   - Deadlines
   - Compliance
-  - 2026
+  - "2026"
 ---
 
 The EU AI Act's phased enforcement timeline means that different AI systems face compliance deadlines at different dates in 2026 and 2027, and companies that map their AI systems to the correct compliance deadline and begin preparation 12 to 18 months in advance achieve on-time compliance at 50% lower cost than those that start 6 months before deadlines, according to a 2026 EU Commission enforcement readiness survey. Missing the August 2026 deadline for high-risk obligations carries penalty exposure up to 35 million EUR.

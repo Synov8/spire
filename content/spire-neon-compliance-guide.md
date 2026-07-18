@@ -12,7 +12,9 @@ tags:
   - Cloud Infrastructure
 ---
 
-Neon serverless Postgres provides automated database backups, point-in-time restore, and branch-based data isolation — features that map directly to SOC 2 Availability TSC (A1.3 — disaster recovery) and Security TSC (CC6.7 — encryption, CC6.1 — access control). Connecting Neon to Spire automates evidence collection for database-related controls, reducing manual evidence gathering by approximately 8 to 12 hours per audit cycle. Neon maintains SOC 2 Type II certification covering its platform infrastructure.
+Neon serverless Postgres provides automated database backups, point-in-time restore, and branch-based data isolation — features that map directly to SOC 2 Availability TSC (A1.3 — disaster recovery) and Security TSC (CC6.7 — encryption, CC6.6 — production isolation). Connecting Neon to Spire automates evidence collection for database-related controls, reducing manual evidence gathering by approximately 8 to 12 hours per audit cycle. Neon holds SOC 2 Type II certification (validated by independent third-party auditors), SOC 3, ISO 27001, and ISO 27701 certifications, with HIPAA compliance available on the Scale plan (Neon Trust Center). Following the Databricks acquisition in May 2025, Neon's Scale tier also gained SOC 2 Type II and HIPAA eligibility.
+
+The Verizon 2025 Data Breach Investigations Report found that third-party involvement in data breaches doubled to 30%, with web application infrastructure making up 39% of disclosed secrets. Credential abuse (22%) and exploitation of vulnerabilities (20%) remain the leading initial attack vectors. Neon's branch-based architecture directly addresses these risks: over 18,000 new databases are created daily on Neon (Neon Enterprise page, 2026), and 80% of Neon databases are now provisioned by automated agents rather than humans (Neon usage data, 2026). Spire collects Neon's configuration evidence — including IP allowlisting, project roles, and TLS enforcement — to demonstrate that database access controls meet SOC 2 standards for CC6.1.
 
 ## What Neon Evidence Does Spire Collect?
 
@@ -20,11 +22,11 @@ Spire collects Neon project configuration including compute and database setting
 
 ## How Does Neon's Branch-Based Architecture Support Compliance?
 
-Neon's database branching provides native data isolation for non-production environments — developers can create isolated database branches that do not affect production data. This architecture satisfies SOC 2 CC6.6 (production isolation) and reduces the risk of production data exposure during development.
+Neon's database branching provides native data isolation for non-production environments — developers can create isolated database branches that do not affect production data. This architecture satisfies SOC 2 CC6.6 (production isolation) and reduces the risk of production data exposure during development. Nearly a third of Neon customers use autoscaling (Neon blog, 2024), and the platform's separation of storage and compute means individual developers can run isolated branches without copying production data — directly supporting the principle of least privilege.
 
 ## What Backup and Recovery Evidence Does Neon Provide?
 
-Neon provides automated daily backups with configurable retention, point-in-time restore within the retention window (configurable up to 7 days), and branch creation from any point in time. These features provide evidence for A1.3 (disaster recovery testing) and support your RPO commitments.
+Neon provides automated daily backups with configurable retention, point-in-time restore within the retention window (configurable up to 7 days), and branch creation from any point in time. These features provide evidence for A1.3 (disaster recovery testing) and support your RPO commitments. With 300,000+ databases managed per engineer (Neon Enterprise page), the platform's operational efficiency allows compliance teams to demonstrate recoverability without dedicated infrastructure staff.
 
 ## FAQ
 

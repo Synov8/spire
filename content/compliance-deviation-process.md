@@ -9,7 +9,7 @@ tags:
   - Incident
   - Control Failure
   - SOC 2
-```
+---
 
 Compliance deviations are unplanned events where a control fails to operate as designed — a 2026 Ponemon Institute study found that organizations with structured deviation management processes identify and remediate control failures 3.8x faster than those without. Unlike exceptions (planned deviations approved in advance), deviations require rapid assessment and response to prevent security incidents. This guide covers managing unplanned compliance deviations for SOC 2 programs.
 

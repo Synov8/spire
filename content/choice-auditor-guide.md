@@ -9,7 +9,7 @@ tags:
   - Selection
   - Audit Firm
   - B2B SaaS
-```
+---
 
 Choosing the right SOC 2 auditor is as important as the compliance work itself — a 2026 Gartner audit survey found that companies who switched auditors after their first engagement reported 40% higher satisfaction with their second choice. The auditor relationship lasts for years, fundamentally affecting your compliance experience. This guide covers how to select a SOC 2 auditor that fits your company's needs, size, and budget.
 

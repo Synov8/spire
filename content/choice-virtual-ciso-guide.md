@@ -9,7 +9,7 @@ tags:
   - SOC 2
   - Vendor Selection
   - B2B SaaS
-```
+---
 
 More than 70% of pre-Series B SaaS companies use a virtual CISO for SOC 2 compliance according to a 2026 Gartner startup security survey, but choosing the wrong vCISO is the most common mistake we see — leading to delayed certifications, wasted budget, and frustrated engineering teams. The right vCISO brings SOC 2 experience, technical depth, and practical guidance. This guide covers how to select and work with a virtual CISO for successful SOC 2 compliance.
 

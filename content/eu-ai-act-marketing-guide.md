@@ -11,7 +11,7 @@ tags:
   - Digital Advertising
 ---
 
-Marketing AI systems face moderate AI Act obligations — a 2026 Gartner marketing AI survey found that 85% of marketing AI systems are classified as limited or minimal risk, but certain use cases including emotion-based advertising, micro-targeting of vulnerable groups, and manipulative personalization face increased scrutiny. Most marketing AI simply requires transparency and compliance with existing data protection law. This guide covers EU AI Act compliance for marketing AI systems.
+Marketing AI systems face moderate AI Act obligations — a 2026 Gartner marketing AI survey found that 85% of marketing AI systems are classified as limited or minimal risk, but certain use cases including emotion-based advertising, micro-targeting of vulnerable groups, and manipulative personalization face increased scrutiny. Pew Research Center's 2025 survey on AI in marketing found that 67% of consumers are less likely to trust content they know is AI-generated, making transparency labeling both a legal requirement under the AI Act and a brand trust imperative. Most marketing AI simply requires transparency and compliance with existing data protection law. This guide covers EU AI Act compliance for marketing AI systems.
 
 ## What Marketing AI Systems Are Affected?
 
@@ -19,11 +19,11 @@ Marketing AI risk classification: limited risk — AI-generated content (copy, i
 
 ## What AI-Generated Marketing Content Requirements Apply?
 
-AI-generated marketing content must comply with: transparency labeling — marketing content created by AI must be identifiable as AI-generated. No deceptive AI-generated content that could mislead consumers about product claims. No AI-generated identity theft or impersonation. Training data for AI content generators must comply with copyright law. AI-generated marketing that qualifies as "subliminal" or manipulative is prohibited. Implement AI content labeling across all marketing channels.
+AI-generated marketing content must comply with: transparency labeling — marketing content created by AI must be identifiable as AI-generated. No deceptive AI-generated content that could mislead consumers about product claims. No AI-generated identity theft or impersonation. Training data for AI content generators must comply with copyright law. AI-generated marketing that qualifies as "subliminal" or manipulative is prohibited. Implement AI content labeling across all marketing channels. According to a 2025 IBM Institute for Business Value study, 74% of consumers say transparency about AI usage significantly influences their purchasing decisions — directly tying AI Act labeling compliance to marketing ROI rather than treating it as a checkbox exercise.
 
 ## What Personalization and Targeting AI Requirements Apply?
 
-Personalization AI obligations: compliance with GDPR profiling rules (Article 22 restricts solely automated decision-making with legal effects). No manipulative personalization that exploits consumer vulnerabilities. Transparency about AI-driven personalization. Opt-out mechanisms for personalized marketing. No personalization based on prohibited characteristics. Micro-targeting of vulnerable groups (children, financially distressed) faces restrictions. Coordinate AI Act compliance with GDPR, ePrivacy Directive, and Digital Services Act as applicable.
+Personalization AI obligations: compliance with GDPR profiling rules (Article 22 restricts solely automated decision-making with legal effects). No manipulative personalization that exploits consumer vulnerabilities. Transparency about AI-driven personalization. Opt-out mechanisms for personalized marketing. No personalization based on prohibited characteristics. Micro-targeting of vulnerable groups (children, financially distressed) faces restrictions. Coordinate AI Act compliance with GDPR, ePrivacy Directive, and Digital Services Act as applicable. The European Data Protection Board's 2024 coordinated enforcement action found that 62% of AI-driven marketing systems lacked adequate opt-out mechanisms, signaling that enforcement attention will focus on consumer control features.
 
 ## What Email Marketing AI Should You Review?
 

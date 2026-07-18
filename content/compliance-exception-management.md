@@ -9,7 +9,7 @@ tags:
   - Risk Acceptance
   - SOC 2
   - Governance
-```
+---
 
 Exceptions to compliance policies and controls are inevitable in fast-moving SaaS companies — a 2026 Gartner compliance operations study found that organizations with structured exception management processes experience 50% fewer audit findings related to exception handling than those without. The key is not to eliminate exceptions but to manage them systematically with documented risk acceptance. This guide covers compliance exception management for SOC 2 programs.
 

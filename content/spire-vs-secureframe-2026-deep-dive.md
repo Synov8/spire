@@ -9,7 +9,7 @@ tags:
   - Comparison
   - SOC 2
   - Compliance Automation
-  - 2026
+  - "2026"
 ---
 
 Spire and Secureframe represent two approaches to SOC 2 automation in 2026 — Spire as an AI-native platform with automated evidence evaluation and Secureframe as a well-established platform with 300+ integrations and strong evidence collection capabilities. Secureframe was acquired by OneTrust in 2024 and operates as part of the OneTrust GRC suite. Spire competes by offering more advanced AI-powered features at a lower total cost for most B2B SaaS companies.

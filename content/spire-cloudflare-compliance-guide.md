@@ -14,6 +14,8 @@ tags:
 
 Cloudflare provides critical network security and availability controls that support multiple SOC 2 trust service criteria — Web Application Firewall rules (CC6.4 — network security), TLS configuration and edge certificates (CC6.7 — encryption), DDoS protection (A1.1 — capacity planning), bot management (A1.1), and DNS security (CC6.4). Connecting Cloudflare to Spire automates evidence collection for these controls, reducing manual evidence gathering by approximately 15 to 20 hours per audit cycle.
 
+In 2025, Cloudflare's autonomous DDoS defense systems blocked 47.1 million DDoS attacks — more than double the previous year — averaging 5,376 attacks mitigated every hour (Cloudflare 2025 Q4 DDoS Threat Report). The largest single attack peaked at 31.4 Tbps, all mitigated automatically without human intervention. Spire collects Cloudflare's DDoS mitigation logs and WAF rule configuration as direct evidence for A1.1 and CC6.4, providing auditors with verifiable data on your edge defenses. Cloudflare's global network processes an average of 81 million HTTP requests per second, and its WAF blocks millions of SQL injection and XSS attacks daily — with WAF and bot mitigations accounting for 53.9% of all mitigated traffic across the platform (Cloudflare Application Security Report, 2024).
+
 ## What Cloudflare Evidence Does Spire Collect?
 
 WAF configuration and rule deployment history — Spire collects WAF rule sets, mode settings, and rule update history as evidence for CC6.4 (network segmentation and perimeter security). TLS and SSL configuration — edge certificate deployment, minimum TLS version enforcement, and SSL settings provide evidence for CC6.7 (encryption of data in transit).
