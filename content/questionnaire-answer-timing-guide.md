@@ -23,7 +23,7 @@ Prioritize by deal stage (close within 30 days = priority 1, close within 90 day
 
 ## What Automation Reduces Response Time?
 
-AI-powered questionnaire response tools that auto-populate answers from your response library, integrate with your compliance platform for evidence references, track response time against SLAs, and provide collaborative review workflows reduce response time by 60% to 80%.
+AI-powered questionnaire response tools that auto-populate answers from your response library, integrate with your compliance platform for evidence references, track response time against SLAs, and provide collaborative review workflows reduce response time by 60% to 80%. Spire's AI agent generates responses directly from live compliance evidence, grounding each answer in actual infrastructure configuration and control status — which means answers are always current and consistent with your SOC 2 posture.
 
 ## FAQ
 

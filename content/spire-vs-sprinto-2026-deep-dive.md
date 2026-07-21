@@ -43,3 +43,15 @@ Spire supports multi-entity and multi-framework compliance for companies with mu
 ### Which platform is better for US enterprise sales?
 
 For US enterprise sales, SOC 2 Type II coverage is the primary requirement. Both platforms provide SOC 2 support. Spire's AI questionnaire response automation provides additional value for US enterprise sales cycles that involve extensive security reviews.
+
+### Can I migrate from Sprinto to Spire?
+
+Yes. Evidence collected on Sprinto can be exported and imported into Spire. The migration typically takes less than a week. Switching between audit cycles is recommended to maintain evidence continuity.
+
+### Does Sprinto include EU AI Act coverage?
+
+Sprinto supports 15+ frameworks including SOC 2, ISO 27001, HIPAA, and GDPR, but does not currently include EU AI Act-specific controls or evidence collection. Spire includes native EU AI Act coverage alongside SOC 2.
+
+### Which platform has better AI capabilities?
+
+Sprinto has strong agentic AI for remediation guidance and workflow automation. Spire has an AI compliance agent that performs independent on-demand audits across SOC 2 and EU AI Act with structured pass/fail verdicts. The capabilities are complementary — Sprinto helps fix gaps, Spire helps find them.

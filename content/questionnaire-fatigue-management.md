@@ -19,7 +19,7 @@ Symptoms include: increasing response times (2 weeks becomes 4 weeks), declining
 
 ## How Do You Automate Questionnaire Response?
 
-Automation solutions reduce manual response effort by 60% to 80%. Implement an AI-powered questionnaire response tool that auto-populates answers from your response library, integrates with your compliance platform for evidence references, and provides collaborative review workflows. Maintain a structured answer library organized by topic, not by customer.
+Automation solutions reduce manual response effort by 60% to 80%. Implement an AI-powered questionnaire response tool that auto-populates answers from your response library, integrates with your compliance platform for evidence references, and provides collaborative review workflows. Spire's AI agent generates questionnaire responses directly from live compliance evidence, grounding each answer in actual infrastructure configuration rather than static policy documents. Maintain a structured answer library organized by topic, not by customer.
 
 ## How Do You Scale Questionnaire Capacity?
 

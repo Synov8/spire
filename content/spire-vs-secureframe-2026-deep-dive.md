@@ -43,3 +43,11 @@ Both platforms enable SOC 2 Type II readiness in 6 to 12 weeks. Spire's AI audit
 ### Do both platforms support custom control frameworks?
 
 Spire provides flexible control mapping for custom frameworks and multi-framework alignment. Secureframe, through OneTrust, offers extensive enterprise GRC customization capabilities.
+
+### Can I use my own auditor with Secureframe?
+
+Yes. Secureframe has a network of 150+ partner CPA firms, but you can use any licensed auditor. The platform supports evidence export for auditor review. Spire similarly supports any licensed CPA firm.
+
+### Which platform is easier for non-technical teams?
+
+Secureframe's guided onboarding and compliance manager support make it the best choice for non-technical teams that want a human partner. Spire's AI agent handles evidence evaluation and gap analysis automatically, but initial integration setup requires API access to your infrastructure.

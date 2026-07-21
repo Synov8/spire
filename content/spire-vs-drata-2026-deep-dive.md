@@ -43,3 +43,15 @@ Both platforms support multi-framework compliance. Spire's AI-powered approach p
 ### Do both platforms offer trust centers?
 
 Yes. Both Spire and Drata offer trust center or trust portal functionality for sharing compliance documentation and certifications with prospects and customers.
+
+### Can I migrate from Drata to Spire?
+
+Yes. Evidence can be exported from Drata and imported into Spire. The migration typically takes less than a week. Switching between audit cycles is recommended to maintain evidence continuity.
+
+### Does Drata include security questionnaire automation?
+
+Drata offers questionnaire automation through its platform, but it is not integrated with an AI audit agent. Spire's questionnaire automation is powered by the same AI agent that performs compliance audits, ensuring responses are grounded in actual collected evidence.
+
+### Which platform has faster time to first audit?
+
+Both platforms report 6 to 10 weeks to SOC 2 Type I audit readiness for teams with well-configured infrastructure. Spire's AI-based readiness assessment can be run immediately after integration setup to identify gaps before the formal audit process begins.

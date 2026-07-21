@@ -20,6 +20,7 @@ Day-to-day engineering controls include: code review requirements (CC8.1) — ev
 ## How Do Engineers Integrate Compliance into CI/CD?
 
 Add compliance checks to your CI/CD pipeline at each stage: pre-commit (secret scanning, linting), pre-merge (code review, dependency scanning, SAST), pre-deploy (container scanning, DAST, infrastructure-as-code scanning), and post-deploy (runtime monitoring, vulnerability scanning). Each compliance check should produce evidence artifacts that feed into your SOC 2 evidence collection. CI/CD-integrated compliance checks are the single most effective way to automate evidence collection.
+Platforms like Spire integrate with your CI/CD pipeline via read-only OAuth connections to GitHub, GitLab, and cloud providers, automatically collecting evidence of branch protection, code review requirements, and deployment approvals as structured SOC 2 evidence — no scripts or manual exports needed.
 
 ## What Logging Standards Should Engineers Follow?
 

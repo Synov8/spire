@@ -16,10 +16,12 @@ SOC 2 certification is as much an engineering leadership challenge as it is a co
 ## What Architecture Decisions Should CTOs Make for SOC 2?
 
 Choose cloud providers with strong SOC 2 compliance programs — AWS, Azure, or GCP have dedicated compliance teams and auditor relationships. Use managed services that inherit compliance controls (RDS, Cloud SQL, Azure SQL) rather than self-managed infrastructure. Implement infrastructure as code with compliance checks in your CI/CD pipeline. Design data encryption into your architecture from day one rather than retrofitting. Choose a data architecture that supports data classification and tenant isolation.
+Spire's AI audit agent, for example, connects to your infrastructure via read-only OAuth and automatically evaluates controls against SOC 2 requirements — no manual evidence gathering or script maintenance needed. It streams every tool call and evaluation in real time so you can see exactly how each conclusion was reached.
 
 ## How Do You Maintain Engineering Velocity During SOC 2?
 
 Automate compliance evidence collection rather than asking engineers to manually document. Use compliance-as-code tools that integrate with your CI/CD pipeline. Implement automated security scanning that doesn't require manual triage. Create lightweight change management workflows that don't add friction to daily development. Reserve manual compliance activities for quarterly reviews rather than daily processes. Companies that automate compliance evidence collection report 60% less engineering time spent on audit preparation.
+Spire's AI audit agent runs on-demand SOC 2 and EU AI Act audits, evaluates evidence against controls, and produces structured reports with pass/fail verdicts and remediation recommendations — no dedicated security team required.
 
 ## What Technical Debt Should You Pay Down for SOC 2?
 

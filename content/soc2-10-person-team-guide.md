@@ -20,6 +20,7 @@ Designate an engineering lead with 3 to 5 hours per week for compliance — typi
 ## What Controls Should Be Automated at the 10-Person Stage?
 
 Automate: cloud infrastructure monitoring (AWS, GCP, Azure), identity provider configuration (Okta, Google Workspace, Azure AD), code repository access and change management (GitHub, GitLab), vulnerability scanning (Snyk, Wiz, CrowdStrike), endpoint security monitoring (Jamf, Kandji, Intune), employee training assignment and tracking, and vendor SOC report collection and review.
+Platforms like Spire provide AI-powered evidence collection covering the essential integration set from day one — cloud provider, identity provider, code repository, and monitoring tools — without requiring per-integration setup or ongoing configuration maintenance.
 
 ## How Does a 10-Person Team Handle On-Call and Incident Response?
 

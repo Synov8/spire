@@ -43,3 +43,19 @@ Both platforms enable SOC 2 readiness in 6 to 12 weeks for most B2B SaaS compani
 ### Do both platforms support multi-framework compliance?
 
 Yes. Both Spire and Vanta support SOC 2, ISO 27001, HIPAA, PCI DSS, and GDPR compliance programs with unified evidence collection across frameworks.
+
+### Can I switch from Vanta to Spire?
+
+Yes. Evidence collected on Vanta can be exported and imported into Spire. Most teams complete the migration within one week. Switching between audit cycles is recommended — do not switch mid-observation period.
+
+### Does Spire integrate with my existing auditor?
+
+Spire works with any licensed CPA firm. Evidence export is compatible with standard auditor tools. If you already have an auditor relationship established through Vanta, you can maintain it while using Spire for evidence collection.
+
+### Does Vanta support EU AI Act compliance?
+
+Vanta announced EU AI Act readiness as part of its 2026 roadmap. As of mid-2026, EU AI Act-specific controls and evidence mappings are not yet available in the platform. Spire includes native EU AI Act coverage today.
+
+### Which platform has faster setup?
+
+Vanta reports 2 to 3 days for initial integration setup. Spire's read-only OAuth flow connects a single integration in seconds; full audit-readiness assessment including AI-agent diagnostics typically takes under one hour for a standard AWS + GitHub + identity-provider stack, though policy documentation and control design take 6 to 10 weeks on either platform.
