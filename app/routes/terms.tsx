@@ -26,25 +26,24 @@ export default function TermsPage() {
   return (
     <PublicLayout>
 
-      <section className="mx-auto max-w-3xl px-6 pt-20 pb-24">
+      <section className="mx-auto max-w-3xl px-6 py-24">
         <div className="text-center">
-          <span className="text-xs font-semibold uppercase tracking-[0.15em] text-[#00D4AA]">Legal</span>
-          <h1 className="mt-3 text-4xl font-bold tracking-tight text-[#F1F1F3] md:text-5xl">Terms of service</h1>
-          <p className="mt-3 text-sm text-[#5C5C66]">Last updated: {new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}</p>
+          <h1 className="text-4xl font-bold tracking-tight text-text-primary md:text-5xl">Terms of service</h1>
+          <p className="mt-3 text-sm text-text-tertiary">Last updated: {new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}</p>
         </div>
 
         <div className="mt-14 space-y-8">
           {sections.map((s) => (
             <div key={s.title}>
-              <h2 className="text-lg font-bold text-[#F1F1F3]">{s.title}</h2>
-              <p className="mt-2 text-sm leading-relaxed text-[#8B8B93]">{s.content}</p>
+              <h2 className="text-lg font-bold text-text-primary">{s.title}</h2>
+              <p className="mt-2 text-sm leading-relaxed text-text-secondary">{s.content}</p>
             </div>
           ))}
         </div>
 
-        <div className="mt-12 rounded-xl border border-[#1C1C24] bg-[#111116] p-6">
-          <p className="text-sm text-[#8B8B93]">
-            Questions about these terms? Contact <span className="text-[#00D4AA]">legal@synov8studio.com</span>
+        <div className="mt-12 rounded-xl border border-border-primary bg-surface-secondary p-6">
+          <p className="text-sm text-text-secondary">
+            Questions about these terms? Contact <span className="text-brand">legal@synov8studio.com</span>
           </p>
         </div>
       </section>

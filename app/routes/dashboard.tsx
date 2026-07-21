@@ -27,17 +27,18 @@ export async function loader({ request }: Route.LoaderArgs) {
   let orgs: Array<{ id: string; name: string; slug: string; logo: string | null }> = [];
 
   if (!orgId) {
-    orgs = await auth.api.listOrganizations({ headers: request.headers }) as any;
-    if (orgs.length > 0) {
-      await auth.api.setActiveOrganization({ body: { organizationId: orgs[0].id }, headers: request.headers });
-      orgId = orgs[0].id;
+    // No active org — try to auto-set the first membership
+    const memberships = await auth.api.listOrganizations({ headers: request.headers }) as any;
+    if (memberships?.[0]) {
+      const first = memberships[0];
+      await auth.api.setActiveOrganization({ body: { organizationId: first.id }, headers: request.headers });
+      orgId = first.id;
     } else {
-      const slug = session.user.email.split("@")[0] + "-org";
-      const org = await auth.api.createOrganization({ body: { name: session.user.name + "'s Org", slug }, headers: request.headers });
-      await auth.api.setActiveOrganization({ body: { organizationId: org.id }, headers: request.headers });
-      orgId = org.id;
-      orgs = [{ id: org.id, name: org.name, slug: org.slug, logo: null }];
+      // Still no org — create a personal org
+      const newOrg = await auth.api.createOrganization({ body: { name: session.user.name || session.user.email, slug: crypto.randomUUID().slice(0, 8) }, headers: request.headers });
+      orgId = newOrg.id;
     }
+    orgs = await auth.api.listOrganizations({ headers: request.headers }) as any;
   } else {
     orgs = await auth.api.listOrganizations({ headers: request.headers }) as any;
   }
@@ -65,22 +66,22 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
   ];
 
   return (
-    <div className="flex h-screen bg-[#07080A]">
-      <aside className="flex w-64 shrink-0 flex-col border-r border-[#1A1D1E] bg-[#0B0D0E]">
+    <div className="flex h-screen bg-surface-primary">
+      <aside className="flex w-64 shrink-0 flex-col border-r border-border-primary bg-surface-secondary">
         {/* Logo + org switcher */}
-        <div className="flex h-14 items-center gap-3 border-b border-[#1A1D1E] px-4">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-[#00D4AA] to-[#00B894] text-[11px] font-bold text-black shadow-[0_2px_8px_-2px_rgba(0,212,170,0.4)]">S</div>
+        <div className="flex h-14 items-center gap-3 border-b border-border-primary px-4">
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-brand to-brand-dark text-[11px] font-bold text-black shadow-[0_2px_8px_-2px_rgba(0,212,170,0.4)]">S</div>
           <div className="flex-1 truncate">
             <div className="relative">
-              <button type="button" onClick={() => setOrgOpen(!orgOpen)} className="flex w-full items-center gap-1.5 text-sm font-medium text-[#E8E8E8] hover:text-white transition-colors">
+              <button type="button" onClick={() => setOrgOpen(!orgOpen)} className="flex w-full items-center gap-1.5 text-sm font-medium text-text-primary hover:text-white transition-colors">
                 <span className="truncate max-w-36">{currentOrgName || "No org"}</span>
-                {orgs.length > 1 && <span className={`text-[#4A4D4E] transition-transform duration-200 ${orgOpen ? "rotate-180" : ""}`}>{icons.chevronDown}</span>}
+                {orgs.length > 1 && <span className={`text-text-tertiary transition-transform duration-200 ${orgOpen ? "rotate-180" : ""}`}>{icons.chevronDown}</span>}
               </button>
               {orgOpen && orgs.length > 1 && (
-                <div className="absolute left-0 top-full z-30 mt-1 w-full overflow-hidden rounded-lg border border-[#1A1D1E] bg-[#0B0D0E] py-1 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.5)]">
+                <div className="absolute left-0 top-full z-30 mt-1 w-full overflow-hidden rounded-xl border border-border-primary bg-surface-secondary py-1 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.5)]">
                   {orgs.map((o) => (
                     <button key={o.id} onClick={async () => { setOrgOpen(false); await authClient.organization.setActive({ organizationId: o.id }); window.location.reload(); }}
-                      className={`block w-full px-3 py-1.5 text-left text-xs transition-colors ${o.id === orgId ? "text-[#00D4AA]" : "text-[#6A6D6E] hover:text-[#E8E8E8] hover:bg-[#141718]"}`}>
+                      className={`block w-full px-3 py-1.5 text-left text-xs transition-colors ${o.id === orgId ? "text-brand" : "text-text-tertiary hover:text-text-primary hover:bg-surface-tertiary"}`}>
                       {o.name}
                     </button>
                   ))}
@@ -98,29 +99,28 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
               <Link key={l.to} to={l.to}
                 className={`group relative flex items-center justify-between overflow-hidden rounded-lg px-3 py-2 text-sm transition-all duration-200 ${
                   active
-                    ? "bg-[#00D4AA]/[0.08] text-[#E8E8E8]"
-                    : "text-[#6A6D6E] hover:bg-[#141718] hover:text-[#E8E8E8]"
+                    ? "bg-brand/[0.08] text-text-primary"
+                    : "text-text-tertiary hover:bg-surface-tertiary hover:text-text-primary"
                 }`}>
                 {/* Active indicator bar */}
-                {active && <span className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-r-full bg-[#00D4AA]" />}
+                {active && <span className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-r-full bg-brand" />}
                 <span className="flex items-center gap-3">
-                  <span className={`transition-colors ${active ? "text-[#00D4AA]" : "text-[#4A4D4E] group-hover:text-[#8B8B93]"}`}>{l.icon}</span>
+                  <span className={`transition-colors ${active ? "text-brand" : "text-text-tertiary group-hover:text-text-secondary"}`}>{l.icon}</span>
                   {l.label}
                 </span>
-
               </Link>
             );
           })}
         </nav>
 
         {/* User section */}
-        <div className="border-t border-[#1A1D1E] p-3">
-          <div className="flex items-center gap-3 rounded-lg px-3 py-2 text-xs text-[#6A6D6E]">
-            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-[#1C1C24] to-[#141718] text-[10px] font-medium text-[#8B8B93] ring-1 ring-[#1A1D1E]">{user.email[0].toUpperCase()}</div>
+        <div className="border-t border-border-primary p-3">
+          <div className="flex items-center gap-3 rounded-lg px-3 py-2 text-xs text-text-tertiary">
+            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-border-primary to-surface-tertiary text-[10px] font-medium text-text-secondary ring-1 ring-border-primary">{user.email[0].toUpperCase()}</div>
             <span className="flex-1 truncate">{user.email}</span>
           </div>
           <form action="/logout" method="POST" className="mt-1">
-            <button type="submit" className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-xs text-[#4A4D4E] hover:bg-[#141718] hover:text-[#EF4444] transition-all duration-200">
+            <button type="submit" className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-xs text-text-tertiary hover:bg-surface-tertiary hover:text-error transition-all duration-200">
               {icons.signOut}
               Sign out
             </button>
@@ -128,7 +128,7 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
         </div>
       </aside>
       <main className="flex flex-1 flex-col overflow-y-auto">
-        {/* Subtle dot-grid background for depth (matches HeroDemo) */}
+        {/* Subtle dot-grid background for depth */}
         <div className="pointer-events-none fixed inset-0 opacity-[0.025]" style={{ backgroundImage: "radial-gradient(circle, #2C2C36 1px, transparent 1px)", backgroundSize: "24px 24px" }} />
         <div className="relative mx-auto flex w-full max-w-6xl flex-1 flex-col p-6 lg:p-8">
           <Outlet context={{ orgId, subscribed }} />

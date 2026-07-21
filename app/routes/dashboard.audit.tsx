@@ -46,7 +46,7 @@ function highlightApps(text: string): (string | { app: string })[] {
   return parts;
 }
 
-// ─── Tool name parsing ───
+// --- Tool name parsing ---
 
 const APP_LABELS: Record<string, string> = {
   github: "GitHub", stripe: "Stripe", notion: "Notion",
@@ -61,28 +61,28 @@ function describeComposioTool(toolName: string, args: any): { app: string; actio
   const lower = toolName.toLowerCase();
 
   if (lower === "composio_manage_connections") {
-    return { app: "", action: "Checking connections…", description: "" };
+    return { app: "", action: "Checking connections\u2026", description: "" };
   }
 
   if (lower === "composio_search_tools") {
-    return { app: "", action: "Finding relevant tools…", description: "" };
+    return { app: "", action: "Finding relevant tools\u2026", description: "" };
   }
 
   if (lower === "composio_get_tool_schemas") {
-    return { app: "", action: "Loading tool schemas…", description: "" };
+    return { app: "", action: "Loading tool schemas\u2026", description: "" };
   }
 
   if (lower === "composio_multi_execute_tool") {
     const thought: string = args?.thought ?? "";
-    return { app: "", action: thought || "Gathering evidence…", description: "" };
+    return { app: "", action: thought || "Gathering evidence\u2026", description: "" };
   }
 
   if (lower === "composio_remote_workbench") {
     const thought: string = args?.thought ?? "";
-    return { app: "", action: thought || "Processing evidence…", description: "" };
+    return { app: "", action: thought || "Processing evidence\u2026", description: "" };
   }
 
-  return { app: "", action: "Running audit checks…", description: "" };
+  return { app: "", action: "Running audit checks\u2026", description: "" };
 }
 
 function describeAction(actionName: string, args: Record<string, unknown>): string {
@@ -123,7 +123,7 @@ function describeToolCall(toolName: string, args: Record<string, unknown>): { ap
   if (lower.startsWith("composio_")) {
     return [describeComposioTool(toolName, args)];
   }
-  if (lower === "submitauditreport") return [{ app: "", action: "Submitting audit report…", description: "" }];
+  if (lower === "submitauditreport") return [{ app: "", action: "Submitting audit report\u2026", description: "" }];
   const parts = toolName.split("_");
   const prefix = parts[0] || "";
   const app = APP_LABELS[prefix] || prefix.charAt(0).toUpperCase() + prefix.slice(1);
@@ -131,7 +131,7 @@ function describeToolCall(toolName: string, args: Record<string, unknown>): { ap
   return [{ app, action: describeAction(verb, args), description: "" }];
 }
 
-// ─── Internal card type with parsed display info ───
+// --- Internal card type with parsed display info ---
 
 interface ToolCard {
   id: number;
@@ -141,16 +141,16 @@ interface ToolCard {
   result?: unknown;
 }
 
-// ─── Individual tool-call card ───
+// --- Individual tool-call card ---
 function ToolCallCard({ card }: { card: ToolCard }) {
   const hasResult = card.result !== undefined;
 
   return (
-    <div className={`flex items-center gap-2 rounded-lg border border-[#1A1D1E] px-3 py-2 ${hasResult ? "" : "border-l-2 border-l-[#00D4AA]"}`}>
-      <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${hasResult ? "bg-[#5C5C66]" : "bg-[#00D4AA] animate-pulse"}`} />
-      <p className="min-w-0 flex-1 text-xs text-[#8B8B93]">
+    <div className={`flex items-center gap-2 rounded-xl border border-border-primary bg-surface-secondary px-3 py-2 ${hasResult ? "" : "border-l-2 border-l-brand"}`}>
+      <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${hasResult ? "bg-text-tertiary" : "bg-brand animate-pulse"}`} />
+      <p className="min-w-0 flex-1 text-xs text-text-secondary">
         {highlightApps(card.action).map((p, i) =>
-          typeof p === "string" ? <span key={i}>{p}</span> : <span key={i} className="rounded bg-[#00D4AA]/10 px-1 py-0.5 font-mono text-[10px] font-semibold text-[#00D4AA]">{p.app}</span>
+          typeof p === "string" ? <span key={i}>{p}</span> : <span key={i} className="rounded bg-brand/10 px-1 py-0.5 font-mono text-[10px] font-semibold text-brand">{p.app}</span>
         )}
       </p>
     </div>
@@ -159,7 +159,7 @@ function ToolCallCard({ card }: { card: ToolCard }) {
 
 let reportSubmitted = false;
 
-// ─── Group stream parts into tool-call cards ───
+// --- Group stream parts into tool-call cards ---
 function buildCards(parts: unknown[]): ToolCard[] {
   const cards: ToolCard[] = [];
   let lastAction = "";
@@ -239,34 +239,34 @@ export default function AuditPage() {
     return (
       <div className="flex flex-1 items-center justify-center">
         <div className="text-center">
-          <p className="text-sm text-[#5C5C66]">No audit running.</p>
-          <Link to="/dashboard" className="mt-2 inline-block text-sm text-[#00D4AA] hover:underline">Back to overview</Link>
+          <p className="text-sm text-text-tertiary">No audit running.</p>
+          <Link to="/dashboard" className="mt-2 inline-block text-sm text-brand hover:underline">Back to overview</Link>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex h-full flex-col bg-[#0B0D0E]">
-      <header className="flex shrink-0 items-center justify-between border-b border-[#1A1D1E] px-5 py-3">
+    <div className="flex h-full flex-col bg-surface-secondary">
+      <header className="flex shrink-0 items-center justify-between border-b border-border-primary px-5 py-3">
         <div className="flex items-center gap-4">
-          <Link to="/dashboard" className="flex h-7 w-7 items-center justify-center rounded-lg text-[#5C5C66] transition-colors hover:bg-[#1A1D1E] hover:text-[#F1F1F3]">
+          <Link to="/dashboard" className="flex h-7 w-7 items-center justify-center rounded-lg text-text-tertiary transition-colors hover:bg-border-border-primary hover:text-text-primary">
             <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
               <path d="M10 4l-4 4 4 4" />
             </svg>
           </Link>
           <div className="flex items-center gap-2.5">
-            <span className={`h-2 w-2 rounded-full ${hasReport ? "bg-[#00D4AA]" : isRunning ? "bg-[#00D4AA] animate-pulse" : "bg-[#5C5C66]"}`} />
-            <h1 className="text-sm font-medium text-[#F1F1F3]">
-              {hasReport ? "Audit complete" : isRunning ? "Running compliance audit" : "Initialising…"}
-              {hasReport && <span className="rounded bg-[#00D4AA]/10 px-1.5 py-0.5 text-[9px] font-semibold text-[#00D4AA]">AI-generated</span>}
+            <span className={`h-2 w-2 rounded-full ${hasReport ? "bg-brand" : isRunning ? "bg-brand animate-pulse" : "bg-text-tertiary"}`} />
+            <h1 className="text-sm font-medium text-text-primary">
+              {hasReport ? "Audit complete" : isRunning ? "Running compliance audit" : "Initialising\u2026"}
+              {hasReport && <span className="rounded bg-brand/10 px-1.5 py-0.5 text-[9px] font-semibold text-brand">AI-generated</span>}
             </h1>
           </div>
-          <span className="text-xs text-[#5C5C66]">{cards.length} steps</span>
+          <span className="text-xs text-text-tertiary">{cards.length} steps</span>
         </div>
         <div className="flex items-center gap-4">
           {hasReport && (
-            <Link to="/dashboard" className="rounded-lg bg-[#00D4AA] px-3.5 py-1.5 text-xs font-medium text-black transition-colors hover:bg-[#00B894]">
+            <Link to="/dashboard" className="rounded-[20px] bg-brand px-3.5 py-1.5 text-xs font-medium text-black transition-colors hover:bg-brand-dark">
               View results
             </Link>
           )}
@@ -275,22 +275,22 @@ export default function AuditPage() {
 
       <div ref={mainRef} className="flex-1 overflow-y-auto px-6 py-5">
         {error && (
-          <div className="mb-4 rounded-xl border border-[#EF4444]/20 bg-[#EF4444]/[0.04] px-4 py-3">
-            <p className="text-sm text-[#EF4444]">Connection error: {String(error)}</p>
+          <div className="mb-4 rounded-xl border border-error/20 bg-error/[0.04] px-4 py-3">
+            <p className="text-sm text-error">Connection error: {String(error)}</p>
           </div>
         )}
 
         {!parts && !error && (
-          <div className="flex items-center gap-3 rounded-xl border border-[#1A1D1E] bg-[#0B0D0E] px-4 py-3">
-            <span className="h-2 w-2 animate-pulse rounded-full bg-[#00D4AA]" />
-            <p className="text-sm text-[#6A6D6E]">Connecting to audit stream…</p>
+          <div className="flex items-center gap-3 rounded-xl border border-border-primary bg-surface-secondary px-4 py-3">
+            <span className="h-2 w-2 animate-pulse rounded-full bg-brand" />
+            <p className="text-sm text-text-tertiary">Connecting to audit stream\u2026</p>
           </div>
         )}
 
         {cards.length === 0 && parts && !error && (
-          <div className="flex items-center gap-3 rounded-xl border border-[#1A1D1E] bg-[#0B0D0E] px-4 py-3">
-            <span className="h-2 w-2 animate-pulse rounded-full bg-[#00D4AA]" />
-            <p className="text-sm text-[#6A6D6E]">Audit agent is starting…</p>
+          <div className="flex items-center gap-3 rounded-xl border border-border-primary bg-surface-secondary px-4 py-3">
+            <span className="h-2 w-2 animate-pulse rounded-full bg-brand" />
+            <p className="text-sm text-text-tertiary">Audit agent is starting\u2026</p>
           </div>
         )}
 

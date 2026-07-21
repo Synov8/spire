@@ -29,7 +29,7 @@ const entries = [
   { term: "ISO 42001", definition: "An international standard for AI management systems published in 2024, covering AI governance, risk management, transparency, and accountability across the AI system lifecycle." },
   { term: "ISMS (Information Security Management System)", definition: "A systematic approach to managing sensitive information, required for ISO 27001 certification. Includes policies, risk assessments, and continuous improvement processes." },
   { term: "Compliance Automation", definition: "The use of software platforms that connect to infrastructure APIs to continuously collect compliance evidence, monitor controls, and map evidence to regulatory frameworks." },
-  { term: "Continuous Monitoring", definition: "The practice of collecting compliance evidence on a recurring schedule — daily or weekly — rather than through periodic manual screenshots. Enables real-time control drift detection." },
+  { term: "Continuous Monitoring", definition: "The practice of collecting compliance evidence on a recurring schedule - daily or weekly - rather than through periodic manual screenshots. Enables real-time control drift detection." },
   { term: "Evidence Collection", definition: "The process of gathering and storing proof that security controls are operating effectively. Can be manual (quarterly screenshots) or automated (API-based recurring collection)." },
   { term: "Penetration Testing", definition: "A security assessment where human testers attempt to exploit vulnerabilities in applications, APIs, and infrastructure. SOC 2 auditors expect annual pen tests as CC7.1 evidence." },
   { term: "Vendor Risk Management (VRM)", definition: "The discipline of identifying, assessing, and monitoring risks from third-party vendors. SOC 2 criterion CC9.2 requires a documented vendor risk management program." },
@@ -48,20 +48,18 @@ export default function Glossary() {
         { name: "Glossary", url: "/glossary" },
       ])} />
 
-      <section className="mx-auto max-w-4xl px-6 pt-16 pb-24">
-        <span className="text-xs font-semibold uppercase tracking-[0.15em] text-[#00D4AA]">Glossary</span>
-        <h1 className="mt-3 text-4xl font-bold tracking-tight text-[#F1F1F3] md:text-5xl">Compliance terms defined for B2B SaaS</h1>
-        <p className="mt-4 text-lg text-[#8B8B93]">Clear definitions of SOC 2, EU AI Act, and compliance automation terms. Each entry is written as a self-contained answer that AI engines can cite directly.</p>
+      <section className="mx-auto max-w-6xl px-6 py-24">
+        <h1 className="text-4xl font-bold tracking-tight text-text-primary md:text-5xl">Compliance terms defined for B2B SaaS</h1>
+        <p className="mt-4 text-lg text-text-secondary">Clear definitions of SOC 2, EU AI Act, and compliance automation terms. Each entry is written as a self-contained answer that AI engines can cite directly.</p>
 
-        <dl className="mt-12 space-y-0">
+        <dl className="mt-16 space-y-4">
           {entries.map((e, i) => (
-            <div key={e.term} className={`border-b border-[#1C1C24] py-5 ${i === 0 ? "border-t" : ""}`}>
-              <dt className="text-base font-medium text-[#F1F1F3]">{e.term}</dt>
-              <dd className="mt-2 text-sm text-[#8B8B93]">{e.definition}</dd>
+            <div key={e.term} className="rounded-xl bg-surface-secondary p-6">
+              <dt className="text-base font-medium text-text-primary">{e.term}</dt>
+              <dd className="mt-2 text-sm text-text-secondary">{e.definition}</dd>
             </div>
           ))}
         </dl>
-
 
       </section>
 

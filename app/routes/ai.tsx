@@ -4,7 +4,7 @@ import { PublicLayout } from "~/components/public-layout";
 export function meta() {
   return [
     { title: "AI | Spire" },
-    { name: "description", content: "Spire's approach to AI — how our compliance agent uses AI, what models we rely on, how customer data is handled, and our AI governance framework." },
+    { name: "description", content: "Spire's approach to AI - how our compliance agent uses AI, what models we rely on, how customer data is handled, and our AI governance framework." },
     { property: "og:title", content: "AI & Transparency | Spire" },
     { property: "og:type", content: "website" },
   ];
@@ -17,7 +17,7 @@ const sections = [
   },
   {
     title: "Models we use",
-    content: "Our compliance agent uses DeepSeek V4 Flash accessed via OpenRouter. The model runs on OpenRouter's infrastructure — no data is sent to Spire's own servers for inference. We evaluate model providers on capability, latency, cost, and security posture before adoption.",
+    content: "Our compliance agent uses DeepSeek V4 Flash accessed via OpenRouter. The model runs on OpenRouter's infrastructure - no data is sent to Spire's own servers for inference. We evaluate model providers on capability, latency, cost, and security posture before adoption.",
   },
   {
     title: "Data handling",
@@ -47,25 +47,58 @@ export default function AiPage() {
 
       <section className="mx-auto max-w-3xl px-6 pt-20 pb-24">
         <div className="text-center">
-          <span className="text-xs font-semibold uppercase tracking-[0.15em] text-[#00D4AA]">Transparency</span>
-          <h1 className="mt-3 text-4xl font-bold tracking-tight text-[#F1F1F3] md:text-5xl">AI & transparency</h1>
-          <p className="mt-3 text-sm text-[#5C5C66]">Last updated: {new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}</p>
+          <h1 className="text-4xl font-bold tracking-tight text-text-primary md:text-5xl">AI & transparency</h1>
+          <p className="mt-3 text-sm text-text-tertiary">Last updated: {new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}</p>
         </div>
+      </section>
 
-        <div className="mt-14 space-y-8">
-          {sections.map((s) => (
-            <div key={s.title}>
-              <h2 className="text-lg font-bold text-[#F1F1F3]">{s.title}</h2>
-              <p className="mt-2 text-sm leading-relaxed text-[#8B8B93]">{s.content}</p>
-            </div>
-          ))}
+      <section className="border-t border-border-primary py-24">
+        <div className="mx-auto max-w-3xl px-6">
+          <div className="space-y-12">
+            {sections.slice(0, 3).map((s) => (
+              <div key={s.title}>
+                <h2 className="text-lg font-bold text-text-primary">{s.title}</h2>
+                <p className="mt-2 text-sm leading-relaxed text-text-secondary">{s.content}</p>
+              </div>
+            ))}
+          </div>
         </div>
+      </section>
 
-        <div className="mt-12 rounded-xl border border-[#1C1C24] bg-[#111116] p-6">
-          <p className="text-sm text-[#8B8B93]">
-            Questions about our AI usage? Contact{" "}
-            <a href="mailto:ai@synov8studio.com" className="text-[#00D4AA] hover:underline">ai@synov8studio.com</a>
-          </p>
+      <section className="border-t border-border-primary py-24">
+        <div className="mx-auto max-w-6xl px-6">
+          <div className="grid gap-6 md:grid-cols-2">
+            {sections.slice(3, 5).map((s) => (
+              <div key={s.title} className="rounded-xl border border-border-primary bg-surface-secondary p-8">
+                <h2 className="text-lg font-bold text-text-primary">{s.title}</h2>
+                <p className="mt-2 text-sm leading-relaxed text-text-secondary">{s.content}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-border-primary py-24">
+        <div className="mx-auto max-w-3xl px-6">
+          <div className="space-y-12">
+            {sections.slice(5, 7).map((s) => (
+              <div key={s.title}>
+                <h2 className="text-lg font-bold text-text-primary">{s.title}</h2>
+                <p className="mt-2 text-sm leading-relaxed text-text-secondary">{s.content}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-border-primary py-24">
+        <div className="mx-auto max-w-3xl px-6">
+          <div className="rounded-xl border border-border-primary bg-surface-secondary p-8">
+            <p className="text-sm text-text-secondary">
+              Questions about our AI usage? Contact{" "}
+              <a href="mailto:ai@synov8studio.com" className="text-brand transition-colors hover:text-brand-dark">ai@synov8studio.com</a>
+            </p>
+          </div>
         </div>
       </section>
 

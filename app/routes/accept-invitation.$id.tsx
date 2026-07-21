@@ -31,21 +31,21 @@ export default function AcceptInvitation({ loaderData }: Route.ComponentProps) {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#0A0A0C]">
-      <div className="w-full max-w-md rounded-xl border border-[#1C1C24] bg-[#111116] p-8 text-center">
+    <div className="flex min-h-screen items-center justify-center bg-surface-primary">
+      <div className="w-full max-w-md rounded-xl border border-border-primary bg-surface-secondary p-8 text-center">
         {fetcher.state === "loading" ? (
-          <p className="text-sm text-[#8B8B93]">Accepting invitation...</p>
+          <p className="text-sm text-text-secondary">Accepting invitation...</p>
         ) : result?.ok ? (
           <>
-            <h1 className="text-2xl font-bold text-[#00D4AA]">Invitation accepted</h1>
-            <p className="mt-2 text-sm text-[#8B8B93]">You've joined the organization.</p>
-            <a href="/dashboard" className="mt-6 inline-block rounded-lg bg-[#00D4AA] px-6 py-2 text-sm font-medium text-black hover:bg-[#00B894]">Go to dashboard</a>
+            <h1 className="text-2xl font-bold text-brand">Invitation accepted</h1>
+            <p className="mt-2 text-sm text-text-secondary">You've joined the organization.</p>
+            <a href="/dashboard" className="mt-6 inline-flex h-10 items-center rounded-[20px] bg-brand px-5 text-sm font-semibold text-black transition-all hover:bg-brand-dark hover:scale-[0.97] active:scale-[0.95]">Go to dashboard</a>
           </>
         ) : (
           <>
-            <h1 className="text-2xl font-bold text-[#F1F1F3]">Organization invitation</h1>
-            <p className="mt-2 text-sm text-[#8B8B93]">You've been invited to join an organization on Spire.</p>
-            {result?.error && <p className="mt-3 text-sm text-[#EF4444]">{result.error}</p>}
+            <h1 className="text-2xl font-bold text-text-primary">Organization invitation</h1>
+            <p className="mt-2 text-sm text-text-secondary">You've been invited to join an organization on Spire.</p>
+            {result?.error && <p className="mt-3 text-sm text-error">{result.error}</p>}
           </>
         )}
       </div>

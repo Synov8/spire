@@ -50,51 +50,51 @@ export default function BillingPage({ loaderData }: Route.ComponentProps) {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-[#F1F1F3]">Billing</h1>
-        <p className="mt-1 text-sm text-[#6A6D6E]">Manage your subscription and billing details</p>
+        <h1 className="text-2xl font-bold tracking-tight text-text-primary">Billing</h1>
+        <p className="mt-1 text-sm text-text-tertiary">Manage your subscription and billing details</p>
       </div>
-      <div className="overflow-hidden rounded-2xl border border-[#1A1D1E] bg-[#0B0D0E]">
+      <div className="overflow-hidden rounded-xl border border-border-primary bg-surface-secondary">
         {/* Header with gradient */}
-        <div className="flex items-center gap-3 border-b border-[#1A1D1E] bg-gradient-to-r from-[#00D4AA]/[0.05] to-transparent px-6 py-4">
-          <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#00D4AA]/10 text-[#00D4AA]">
+        <div className="flex items-center gap-3 border-b border-border-primary bg-gradient-to-r from-brand/[0.05] to-transparent px-6 py-4">
+          <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-brand/10 text-brand">
             <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="1.5" y="3.5" width="13" height="9" rx="1.5"/><path d="M1.5 7h13M4 10.5h2.5"/></svg>
           </span>
           <div>
-            <h2 className="text-sm font-semibold text-[#F1F1F3]">Current plan</h2>
-            <p className="text-xs text-[#5C5C66]">Your subscription and billing cycle</p>
+            <h2 className="text-sm font-semibold text-text-primary">Current plan</h2>
+            <p className="text-xs text-text-tertiary">Your subscription and billing cycle</p>
           </div>
         </div>
         <div className="p-6">
           <div className="flex items-baseline gap-3">
-            <span className="text-2xl font-bold capitalize text-[#F1F1F3]">{sub ? sub.plan : "Free"}</span>
+            <span className="text-2xl font-bold capitalize text-text-primary">{sub ? sub.plan : "Free"}</span>
             {sub?.status === "trialing" && (
-              <span className="flex items-center gap-1.5 rounded-full bg-[#00D4AA]/10 px-2.5 py-0.5 text-xs font-medium text-[#00D4AA]">
-                <span className="h-1.5 w-1.5 rounded-full bg-[#00D4AA]" />Trial
+              <span className="flex items-center gap-1.5 rounded-full bg-brand/10 px-2.5 py-0.5 text-xs font-medium text-brand">
+                <span className="h-1.5 w-1.5 rounded-full bg-brand" />Trial
               </span>
             )}
           </div>
           {sub && (
             <div className="mt-5 grid gap-4 sm:grid-cols-3">
-              <div className="rounded-xl border border-[#1A1D1E] bg-[#07080A] p-4">
-                <p className="text-xs text-[#5C5C66] uppercase tracking-wider">Status</p>
-                <p className="mt-1 text-sm font-medium capitalize text-[#F1F1F3]">{sub.status}</p>
+              <div className="rounded-xl border border-border-primary bg-surface-primary p-4">
+                <p className="text-xs text-text-tertiary uppercase tracking-wider">Status</p>
+                <p className="mt-1 text-sm font-medium capitalize text-text-primary">{sub.status}</p>
               </div>
               {sub.billingInterval && (
-                <div className="rounded-xl border border-[#1A1D1E] bg-[#07080A] p-4">
-                  <p className="text-xs text-[#5C5C66] uppercase tracking-wider">Billing</p>
-                  <p className="mt-1 text-sm font-medium capitalize text-[#F1F1F3]">{sub.billingInterval}</p>
+                <div className="rounded-xl border border-border-primary bg-surface-primary p-4">
+                  <p className="text-xs text-text-tertiary uppercase tracking-wider">Billing</p>
+                  <p className="mt-1 text-sm font-medium capitalize text-text-primary">{sub.billingInterval}</p>
                 </div>
               )}
               {sub.periodEnd && (
-                <div className="rounded-xl border border-[#1A1D1E] bg-[#07080A] p-4">
-                  <p className="text-xs text-[#5C5C66] uppercase tracking-wider">Period ends</p>
-                  <p className="mt-1 text-sm font-medium text-[#F1F1F3]">{new Date(sub.periodEnd).toLocaleDateString()}</p>
+                <div className="rounded-xl border border-border-primary bg-surface-primary p-4">
+                  <p className="text-xs text-text-tertiary uppercase tracking-wider">Period ends</p>
+                  <p className="mt-1 text-sm font-medium text-text-primary">{new Date(sub.periodEnd).toLocaleDateString()}</p>
                 </div>
               )}
             </div>
           )}
           {sub?.cancelAtPeriodEnd && (
-            <div className="mt-4 flex items-center gap-2 rounded-lg border border-[#F59E0B]/20 bg-[#F59E0B]/[0.06] px-4 py-3 text-sm text-[#F59E0B]">
+            <div className="mt-4 flex items-center gap-2 rounded-lg border border-warning/20 bg-warning/5 px-4 py-3 text-sm text-warning">
               <svg className="h-4 w-4 shrink-0" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 5v3.5M8 11h.01"/></svg>
               Cancels at period end
             </div>
@@ -102,13 +102,13 @@ export default function BillingPage({ loaderData }: Route.ComponentProps) {
           <div className="mt-6 flex gap-3">
             {sub ? (
               <>
-                <button type="button" onClick={manageBilling} className="rounded-lg border border-[#1A1D1E] px-4 py-2 text-sm font-medium text-[#8B8B93] hover:border-[#00D4AA] hover:text-[#00D4AA] transition-all duration-200">Manage billing</button>
-                <button type="button" onClick={cancelSubscription} className="rounded-lg border border-[#EF4444]/30 px-4 py-2 text-sm font-medium text-[#EF4444] hover:border-[#EF4444]/60 hover:bg-[#EF4444]/[0.04] transition-all duration-200">Cancel subscription</button>
+                <button type="button" onClick={manageBilling} className="inline-flex h-10 items-center rounded-[20px] border border-border-primary px-5 text-sm font-medium text-text-secondary transition-all hover:border-brand/40 hover:text-text-primary">Manage billing</button>
+                <button type="button" onClick={cancelSubscription} className="inline-flex h-10 items-center rounded-[20px] border border-error/30 px-5 text-sm font-medium text-error transition-all hover:border-error/60 hover:bg-error/[0.04]">Cancel subscription</button>
               </>
             ) : (
               <>
-                <button type="button" onClick={() => upgrade("starter")} className="rounded-lg border border-[#1A1D1E] px-5 py-2 text-sm font-medium text-[#F1F1F3] hover:border-[#00D4AA] hover:text-[#00D4AA] transition-all duration-200">Upgrade to Starter — £200/mo</button>
-                <button type="button" onClick={() => upgrade("growth")} className="rounded-lg bg-[#00D4AA] px-5 py-2 text-sm font-medium text-black hover:bg-[#00B894] transition-all duration-200 shadow-[0_2px_12px_-2px_rgba(0,212,170,0.3)]">Upgrade to Growth — £1,200/mo</button>
+                <button type="button" onClick={() => upgrade("starter")} className="inline-flex h-10 items-center rounded-[20px] border border-border-primary px-5 text-sm font-medium text-text-primary transition-all hover:border-brand/40 hover:text-text-primary">Upgrade to Starter - £200/mo</button>
+                <button type="button" onClick={() => upgrade("growth")} className="inline-flex h-10 items-center rounded-[20px] bg-brand px-5 text-sm font-semibold text-black transition-all hover:bg-brand-dark hover:scale-[0.97] active:scale-[0.95] shadow-[0_2px_12px_-2px_rgba(0,212,170,0.3)]">Upgrade to Growth - £1,200/mo</button>
               </>
             )}
           </div>

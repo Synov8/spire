@@ -383,7 +383,7 @@ function Soc2RowComponent({
                       <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#00D4AA]" aria-hidden />
                       <span>
                         <span className="font-medium text-[#F1F1F3]">{item.name}</span>
-                        <span className="text-[#8B8B93]"> — {item.text}</span>
+                        <span className="text-text-secondary"> - {item.text}</span>
                       </span>
                     </li>
                   ))}

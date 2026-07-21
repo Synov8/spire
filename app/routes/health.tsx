@@ -84,9 +84,10 @@ export async function loader() {
 
 function StatusIcon({ ok }: { ok: boolean }) {
   return ok
-    ? <span className="inline-block h-2.5 w-2.5 rounded-full bg-[#00D4AA]" />
-    : <span className="inline-block h-2.5 w-2.5 rounded-full bg-[#FF4D4D]" />;
+    ? <span className="inline-block h-2.5 w-2.5 rounded-full bg-brand" />
+    : <span className="inline-block h-2.5 w-2.5 rounded-full bg-error" />;
 }
+
 
 export default function HealthPage() {
   const { results, healthy, ts } = useLoaderData<typeof loader>();
@@ -109,29 +110,27 @@ export default function HealthPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <section className="mx-auto max-w-2xl px-6 pt-20 pb-24">
         <div className="text-center">
-          <span className="text-xs font-semibold uppercase tracking-[0.15em] text-[#00D4AA]">System</span>
-          <h1 className="mt-3 text-4xl font-bold tracking-tight text-[#F1F1F3] md:text-5xl">Health check</h1>
+          <h1 className="mt-3 text-4xl font-bold tracking-tight text-text-primary md:text-5xl">Health check</h1>
           <div className="mt-4 flex items-center justify-center gap-2">
             <StatusIcon ok={healthy} />
-            <span className={healthy ? "text-[#00D4AA]" : "text-[#FF4D4D]"}>
+            <span className={healthy ? "text-brand" : "text-error"}>
               {healthy ? "All systems operational" : "Some checks failed"}
             </span>
-            <span className="text-xs text-[#5C5C66]">| {new Date(ts).toLocaleString("en-GB")}</span>
+            <span className="text-xs text-text-tertiary">| {new Date(ts).toLocaleString("en-GB")}</span>
           </div>
         </div>
 
         <div className="mt-10 space-y-2">
           {results.map((r: any) => (
-            <div key={r.label} className="flex items-center justify-between rounded-lg border border-[#1C1C24] bg-[#111116] px-5 py-3">
+            <div key={r.label} className="flex items-center justify-between rounded-lg border border-border-primary bg-surface-secondary px-5 py-3">
               <div className="flex items-center gap-3">
                 <StatusIcon ok={r.ok} />
-                <span className="text-sm text-[#F1F1F3]">{r.label}</span>
+                <span className="text-sm text-text-primary">{r.label}</span>
               </div>
-              <span className={`text-xs ${r.ok ? "text-[#5C5C66]" : "text-[#FF4D4D]"}`}>{r.detail}</span>
+              <span className={`text-xs ${r.ok ? "text-text-tertiary" : "text-error"}`}>{r.detail}</span>
             </div>
           ))}
         </div>
-
 
       </section>
     </PublicLayout>

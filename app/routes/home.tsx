@@ -19,17 +19,6 @@ import {
 import { INTEGRATION_NAMES } from "~/lib/integration-data";
 import type { Route } from "./+types/home";
 
-/**
- * Final CTA microcopy per inferred buyer role (spec §11 buyer-role
- * segmentation — scaffold only; behavioural gating is intentionally NOT
- * applied). The CTA target stays identical across variants — we are
- * segmenting the *tone of conversation*, not paywalled features.
- *
- * Honesty rule (spec §10.1): the role is inferred from `?role=` URL
- * params on landing pages from email campaigns. We do NOT silently
- * classify visitors from referrers; the default role for an unannotated
- * visit is `"unknown"`.
- */
 const FINAL_CTA_BY_ROLE: Record<BuyerRole, { eyebrow: string; headlineTail: string; sub: string }> = {
   cto: {
     eyebrow: "For engineering leaders",
@@ -44,7 +33,7 @@ const FINAL_CTA_BY_ROLE: Record<BuyerRole, { eyebrow: string; headlineTail: stri
   revops: {
     eyebrow: "For revenue operations",
     headlineTail: "your deal-velocity blocker?",
-    sub: "Stop letting security reviews stall procurement. Auto-filled questionnaires in hours, not weeks — wired directly into the deal cycle.",
+    sub: "Stop letting security reviews stall procurement. Auto-filled questionnaires in hours, not weeks - wired directly into the deal cycle.",
   },
   unknown: {
     eyebrow: "Ready when you are",
@@ -55,9 +44,9 @@ const FINAL_CTA_BY_ROLE: Record<BuyerRole, { eyebrow: string; headlineTail: stri
 
 export function meta() {
   return [
-    { title: "Spire — AI-Powered SOC 2 & EU AI Act Compliance for B2B SaaS" },
+    { title: "Spire - AI-Powered SOC 2 & EU AI Act Compliance for B2B SaaS" },
     { name: "description", content: "Spire automates SOC 2 and EU AI Act compliance for B2B SaaS companies. Continuous evidence collection, AI-powered audit readiness, and automated security questionnaire responses." },
-    { property: "og:title", content: "Spire — AI-Powered Compliance Automation" },
+    { property: "og:title", content: "Spire - AI-Powered Compliance Automation" },
     { property: "og:description", content: "Automate SOC 2 and EU AI Act compliance with Spire's AI compliance agent." },
     { property: "og:type", content: "website" },
     { property: "og:url", content: "https://spire.synov8studio.com" },
@@ -66,21 +55,10 @@ export function meta() {
 }
 
 export async function loader({ request }: Route.LoaderArgs) {
-  // SSR-side role resolution (spec §11 buyer-role): read the cookie only.
-  // The `?role=` URL param is honoured client-side via storeRoleCookie() so
-  // the same browser surfaces the right variant on the next non-JS render
-  // too. We deliberately do NOT trust the URL param server-side — anyone
-  // could craft it and the cookie is the durable signal.
   const role = readRoleFromCookie(request);
-  // Also resolve the URL param once (without persisting) so a first-time
-  // visitor who landed with `?role=cto` and has JS enabled sees the
-  // variant on the SAME render — without waiting for hydration round-trip.
   const url = new URL(request.url);
   const urlRole = parseRoleFromUrl(url);
-  return {
-    role,
-    initialRoleFromUrl: urlRole,
-  };
+  return { role, initialRoleFromUrl: urlRole };
 }
 
 function Check({ className }: { className?: string }) {
@@ -91,90 +69,63 @@ function ArrowRight() {
   return <svg className="ml-1 inline-block h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 8h10m-3-4 4 4-4 4"/></svg>;
 }
 
-/**
- * Client-only effect that promotes the URL-param `?role=` into the
- * persisted cookie + localStorage. Strictly post-hydration so SSR HTML
- * and the first client render stay byte-identical (no mismatch).
- *
- * React 19 StrictMode intentionally double-invokes effects in dev. The
- * `persistedRef` ref below ensures we only WRITE the cookie once per
- * mount, not twice — the cookie write itself is idempotent so a double
- * write is harmless, but we keep the count to one for log cleanliness.
- */
+const INTEGRATION_PILLS = [
+  "GitHub", "Stripe", "Vercel", "Cloudflare", "Neon",
+  "AWS", "Datadog", "Okta", "Sentry", "Linear",
+  "Google Workspace", "Microsoft 365", "GitLab", "Slack",
+  "Jira", "Resend", "Notion", "Confluence",
+];
+
 export default function Home({ loaderData }: Route.ComponentProps) {
-  // SSR + first client render: role is the cookie-derived value ONLY.
-  // The URL `?role=` does NOT influence this render — that's what keeps
-  // hydration safe. After hydration completes (post-paint), the effect
-  // below updates `displayedRole` if a URL param was provided.
   const cookieRole = loaderData.role;
   const urlRole = loaderData.initialRoleFromUrl;
-  const effectiveRole = cookieRole;
 
   const [persistedRoleOnce, setPersistedRoleOnce] = useState(false);
   useEffect(() => {
     if (persistedRoleOnce) return;
-    if (urlRole === "unknown") {
-      setPersistedRoleOnce(true);
-      return;
-    }
-    if (urlRole === cookieRole) {
-      setPersistedRoleOnce(true);
-      return;
-    }
-    try {
-      storeRoleCookie(urlRole);
-    } catch {
-      /* ignore — cookie write rejected (CSP, private mode, etc.) */
-    }
+    if (urlRole === "unknown") { setPersistedRoleOnce(true); return; }
+    if (urlRole === cookieRole) { setPersistedRoleOnce(true); return; }
+    try { storeRoleCookie(urlRole); } catch { /* ignore */ }
     setPersistedRoleOnce(true);
   }, [persistedRoleOnce, urlRole, cookieRole]);
 
-  const cta = FINAL_CTA_BY_ROLE[effectiveRole];
+  const cta = FINAL_CTA_BY_ROLE[cookieRole];
 
   return (
     <PublicLayout>
 
-      {/* JSON-LD: SoftwareApplication + FAQPage + BreadcrumbList */}
-      <StructuredData
-        schemas={[
-          softwareApplicationSchema(),
-          homeFaqPageSchema(),
-          breadcrumbListSchema([{ name: "Home", url: "/" }]),
-        ]}
-      />
+      <StructuredData schemas={[
+        softwareApplicationSchema(),
+        homeFaqPageSchema(),
+        breadcrumbListSchema([{ name: "Home", url: "/" }]),
+      ]} />
 
-      {/* HERO — §4.2: headline + subhead + CTA on left, animated demo on right at md+, stacked on mobile */}
-      <section className="mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-7xl flex-col justify-center overflow-x-hidden px-4 pt-8 pb-12 md:px-6 md:pt-16">
-        <div className="grid items-center gap-6 md:grid-cols-2 md:gap-12">
+      {/* ─── HERO: Asymmetric split ─── */}
+      <section className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-6xl flex-col justify-center overflow-x-hidden px-6 pt-8 pb-12 md:pt-16">
+        <div className="grid items-center gap-8 md:grid-cols-2 md:gap-14">
           <div className="text-center md:text-left">
-            <h1 className="text-2xl font-extrabold leading-[1.1] tracking-tight md:text-5xl lg:text-6xl">
-              Stop losing enterprise deals<br />
-              <span className="text-[#00D4AA]">to SOC 2, AI Act, and security questionnaires</span>
+            <h1 className="text-3xl font-bold leading-[1.1] tracking-tight md:text-5xl lg:text-6xl">
+              Stop losing enterprise deals
+              <span className="mt-1 block text-brand">to compliance delays</span>
             </h1>
-            <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-[#8B8B93] md:mx-0 md:mt-4 md:text-lg">
-              Spire connects to {INTEGRATION_NAMES.length} integrations via read-only OAuth. Collects audit-ready evidence
-              24/7 and auto-fills security questionnaires in minutes.
+            <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-text-secondary md:mx-0 md:text-base">
+              Spire connects to {INTEGRATION_NAMES.length} integrations via read-only OAuth.
+              Collects audit-ready evidence 24/7 and auto-fills security questionnaires in minutes.
             </p>
-            <div className="mt-6 flex flex-wrap items-center justify-center gap-2 md:mt-8 md:gap-3 md:justify-start">
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-3 md:justify-start">
               <Link
                 to="/dashboard/questionnaires/upload"
-                className="rounded-lg bg-[#00D4AA] px-4 py-2 text-xs font-semibold text-black hover:bg-[#00B894] transition-colors md:px-5 md:py-2.5 md:text-sm"
+                className="inline-flex h-11 items-center rounded-[20px] bg-brand px-6 text-sm font-semibold text-black transition-all hover:bg-brand-dark hover:scale-[0.97] active:scale-[0.95]"
               >
                 Upload a questionnaire <ArrowRight />
               </Link>
               <Link
                 to="/integrations"
-                className="rounded-lg border border-[#1C1C24] px-4 py-2 text-xs font-medium text-[#8B8B93] hover:border-[#00D4AA] hover:text-[#00D4AA] transition-colors md:px-5 md:py-2.5 md:text-sm"
+                className="inline-flex h-11 items-center rounded-[20px] border border-border-primary px-6 text-sm font-medium text-text-secondary transition-all hover:border-brand/40 hover:text-text-primary hover:scale-[0.97] active:scale-[0.95]"
               >
                 View integrations
               </Link>
             </div>
-            <p className="mt-4 text-[8px] font-semibold uppercase tracking-[0.1em] text-[#5C5C66] md:mt-6 md:text-[10px] md:tracking-[0.15em]">
-              GitHub · Stripe · Vercel · Cloudflare · Neon · +{INTEGRATION_NAMES.length - 5} more
-            </p>
-            <p className="mt-1 text-[8px] font-semibold uppercase tracking-[0.1em] text-[#5C5C66] md:mt-1.5 md:text-[10px] md:tracking-[0.15em]">
-              Featured on Tiny Startups · Product Hunt · SideProjectors · SaaS Cubes
-            </p>
           </div>
           <div className="w-full">
             <HeroDemo />
@@ -182,195 +133,206 @@ export default function Home({ loaderData }: Route.ComponentProps) {
         </div>
       </section>
 
-
-
-      {/* PROBLEM */}
-      <section className="mx-auto max-w-5xl px-6 py-24">
-        <div className="mx-auto max-w-3xl">
-          <span className="text-xs font-semibold uppercase tracking-[0.15em] text-[#EF4444]">The problem</span>
-          <h2 className="mt-3 text-4xl font-bold tracking-tight md:text-5xl">
-            Compliance is slowing down your revenue
-          </h2>
-          <p className="mt-4 text-lg text-[#8B8B93]">
-            If you're selling to enterprise, you already know the pattern.
+      {/* ─── TRUST STRIP: Integration pills + badges ─── */}
+      <section aria-label="Trusted by" className="border-y border-border-primary bg-surface-secondary/50 py-8">
+        <div className="mx-auto max-w-6xl px-6">
+          <p className="mb-4 text-center text-xs font-medium text-text-tertiary">
+            {INTEGRATION_NAMES.length} integrations &middot; Featured on Tiny Startups, Product Hunt, and more
           </p>
-          <div className="mt-10 grid gap-4 sm:grid-cols-2">
+          <div className="relative overflow-hidden mask-fade-x">
+            <div className="flex w-max animate-scroll items-center gap-3">
+              {[...Array(3)].flatMap(() =>
+                INTEGRATION_PILLS.map((name) => (
+                  <span
+                    key={name}
+                    className="inline-flex h-8 shrink-0 items-center rounded-full border border-border-primary bg-surface-tertiary px-3.5 text-xs font-medium text-text-secondary"
+                  >
+                    {name}
+                  </span>
+                )),
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── PROBLEM: Compliance is a deal blocker ─── */}
+      <section className="mx-auto max-w-6xl px-6 py-24">
+        <div className="grid items-center gap-12 md:grid-cols-2">
+          <div>
+            <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
+              Enterprise compliance is a revenue problem
+            </h2>
+            <p className="mt-4 text-sm leading-relaxed text-text-secondary md:text-base">
+              If you're selling to enterprise, you already know the pattern. Security
+              questionnaires take weeks. SOC 2 evidence is scattered across a dozen tools.
+              Engineers get pulled into compliance work. Deals stall in procurement.
+            </p>
+            <div className="mt-8 space-y-3">
+              {[
+                "Security questionnaires take days or weeks to complete",
+                "SOC 2 evidence scattered across a dozen tools",
+                "Engineers pulled out of product work for compliance",
+                "Deals stall in procurement for 'security review'",
+              ].map((item) => (
+                <div key={item} className="flex items-start gap-3">
+                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-error-subtle text-[10px] text-error">!!</span>
+                  <span className="text-sm text-text-secondary">{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
             {[
-              "Security questionnaires take days or weeks to complete",
-              "SOC 2 evidence is scattered across a dozen tools",
-              "Engineers get pulled into compliance work",
-              "Deals stall in procurement for 'security review'",
-              "Everything becomes a last-minute scramble before audits",
-            ].map((item, i) => (
-              <div key={i} className="flex items-start gap-3 rounded-lg border border-[#1C1C24] bg-[#111116] p-4">
-                <span className="mt-0.5 shrink-0 text-[#EF4444]">✕</span>
-                <span className="text-[#B0B0B8]">{item}</span>
+              { stat: "2-8 weeks", label: "per security review" },
+              { stat: "40 hours", label: "avg questionnaire fill time" },
+              { stat: "3-5", label: "engineers pulled per audit" },
+              { stat: "80%", label: "of deals have security reqs" },
+            ].map(({ stat, label }) => (
+              <div key={stat} className="rounded-xl border border-border-primary bg-surface-secondary p-5">
+                <p className="text-2xl font-bold tracking-tight text-text-primary">{stat}</p>
+                <p className="mt-1 text-xs text-text-tertiary">{label}</p>
               </div>
             ))}
           </div>
-          <p className="mt-6 text-center text-lg font-semibold text-[#EF4444]">
-            This doesn't scale — and it costs deals.
-          </p>
         </div>
       </section>
 
-      {/* THE SHIFT */}
-      <section className="border-y border-[#1C1C24] bg-[#111116]/30 py-20">
+      {/* ─── SHIFT: Continuous compliance ─── */}
+      <section className="border-y border-border-primary bg-surface-secondary/30 py-24">
         <div className="mx-auto max-w-3xl px-6 text-center">
-          <span className="text-xs font-semibold uppercase tracking-[0.15em] text-[#00D4AA]">The shift</span>
-          <h2 className="mt-3 text-4xl font-bold tracking-tight md:text-5xl">
-            Compliance should run continuously —<br />
-            <span className="text-[#00D4AA]">not be rebuilt for every audit</span>
+          <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
+            Compliance should run continuously
           </h2>
-          <p className="mt-6 text-lg leading-relaxed text-[#8B8B93]">
-            Instead of manually gathering evidence and answering repetitive security questions,
-            your infrastructure should already know the answers. That's what we automate.
+          <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-text-secondary md:text-base">
+            Instead of manually gathering evidence for every audit or security review, your
+            infrastructure should already know the answers. That's what we automate.
           </p>
         </div>
       </section>
 
-      {/* TRUST MARK — §4.5: thin band, 3 shield+text items between THE SHIFT and CONTROL EXPLORER */}
-      <section aria-label="Trust mark" className="mx-auto max-w-5xl px-6 py-10">
-        <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 text-sm text-[#8B8B93]">
-          <div className="flex items-center gap-2">
-            <svg className="h-4 w-4 text-[#00D4AA]" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true">
-              <path d="M8 1.5l5 2v4c0 3-2 5.5-5 6.5-3-1-5-3.5-5-6.5v-4l5-2z" strokeLinejoin="round" />
-              <path d="M5.5 8l2 2 3.5-3.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            <span>Read-only integrations</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <svg className="h-4 w-4 text-[#00D4AA]" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true">
-              <path d="M2.5 7V5a5.5 5.5 0 0 1 11 0v2" strokeLinecap="round" />
-              <rect x="2.5" y="7" width="11" height="7" rx="1.5" />
-              <circle cx="8" cy="10.5" r="1.25" fill="currentColor" stroke="none" />
-            </svg>
-            <span>AES-256 at rest, TLS 1.3 in transit</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <svg className="h-4 w-4 text-[#00D4AA]" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true">
-              <circle cx="7" cy="7" r="4.5" />
-              <path d="M10.5 10.5L14 14" strokeLinecap="round" />
-              <path d="M5 7h4M7 5v4" strokeLinecap="round" />
-            </svg>
-            <span>Full audit trail on every evidence item</span>
-          </div>
-        </div>
-      </section>
-
-      {/* CONTROL EXPLORER — §4.6: replaces the previous 4 PRODUCT cards with a tabbed, filterable control explorer */}
+      {/* ─── CONTROL EXPLORER ─── */}
       <section id="control-explorer" className="mx-auto max-w-6xl px-6 py-24">
-        <span className="text-xs font-semibold uppercase tracking-[0.15em] text-[#00D4AA]">What it covers</span>
-        <h2 className="mt-3 text-4xl font-bold tracking-tight md:text-5xl">
-          Mapped to the controls<br />
-          <span className="text-[#00D4AA]">your auditor actually checks</span>
+        <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
+          Mapped to the controls
+          <span className="mt-1 block text-brand">your auditor actually checks</span>
         </h2>
-        <p className="mt-4 max-w-3xl text-lg text-[#8B8B93]">
+        <p className="mt-3 max-w-2xl text-sm text-text-secondary md:text-base">
           Pick a framework tab and an integration to see which controls Spire currently
-          collects evidence for. Click any row to expand the integrations and the
-          exact evidence name.
+          collects evidence for. Click any row to expand details.
         </p>
-
         <div className="mt-10">
           <ControlExplorer />
         </div>
       </section>
 
-      {/* BEFORE / AFTER */}
-      <section className="border-y border-[#1C1C24] bg-[#111116]/30 py-20">
-        <div className="mx-auto max-w-5xl px-6 text-center">
-          <span className="text-xs font-semibold uppercase tracking-[0.15em] text-[#8B8B93]">Before vs after</span>
-          <div className="mt-10 grid gap-8 md:grid-cols-2">
-            <div className="rounded-xl border border-[#EF4444]/20 bg-[#111116] p-8">
-              <h3 className="text-lg font-bold text-[#EF4444]">Before</h3>
-              <ul className="mt-5 space-y-3 text-left">
-                {[
-                  "2–8 weeks of compliance work per review",
-                  "Engineers pulled into evidence gathering",
-                  "Security questionnaires slow down deal cycles",
-                  "Audit prep chaos every year",
-                ].map((text) => (
-                  <li key={text} className="flex items-start gap-3 text-sm text-[#8B8B93]">
-                    <span className="mt-0.5 text-[#EF4444]">✕</span>
-                    <span>{text}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="rounded-xl border border-[#00D4AA]/20 bg-[#111116] p-8">
-              <h3 className="text-lg font-bold text-[#00D4AA]">After</h3>
-              <ul className="mt-5 space-y-3 text-left">
-                {[
-                  "Always audit-ready — no scramble",
-                  "Questionnaires completed in hours, not weeks",
-                  "Evidence collected automatically from live systems",
-                  "Zero fire drills before audits",
-                ].map((text) => (
-                  <li key={text} className="flex items-start gap-3 text-sm text-[#8B8B93]">
-                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#00D4AA]" />
-                    <span>{text}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* HOW IT WORKS */}
-      <section className="mx-auto max-w-5xl px-6 py-24">
-        <span className="text-xs font-semibold uppercase tracking-[0.15em] text-[#00D4AA]">How it works</span>
-        <h2 className="mt-3 text-4xl font-bold tracking-tight md:text-5xl">Three steps to continuous compliance</h2>
-        <div className="mt-14 grid gap-6 md:grid-cols-3">
-          {[
-            ["Connect your systems", `GitHub, Stripe, Cloudflare, Neon, Datadog, Sentry, Notion, Resend, and ${Math.max(0, INTEGRATION_NAMES.length - 8)} more. All read-only.`],
-            ["We map your compliance", "Controls, evidence, and risks are built automatically from live system data."],
-            ["Continuous readiness", "Audit readiness becomes a background process. Questionnaires fill themselves."],
-          ].map(([title, desc], i) => (
-            <div key={i} className="rounded-xl border border-[#1C1C24] bg-[#111116] p-6">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#1C1C24] text-sm font-bold text-[#00D4AA]">{i + 1}</div>
-              <h3 className="mt-4 font-bold text-white">{title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-[#8B8B93]">{desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* SECURITY / TRUST */}
-      <section className="border-y border-[#1C1C24] bg-[#111116]/30 py-20">
-        <div className="mx-auto max-w-4xl px-6">
-          <span className="text-xs font-semibold uppercase tracking-[0.15em] text-[#8B8B93]">Security & Trust</span>
-          <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">
-            We operate read-only integrations<br />
-            <span className="text-[#00D4AA]">and never modify your infrastructure</span>
+      {/* ─── HOW IT WORKS: 3 steps ─── */}
+      <section className="border-y border-border-primary bg-surface-secondary/30 py-24">
+        <div className="mx-auto max-w-5xl px-6">
+          <h2 className="text-center text-3xl font-bold tracking-tight md:text-4xl">
+            Three steps to continuous compliance
           </h2>
-          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-14 grid gap-6 md:grid-cols-3">
             {[
-              ["Read-only access", "To every connected system — no mutations, ever."],
-              ["SOC 2-aligned", "Data handling follows the same standards we help you meet."],
-              ["Encrypted storage", "All evidence encrypted at rest and in transit."],
-              ["Full audit trail", "Every piece of collected data is timestamped and traceable."],
-            ].map(([title, desc]) => (
-              <div key={title} className="rounded-lg border border-[#1C1C24] bg-[#111116] p-5">
-                <h3 className="text-sm font-bold text-white">{title}</h3>
-                <p className="mt-1.5 text-xs leading-relaxed text-[#8B8B93]">{desc}</p>
+              {
+                step: "01",
+                title: "Connect your systems",
+                desc: `GitHub, Stripe, Cloudflare, Neon, Datadog, Notion, Resend, and ${Math.max(0, INTEGRATION_NAMES.length - 7)} more. All read-only OAuth, no agents.`,
+              },
+              {
+                step: "02",
+                title: "We map your controls",
+                desc: "Controls, evidence, and risks are built automatically from live system data. Mapped to SOC 2 and EU AI Act frameworks.",
+              },
+              {
+                step: "03",
+                title: "Continuous readiness",
+                desc: "Audit readiness becomes a background process. Questionnaires fill themselves. No more fire drills.",
+              },
+            ].map(({ step, title, desc }) => (
+              <div key={step} className="rounded-xl border border-border-primary bg-surface-secondary p-6">
+                <span className="font-mono text-xs font-semibold tracking-wider text-brand">{step}</span>
+                <h3 className="mt-3 text-lg font-bold text-text-primary">{title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-text-secondary">{desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* INLINE MICRO-FAQ — §4.8: 5 questions, motion-driven accordion, "See all FAQs → /faq" link */}
+      {/* ─── THE DIFFERENCE: Before vs After ─── */}
+      <section className="mx-auto max-w-5xl px-6 py-24">
+        <h2 className="text-center text-3xl font-bold tracking-tight md:text-4xl">
+          The difference
+        </h2>
+        <div className="mt-12 grid gap-6 md:grid-cols-2">
+          <div className="rounded-xl border border-error/20 bg-surface-secondary p-8">
+            <h3 className="text-lg font-bold text-error">Before</h3>
+            <ul className="mt-6 space-y-4">
+              {[
+                "2-8 weeks of compliance work per review",
+                "Engineers pulled into evidence gathering",
+                "Security questionnaires slow down deal cycles",
+                "Audit prep chaos every year",
+              ].map((text) => (
+                <li key={text} className="flex items-start gap-3 text-sm text-text-secondary">
+                  <span className="mt-0.5 text-error">!!</span>
+                  <span>{text}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="rounded-xl border border-brand/20 bg-surface-secondary p-8">
+            <h3 className="text-lg font-bold text-brand">After</h3>
+            <ul className="mt-6 space-y-4">
+              {[
+                "Always audit-ready - no scramble",
+                "Questionnaires completed in hours, not weeks",
+                "Evidence collected automatically from live systems",
+                "Zero fire drills before audits",
+              ].map((text) => (
+                <li key={text} className="flex items-start gap-3 text-sm text-text-secondary">
+                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-brand" />
+                  <span>{text}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── SECURITY & TRUST ─── */}
+      <section className="border-y border-border-primary bg-surface-secondary/30 py-20">
+        <div className="mx-auto max-w-5xl px-6">
+          <h2 className="text-center text-2xl font-bold tracking-tight md:text-3xl">
+            Read-only access, full audit trail
+          </h2>
+          <p className="mx-auto mt-3 max-w-lg text-center text-sm text-text-secondary">
+            We never modify your infrastructure. Every piece of collected data is timestamped and traceable.
+          </p>
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              ["Read-only access", "To every connected system - no mutations, ever."],
+              ["SOC 2-aligned", "Data handling follows the same standards we help you meet."],
+              ["Encrypted storage", "All evidence encrypted at rest and in transit."],
+              ["Full audit trail", "Every piece of collected data is timestamped and traceable."],
+            ].map(([title, desc]) => (
+              <div key={title} className="rounded-xl border border-border-primary bg-surface-secondary p-5">
+                <h3 className="text-sm font-bold text-text-primary">{title}</h3>
+                <p className="mt-1.5 text-xs leading-relaxed text-text-secondary">{desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── FAQ ─── */}
       <section className="mx-auto max-w-6xl px-6 py-24">
         <div className="mx-auto max-w-3xl text-center">
-          <span className="text-xs font-semibold uppercase tracking-[0.15em] text-[#00D4AA]">
-            FAQ
-          </span>
-          <h2 className="mt-3 text-4xl font-bold tracking-tight md:text-5xl">
-            Top questions,<br />
-            <span className="text-[#00D4AA]">answered upfront</span>
+          <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
+            Top questions, answered upfront
           </h2>
-          <p className="mt-4 text-base text-[#8B8B93]">
+          <p className="mx-auto mt-3 max-w-md text-sm text-text-secondary">
             Five things buyers ask before signing up. Pulled verbatim from our full FAQ.
           </p>
         </div>
@@ -379,33 +341,27 @@ export default function Home({ loaderData }: Route.ComponentProps) {
         </div>
       </section>
 
-      {/* FINAL CTA — microcopy variant from spec §11 buyer-role, hidden
-          until effectiveRole resolves (cookie or URL `?role=` param). */}
+      {/* ─── FINAL CTA ─── */}
       <section className="mx-auto max-w-4xl px-6 py-24 text-center">
-        <span className="text-xs font-semibold uppercase tracking-[0.15em] text-[#8B8B93]">
-          {cta.eyebrow}
-        </span>
-        <h2 className="mt-3 text-4xl font-bold tracking-tight md:text-5xl">
-          Ready to stop losing deals<br />
-          <span className="text-[#00D4AA]">{cta.headlineTail}</span>
+        <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
+          Ready to stop losing deals
+          <span className="mt-1 block text-brand">{cta.headlineTail}</span>
         </h2>
-        <p className="mx-auto mt-4 max-w-xl text-lg text-[#8B8B93]">
+        <p className="mx-auto mt-4 max-w-xl text-sm text-text-secondary">
           {cta.sub}
         </p>
         <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
           <Link
             to="/dashboard/questionnaires/upload"
-            className="rounded-lg bg-[#00D4AA] px-7 py-3 font-semibold text-black hover:bg-[#00B894] transition-colors"
+            className="inline-flex h-12 items-center rounded-[20px] bg-brand px-8 text-base font-semibold text-black transition-all hover:bg-brand-dark hover:scale-[0.97] active:scale-[0.95]"
           >
             Upload a questionnaire <ArrowRight />
           </Link>
         </div>
-
-        {/* Trimmed per §4.7: one sentence + neutral #1C1C24 surfaces (no F59E0B warning-yellow). */}
-        <div className="mx-auto mt-16 max-w-xl rounded-xl border border-[#1C1C24] bg-[#1C1C24] p-6 text-left">
-          <p className="text-sm leading-relaxed text-[#8B8B93]">
+        <div className="mx-auto mt-16 max-w-xl rounded-xl border border-border-primary bg-surface-secondary p-6 text-left">
+          <p className="text-sm leading-relaxed text-text-secondary">
             If you're preparing for SOC 2, responding to enterprise security reviews, or closing B2B
-            deals slowed by procurement — this is exactly where automation pays for itself immediately.
+            deals slowed by procurement - this is exactly where automation pays for itself immediately.
           </p>
         </div>
       </section>

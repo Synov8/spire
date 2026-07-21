@@ -46,45 +46,44 @@ export default function ContactPage() {
   return (
     <PublicLayout>
 
-      <section className="mx-auto max-w-5xl px-6 pt-20 pb-24">
+      <section className="mx-auto max-w-6xl px-6 py-24">
         <div className="mx-auto max-w-3xl text-center">
-          <span className="text-xs font-semibold uppercase tracking-[0.15em] text-[#00D4AA]">Contact</span>
-          <h1 className="mt-3 text-4xl font-bold tracking-tight text-[#F1F1F3] md:text-5xl">
+          <h1 className="text-4xl font-bold tracking-tight text-text-primary md:text-5xl">
             Let's talk about<br />
-            <span className="text-[#00D4AA]">your compliance goals</span>
+            <span className="text-brand">your compliance goals</span>
           </h1>
-          <p className="mt-4 text-lg text-[#8B8B93]">
+          <p className="mt-4 text-lg text-text-secondary">
             Tell us about your stack and we'll show you what automated compliance looks like for your team.
           </p>
         </div>
 
         <div className="mt-14 grid gap-8 md:grid-cols-2">
-          <div className="rounded-xl border border-[#1C1C24] bg-[#111116] p-8">
-            <h2 className="text-lg font-bold text-[#F1F1F3]">Book a demo</h2>
-            <p className="mt-2 text-sm text-[#8B8B93]">See Spire working with your actual infrastructure. 15 minutes, no commitment.</p>
+          <div className="rounded-xl border border-border-primary bg-surface-secondary p-8">
+            <h2 className="text-lg font-bold text-text-primary">Book a demo</h2>
+            <p className="mt-2 text-sm text-text-secondary">See Spire working with your actual infrastructure. 15 minutes, no commitment.</p>
             {fetcher.data?.ok ? (
-              <p className="mt-6 text-sm text-[#00D4AA]">Thanks! We'll be in touch shortly.</p>
+              <p className="mt-6 text-sm text-brand">Thanks! We'll be in touch shortly.</p>
             ) : (
               <fetcher.Form method="post" className="mt-6 space-y-4">
                 <div>
-                  <label className="mb-1 block text-xs uppercase tracking-wider text-[#8B8B93]">Work email</label>
+                  <label className="mb-1 block text-xs uppercase tracking-wider text-text-secondary">Work email</label>
                   <input type="email" name="email" required placeholder="you@company.com"
-                    className="w-full rounded-lg border border-[#1C1C24] bg-[#0A0A0C] px-3 py-2.5 text-sm text-[#F1F1F3] placeholder-[#5C5C66] focus:border-[#00D4AA] focus:outline-none transition-colors" />
+                    className="w-full rounded-[8px] border border-border-primary bg-surface-primary px-3 py-2.5 text-sm text-text-primary placeholder-text-text-tertiary focus:border-brand focus:outline-none transition-colors" />
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs uppercase tracking-wider text-[#8B8B93]">Company</label>
+                  <label className="mb-1 block text-xs uppercase tracking-wider text-text-secondary">Company</label>
                   <input type="text" name="company" required placeholder="Your company"
-                    className="w-full rounded-lg border border-[#1C1C24] bg-[#0A0A0C] px-3 py-2.5 text-sm text-[#F1F1F3] placeholder-[#5C5C66] focus:border-[#00D4AA] focus:outline-none transition-colors" />
+                    className="w-full rounded-[8px] border border-border-primary bg-surface-primary px-3 py-2.5 text-sm text-text-primary placeholder-text-text-tertiary focus:border-brand focus:outline-none transition-colors" />
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs uppercase tracking-wider text-[#8B8B93]">What are you working on?</label>
+                  <label className="mb-1 block text-xs uppercase tracking-wider text-text-secondary">What are you working on?</label>
                   <textarea name="message" rows={3} required placeholder="Preparing for SOC 2, responding to enterprise security reviews..."
-                    className="w-full rounded-lg border border-[#1C1C24] bg-[#0A0A0C] px-3 py-2.5 text-sm text-[#F1F1F3] placeholder-[#5C5C66] focus:border-[#00D4AA] focus:outline-none transition-colors resize-none" />
+                    className="w-full rounded-[8px] border border-border-primary bg-surface-primary px-3 py-2.5 text-sm text-text-primary placeholder-text-text-tertiary focus:border-brand focus:outline-none transition-colors resize-none" />
                 </div>
                 {fetcher.data?.error && (
-                  <p className="text-sm text-red-400">{fetcher.data.error}</p>
+                  <p className="text-sm text-error">{fetcher.data.error}</p>
                 )}
-                <button type="submit" disabled={fetcher.state !== "idle"} className="w-full rounded-lg bg-[#00D4AA] py-2.5 text-sm font-medium text-black hover:bg-[#00B894] transition-colors disabled:opacity-50">
+                <button type="submit" disabled={fetcher.state !== "idle"} className="flex h-11 w-full items-center justify-center rounded-[20px] bg-brand px-6 text-sm font-semibold text-black transition-all hover:bg-brand-dark hover:scale-[0.97] active:scale-[0.95] disabled:opacity-50">
                   {fetcher.state !== "idle" ? "Sending..." : "Book a 15-minute demo"}
                 </button>
               </fetcher.Form>
@@ -92,22 +91,22 @@ export default function ContactPage() {
           </div>
 
           <div className="space-y-6">
-            <div className="rounded-xl border border-[#1C1C24] bg-[#111116] p-6">
-              <h3 className="text-sm font-semibold text-[#F1F1F3]">Email</h3>
-              <p className="mt-1 text-sm text-[#8B8B93]">hello@synov8studio.com</p>
+            <div className="rounded-xl border border-border-primary bg-surface-secondary p-6">
+              <h3 className="text-sm font-semibold text-text-primary">Email</h3>
+              <p className="mt-1 text-sm text-text-secondary">hello@synov8studio.com</p>
             </div>
-            <div className="rounded-xl border border-[#1C1C24] bg-[#111116] p-6">
-              <h3 className="text-sm font-semibold text-[#F1F1F3]">Security questions</h3>
-              <p className="mt-1 text-sm text-[#8B8B93]">security@synov8studio.com</p>
+            <div className="rounded-xl border border-border-primary bg-surface-secondary p-6">
+              <h3 className="text-sm font-semibold text-text-primary">Security questions</h3>
+              <p className="mt-1 text-sm text-text-secondary">security@synov8studio.com</p>
             </div>
-            <div className="rounded-xl border border-[#1C1C24] bg-[#111116] p-6">
-              <h3 className="text-sm font-semibold text-[#F1F1F3]">Partnerships</h3>
-              <p className="mt-1 text-sm text-[#8B8B93]">partners@synov8studio.com</p>
+            <div className="rounded-xl border border-border-primary bg-surface-secondary p-6">
+              <h3 className="text-sm font-semibold text-text-primary">Partnerships</h3>
+              <p className="mt-1 text-sm text-text-secondary">partners@synov8studio.com</p>
             </div>
-            <div className="rounded-xl border border-[#1C1C24] bg-[#111116] p-6">
-              <h3 className="text-sm font-semibold text-[#F1F1F3]">Try it yourself</h3>
-              <p className="mt-1 text-sm text-[#8B8B93]">Connect your first integration in under 5 minutes.</p>
-              <Link to="/login" className="mt-3 inline-block rounded-lg bg-[#00D4AA] px-4 py-2 text-sm font-medium text-black hover:bg-[#00B894] transition-colors">
+            <div className="rounded-xl border border-border-primary bg-surface-secondary p-6">
+              <h3 className="text-sm font-semibold text-text-primary">Try it yourself</h3>
+              <p className="mt-1 text-sm text-text-secondary">Connect your first integration in under 5 minutes.</p>
+              <Link to="/login" className="mt-3 inline-flex h-11 items-center rounded-[20px] border border-border-primary px-6 text-sm font-medium text-text-secondary transition-all hover:border-brand/40 hover:text-text-primary hover:scale-[0.97] active:scale-[0.95]">
                 Get started
               </Link>
             </div>

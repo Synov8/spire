@@ -116,18 +116,18 @@ export default function DashboardHome({ loaderData }: Route.ComponentProps) {
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-8 py-12">
       <div className="text-center">
-        <h1 className="text-2xl font-bold tracking-tight text-[#F1F1F3]">Overview</h1>
-        <p className="mt-1 text-sm text-[#6A6D6E]">Compliance posture and audit readiness</p>
+        <h1 className="text-2xl font-bold tracking-tight text-text-primary">Overview</h1>
+        <p className="mt-1 text-sm text-text-tertiary">Compliance posture and audit readiness</p>
       </div>
 
       {!hasAudit && !summaryStats && (
         <div className="flex flex-col items-center gap-6">
-          <div className="flex h-20 w-20 items-center justify-center rounded-3xl border border-dashed border-[#1A1D1E] bg-[#0B0D0E]/50">
-            <svg className="h-10 w-10 text-[#4A4D4E]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"/><path d="M9 12l2 2 4-4"/></svg>
+          <div className="flex h-20 w-20 items-center justify-center rounded-3xl border border-dashed border-border-primary bg-surface-secondary/50">
+            <svg className="h-10 w-10 text-text-tertiary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"/><path d="M9 12l2 2 4-4"/></svg>
           </div>
-          <p className="text-sm font-medium text-[#8B8B93]">No audit run yet</p>
-          <p className="text-xs text-[#5C5C66]">Connect integrations, then run an audit.</p>
-          <Link to="/dashboard/integrations" className="inline-flex items-center gap-2 rounded-lg bg-[#00D4AA] px-5 py-2.5 text-sm font-medium text-black hover:bg-[#00B894] transition-all shadow-[0_2px_12px_-2px_rgba(0,212,170,0.3)]">
+          <p className="text-sm font-medium text-text-secondary">No audit run yet</p>
+          <p className="text-xs text-text-tertiary">Connect integrations, then run an audit.</p>
+          <Link to="/dashboard/integrations" className="inline-flex h-10 items-center gap-2 rounded-[20px] bg-brand px-5 text-sm font-semibold text-black transition-all hover:bg-brand-dark hover:scale-[0.97] active:scale-[0.95]">
             <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M8 2v12M2 8h12"/></svg>
             Connect integrations
           </Link>
@@ -139,30 +139,30 @@ export default function DashboardHome({ loaderData }: Route.ComponentProps) {
           <DonutSummary stats={summaryStats} />
           <div className="flex items-center gap-3">
             <Link to="/dashboard/review"
-              className="rounded-lg bg-[#00D4AA] px-5 py-2.5 text-sm font-medium text-black hover:bg-[#00B894] transition-all shadow-[0_2px_12px_-2px_rgba(0,212,170,0.3)]">
+              className="inline-flex h-10 items-center rounded-[20px] bg-brand px-5 text-sm font-semibold text-black transition-all hover:bg-brand-dark hover:scale-[0.97] active:scale-[0.95]">
               Review findings
             </Link>
             {activeRun && (
               <Link to={`/dashboard/audit?runId=${activeRun.runId}&token=${activeRun.token}`}
-                className="rounded-lg border border-[#1A1D1E] px-5 py-2.5 text-sm font-medium text-[#8B8B93] hover:border-[#00D4AA] hover:text-[#00D4AA] transition-all">
+                className="inline-flex h-10 items-center rounded-[20px] border border-border-primary px-5 text-sm font-medium text-text-secondary transition-all hover:border-brand/40 hover:text-text-primary">
                 View current audit
               </Link>
             )}
             <button type="button" onClick={() => setConfirmAudit(true)} disabled={running}
-              className="rounded-lg border border-[#1A1D1E] px-5 py-2.5 text-sm font-medium text-[#8B8B93] hover:border-[#EF4444] hover:text-[#EF4444] transition-all disabled:opacity-50">
-              {running ? "Auditing…" : "New audit"}
+              className="inline-flex h-10 items-center rounded-[20px] border border-border-primary px-5 text-sm font-medium text-text-secondary transition-all hover:border-error hover:text-error disabled:opacity-50">
+              {running ? "Auditing\u2026" : "New audit"}
             </button>
             {hydrated && DownloadReportButton && reportData && <DownloadReportButton
               appUrl={reportData.appUrl} orgName={reportData.orgName} date={reportData.date} frameworks={reportData.frameworks}
             />}
             {!hydrated && reportData && (
-              <span className="rounded-lg border border-[#1A1D1E] px-5 py-2.5 text-sm font-medium text-[#5C5C66]">Download report</span>
+              <span className="inline-flex h-10 items-center rounded-[20px] border border-border-primary px-5 text-sm font-medium text-text-tertiary">Download report</span>
             )}
           </div>
           {auditError && (
-            <p className="text-sm text-[#EF4444]">Failed to start audit: {auditError}</p>
+            <p className="text-sm text-error">Failed to start audit: {auditError}</p>
           )}
-          <div className="flex items-center gap-6 text-xs text-[#5C5C66]">
+          <div className="flex items-center gap-6 text-xs text-text-tertiary">
             <span className="flex items-center gap-1.5">
               <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><rect x="2.5" y="2.5" width="4.5" height="4.5" rx="1"/><rect x="9" y="2.5" width="4.5" height="4.5" rx="1"/><rect x="2.5" y="9" width="4.5" height="4.5" rx="1"/><rect x="9" y="9" width="4.5" height="4.5" rx="1"/></svg>
               {evidenceCount} evidence items
@@ -180,31 +180,31 @@ export default function DashboardHome({ loaderData }: Route.ComponentProps) {
       )}
 
       {running && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#07080A]/80 backdrop-blur-sm">
-          <div className="rounded-2xl border border-[#1A1D1E] bg-[#0B0D0E] p-6">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-surface-primary/80 backdrop-blur-sm">
+          <div className="rounded-2xl border border-border-primary bg-surface-secondary p-6">
             <div className="flex items-center gap-2">
-              <span className="h-2 w-2 animate-pulse rounded-full bg-[#00D4AA]" />
-              <h2 className="text-sm font-semibold text-[#00D4AA]">Starting audit…</h2>
+              <span className="h-2 w-2 animate-pulse rounded-full bg-brand" />
+              <h2 className="text-sm font-semibold text-brand">Starting audit\u2026</h2>
             </div>
           </div>
         </div>
       )}
 
       {confirmAudit && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#07080A]/80 backdrop-blur-sm">
-          <div className="w-full max-w-sm rounded-2xl border border-[#1A1D1E] bg-[#0B0D0E] p-6 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.5)]">
-            <h3 className="text-sm font-semibold text-[#F1F1F3]">Run a new audit?</h3>
-            <p className="mt-2 text-xs text-[#6A6D6E] leading-relaxed">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-surface-primary/80 backdrop-blur-sm">
+          <div className="w-full max-w-sm rounded-2xl border border-border-primary bg-surface-secondary p-6 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.5)]">
+            <h3 className="text-sm font-semibold text-text-primary">Run a new audit?</h3>
+            <p className="mt-2 text-xs text-text-tertiary leading-relaxed">
               This will clear all current review items and uploaded evidence files.
               The AI will re-check every control from scratch.
             </p>
             <div className="mt-5 flex items-center justify-end gap-3">
               <button type="button" onClick={() => setConfirmAudit(false)}
-                className="rounded-lg border border-[#1A1D1E] px-4 py-2 text-xs font-medium text-[#8B8B93] hover:bg-[#141718] transition-all">
+                className="inline-flex h-10 items-center rounded-[20px] border border-border-primary px-4 text-xs font-medium text-text-secondary transition-all hover:bg-surface-tertiary">
                 Cancel
               </button>
               <button type="button" onClick={() => { setConfirmAudit(false); runAudit(); }}
-                className="rounded-lg bg-[#00D4AA] px-4 py-2 text-xs font-medium text-black hover:bg-[#00B894] transition-all">
+                className="inline-flex h-10 items-center rounded-[20px] bg-brand px-4 text-xs font-medium text-black transition-all hover:bg-brand-dark hover:scale-[0.97] active:scale-[0.95]">
                 Run audit
               </button>
             </div>
@@ -258,7 +258,7 @@ function DonutSummary({ stats }: { stats: { pct: number; verified: number; faile
               <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
             </filter>
           </defs>
-          <circle cx={cx} cy={cy} r={r + 1} fill="none" stroke="#1A1D1E" strokeWidth={sw + 2} />
+          <circle cx={cx} cy={cy} r={r + 1} fill="none" className="stroke-border-primary" strokeWidth={sw + 2} />
           {arcs.map((a) => (
             <circle
               id={`arc-${a.key}`}
@@ -276,12 +276,12 @@ function DonutSummary({ stats }: { stats: { pct: number; verified: number; faile
           ))}
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-          <span className="text-4xl font-bold text-[#F1F1F3]">{stats.pct}%</span>
-          <span className="text-sm text-[#8B8B93] mt-0.5">pass rate</span>
+          <span className="text-4xl font-bold text-text-primary">{stats.pct}%</span>
+          <span className="text-sm text-text-secondary mt-0.5">pass rate</span>
         </div>
       </div>
       {hovered && (
-        <div className="absolute left-1/2 top-full mt-2 -translate-x-1/2 rounded-lg border border-[#2A2D2E] bg-[#1A1D1E] px-4 py-2.5 text-sm font-medium text-[#E8E8E8] whitespace-nowrap shadow-lg">
+        <div className="absolute left-1/2 top-full mt-2 -translate-x-1/2 rounded-lg border border-border-secondary bg-surface-tertiary px-4 py-2.5 text-sm font-medium text-text-primary whitespace-nowrap shadow-lg">
           {hovered.label}: {hovered.value}/{hovered.total}
         </div>
       )}

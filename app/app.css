@@ -1,20 +1,20 @@
-/* CWV (spec §11): declare a fallback face that matches Inter's metrics so the
-   display=swap fallback doesn't trigger a Cumulative Layout Shift (CLS) when
-   Inter swaps in. The size-adjust + ascent/descent overrides are tuned to
-   Inter's 14–32pt variable axis (very close to ui-sans-serif / system-ui
-   metrics at the 16 px default body size). Recommended by Next.js & Vercel
-   CWV guidelines for Google Fonts preconnect users. */
+/* Spire design system — dark-tech precision for B2B compliance SaaS.
+ *
+ * Typography: Outfit (sans, geometric) + JetBrains Mono (code/data).
+ * Palette: near-black zinc, emerald-teal accent, high-contrast hierarchy.
+ * Radius: 12px cards, 8px inputs, 20px buttons — documented below.
+ * Motion: scroll-reveal, reduced-motion respected globally.
+ */
+
+/* Fallback metrics for Outfit — tuned Outfit's geometric proportions so the
+   font-swap doesn't trigger CLS. Outfit is taller than Inter so the
+   size-adjust is different. */
 @font-face {
-  font-family: "Inter Fallback";
+  font-family: "Outfit Fallback";
   src: local("Arial");
-  /* Metric overrides tuned to Inter at the 16 px body size. Values match the
-     Next.js + Vercel CWV reference (https://github.com/vercel/next.js Font
-     Fallback instrumentation): size-adjust 107.6 % + ascent 90 % + descent
-     22.43 % effectively eliminate the FOUT→FOIT layout shift on first paint
-     when display=swap is in effect. */
-  size-adjust: 107.6%;
-  ascent-override: 90%;
-  descent-override: 22.43%;
+  size-adjust: 105%;
+  ascent-override: 92%;
+  descent-override: 24%;
   line-gap-override: 0%;
 }
 
@@ -22,48 +22,124 @@
 @plugin "@tailwindcss/typography";
 
 @theme {
-  --font-sans: "Inter", "Inter Fallback", ui-sans-serif, system-ui, sans-serif,
+  /* Font stacks */
+  --font-sans: "Outfit", "Outfit Fallback", ui-sans-serif, system-ui, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo,
+    Consolas, "Liberation Mono", monospace;
+
+  /* Brand accent — emerald-teal, kept from Spire's identity, used as the
+     single lock accent across all pages. */
   --color-brand: #00D4AA;
   --color-brand-dark: #00B894;
-  --color-surface: #111116;
-  --color-border: #1C1C24;
-  --color-muted: #8B8B93;
+  --color-brand-subtle: rgba(0, 212, 170, 0.08);
+
+  /* Surface hierarchy — dark base, zinc-adjacent, warm undertone suppressed */
+  --color-surface-primary: #07080A;
+  --color-surface-secondary: #0D0E12;
+  --color-surface-tertiary: #141519;
+  --color-surface-elevated: #1A1C23;
+
+  /* Borders */
+  --color-border-primary: #1E2026;
+  --color-border-secondary: #2A2D36;
+
+  /* Text hierarchy */
+  --color-text-primary: #ECEDF0;
+  --color-text-secondary: #8B8F98;
+  --color-text-tertiary: #5C5F6A;
+
+  /* Semantic — error, warning, success */
+  --color-error: #EF4444;
+  --color-error-subtle: rgba(239, 68, 68, 0.08);
+  --color-warning: #F59E0B;
+  --color-warning-subtle: rgba(245, 158, 11, 0.08);
+  --color-success: #10B981;
+  --color-success-subtle: rgba(16, 185, 129, 0.08);
 }
 
+/* Base */
 html,
 body {
-  @apply bg-[#0A0A0C];
+  @apply bg-surface-primary;
   color-scheme: dark;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
+
+/* Corner-radius system — enforced via class conventions:
+   - .radius-card    → 12px  (cards, sections, panels)
+   - .radius-button  → 20px  (primary CTAs, pill buttons)
+   - .radius-input   → 8px   (form fields, search bars)
+   - .radius-full    → 9999px (avatars, status dots)
+*/
+
+/* ─── Motion keyframes ─────────────────────────────────────── */
 
 @keyframes fade-up {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-.animate-fade-up {
-  animation: fade-up 0.6s ease-out both;
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
-.animate-fade-up-1 { animation-delay: 0.1s; }
-.animate-fade-up-2 { animation-delay: 0.2s; }
-.animate-fade-up-3 { animation-delay: 0.3s; }
-.animate-fade-up-4 { animation-delay: 0.4s; }
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
 
+@keyframes slide-left {
+  from { opacity: 0; transform: translateX(12px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* Utility classes */
+.animate-fade-up   { animation: fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.animate-fade-in   { animation: fade-in 0.4s ease-out both; }
+.animate-scale-in  { animation: scale-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.animate-slide-left { animation: slide-left 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+.animate-fade-up-1 { animation-delay: 0.08s; }
+.animate-fade-up-2 { animation-delay: 0.16s; }
+.animate-fade-up-3 { animation-delay: 0.24s; }
+.animate-fade-up-4 { animation-delay: 0.32s; }
+.animate-fade-up-5 { animation-delay: 0.40s; }
+.animate-fade-up-6 { animation-delay: 0.48s; }
+
+/* Horizontal scroll (marquee, logo wall) */
 @keyframes scroll {
-  0% { transform: translateX(0); }
+  0%   { transform: translateX(0); }
   100% { transform: translateX(-50%); }
 }
+
 .animate-scroll {
-  animation: scroll 25s linear infinite;
+  animation: scroll 30s linear infinite;
   min-width: max-content;
 }
+
 .mask-fade-x {
   -webkit-mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
   mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
 }
 
+/* Reduced-motion collapse — all animated elements freeze */
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-up,
+  .animate-fade-in,
+  .animate-scale-in,
+  .animate-slide-left,
+  .animate-scroll,
+  [data-animate] {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* FAQ answer capsule — used on /faq and blog FAQ sections */
 .answer-capsule {
   border-left: 3px solid #00D4AA;
   background: rgba(0, 212, 170, 0.04);
@@ -78,3 +154,19 @@ body {
   color: #E0E0E6;
 }
 .answer-capsule p:last-child { margin-bottom: 0; }
+
+/* Glass surface — frosted-backdrop for nav and hero overlays */
+.glass-surface {
+  background: rgba(7, 8, 10, 0.72);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  border-bottom: 1px solid rgba(30, 32, 38, 0.6);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .glass-surface {
+    background: rgb(7, 8, 10);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}

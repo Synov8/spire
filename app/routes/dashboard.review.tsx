@@ -131,20 +131,20 @@ export async function action({ request, context }: Route.ActionArgs) {
 function extBadge(filename: string) {
   const ext = filename.includes(".") ? filename.split(".").pop()!.toUpperCase() : "FILE";
   const colours: Record<string, string> = {
-    PDF: "bg-[#EF4444]/10 text-[#EF4444] border-[#EF4444]/20",
+    PDF: "bg-error/10 text-error border-error/20",
     PNG: "bg-[#3B82F6]/10 text-[#3B82F6] border-[#3B82F6]/20",
     JPG: "bg-[#3B82F6]/10 text-[#3B82F6] border-[#3B82F6]/20",
     GIF: "bg-[#8B5CF6]/10 text-[#8B5CF6] border-[#8B5CF6]/20",
-    SVG: "bg-[#F59E0B]/10 text-[#F59E0B] border-[#F59E0B]/20",
+    SVG: "bg-warning/10 text-warning border-warning/20",
     DOC: "bg-[#2563EB]/10 text-[#2563EB] border-[#2563EB]/20",
     DOCX: "bg-[#2563EB]/10 text-[#2563EB] border-[#2563EB]/20",
-    TXT: "bg-[#6A6D6E]/10 text-[#6A6D6E] border-[#6A6D6E]/20",
-    CSV: "bg-[#10B981]/10 text-[#10B981] border-[#10B981]/20",
-    JSON: "bg-[#F59E0B]/10 text-[#F59E0B] border-[#F59E0B]/20",
+    TXT: "bg-text-tertiary/10 text-text-tertiary border-text-tertiary/20",
+    CSV: "bg-brand/10 text-brand border-brand/20",
+    JSON: "bg-warning/10 text-warning border-warning/20",
     MD: "bg-[#3B82F6]/10 text-[#3B82F6] border-[#3B82F6]/20",
   };
   return (
-    <span className={`inline-flex items-center rounded border px-1.5 py-0.5 font-mono text-[10px] font-semibold leading-none ${colours[ext] || "bg-[#5C5C66]/10 text-[#5C5C66] border-[#5C5C66]/20"}`}>
+    <span className={`inline-flex items-center rounded border px-1.5 py-0.5 font-mono text-[10px] font-semibold leading-none ${colours[ext] || "bg-text-tertiary/10 text-text-tertiary border-text-tertiary/20"}`}>
       {ext}
     </span>
   );
@@ -178,14 +178,14 @@ export default function ReviewPage({ loaderData }: Route.ComponentProps) {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold tracking-tight text-[#F1F1F3]">Review</h1>
-          <p className="mt-1 text-sm text-[#6A6D6E]">{items.length} controls mapped</p>
+          <h1 className="text-xl font-bold tracking-tight text-text-primary">Review</h1>
+          <p className="mt-1 text-sm text-text-tertiary">{items.length} controls mapped</p>
         </div>
         <div className="flex items-center gap-3">
           {(["soc2", "ai-act"] as const).map((fw) => (
             <button key={fw} onClick={() => setFramework(fw)}
               className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
-                framework === fw ? "bg-[#00D4AA]/10 text-[#00D4AA]" : "text-[#5C5C66] hover:text-[#8B8B93]"
+                framework === fw ? "bg-brand/10 text-brand" : "text-text-tertiary hover:text-text-secondary"
               }`}
             >{fw === "soc2" ? "SOC 2" : "EU AI Act"}</button>
           ))}
@@ -193,33 +193,33 @@ export default function ReviewPage({ loaderData }: Route.ComponentProps) {
       </div>
 
       {/* Org-level evidence section */}
-      <div className="rounded-xl border border-[#1A1D1E] bg-[#0B0D0E] p-4">
-        <h2 className="text-xs font-semibold uppercase tracking-wider text-[#5C5C66] mb-3">Submit evidence</h2>
+      <div className="rounded-xl border border-border-primary bg-surface-secondary p-4">
+        <h2 className="text-xs font-semibold uppercase tracking-wider text-text-tertiary mb-3">Submit evidence</h2>
         <fetcher.Form method="POST" encType="multipart/form-data" className="space-y-3">
           <input type="hidden" name="intent" value="submit-evidence" />
           <textarea name="content" value={evidenceText} onChange={(e) => setEvidenceText(e.target.value)}
-            rows={3} placeholder="Describe the evidence you have…"
-            className="w-full rounded-lg border border-[#1A1D1E] bg-[#07080A] px-3 py-2.5 text-sm text-[#F1F1F3] placeholder-[#5C5C66] focus:border-[#00D4AA] focus:outline-none focus:ring-1 focus:ring-[#00D4AA]/20 transition-all resize-y"
+            rows={3} placeholder="Describe the evidence you have..."
+            className="w-full rounded-lg border border-border-primary bg-surface-primary px-3 py-2.5 text-sm text-text-primary placeholder-text-tertiary focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand/20 transition-all resize-y"
           />
           <div>
             {evidenceFiles.length > 0 ? (
               <div className="space-y-1.5">
                 {evidenceFiles.map((f, i) => (
-                  <div key={`${f.name}-${i}`} className="flex items-center gap-2 rounded-lg border border-[#1A1D1E] bg-[#07080A] px-3 py-2">
-                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-[#1A1D1E]">
-                      <svg className="h-4 w-4 text-[#6A6D6E]" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M9 1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V5l-4-4z"/><path d="M9 1v4h4"/></svg>
+                  <div key={`${f.name}-${i}`} className="flex items-center gap-2 rounded-lg border border-border-primary bg-surface-primary px-3 py-2">
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-border-primary">
+                      <svg className="h-4 w-4 text-text-tertiary" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M9 1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V5l-4-4z"/><path d="M9 1v4h4"/></svg>
                     </span>
-                    <span className="min-w-0 flex-1 truncate text-sm text-[#F1F1F3]">{f.name}</span>
+                    <span className="min-w-0 flex-1 truncate text-sm text-text-primary">{f.name}</span>
                     {extBadge(f.name)}
                     <button type="button" onClick={() => setEvidenceFiles((p) => p.filter((_, j) => j !== i))}
-                      className="shrink-0 rounded p-1 text-[#5C5C66] hover:bg-[#1A1D1E] hover:text-[#EF4444] transition-colors">
+                      className="shrink-0 rounded p-1 text-text-tertiary hover:bg-border-primary hover:text-error transition-colors">
                       <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg>
                     </button>
                   </div>
                 ))}
-                <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-dashed border-[#1A1D1E] bg-[#07080A] px-3 py-2 text-sm text-[#5C5C66] hover:border-[#00D4AA]/30 hover:text-[#8B8B93] transition-colors">
+                <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-dashed border-border-primary bg-surface-primary px-3 py-2 text-sm text-text-tertiary hover:border-brand/30 hover:text-text-secondary transition-colors">
                   <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M8 2v12M2 8h12"/></svg>
-                  Add more files…
+                  Add more files...
                   <input type="file" multiple className="hidden" onChange={(e) => {
                     const nf = Array.from(e.target.files || []);
                     if (nf.length > 0) setEvidenceFiles((p) => [...p, ...nf]);
@@ -227,9 +227,9 @@ export default function ReviewPage({ loaderData }: Route.ComponentProps) {
                 </label>
               </div>
             ) : (
-              <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-dashed border-[#1A1D1E] bg-[#07080A] px-3 py-2.5 text-sm text-[#5C5C66] hover:border-[#00D4AA]/30 hover:text-[#8B8B93] transition-colors">
+              <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-dashed border-border-primary bg-surface-primary px-3 py-2.5 text-sm text-text-tertiary hover:border-brand/30 hover:text-text-secondary transition-colors">
                 <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M8 2v12M2 8h12"/></svg>
-                Choose files…
+                Choose files...
                 <input type="file" multiple className="hidden" onChange={(e) => {
                   const nf = Array.from(e.target.files || []);
                   if (nf.length > 0) setEvidenceFiles(nf);
@@ -239,8 +239,8 @@ export default function ReviewPage({ loaderData }: Route.ComponentProps) {
           </div>
           <div className="flex justify-end">
             <button type="submit" disabled={fetcher.state !== "idle"}
-              className="rounded-lg bg-[#00D4AA] px-5 py-2 text-sm font-medium text-black hover:bg-[#00B894] transition-all duration-200 disabled:opacity-50">
-              {fetcher.state !== "idle" ? "Re-evaluating…" : "Submit & re-evaluate"}
+              className="rounded-[20px] bg-brand px-5 py-2 text-sm font-medium text-black hover:bg-brand-dark transition-all duration-200 disabled:opacity-50">
+              {fetcher.state !== "idle" ? "Re-evaluating..." : "Submit & re-evaluate"}
             </button>
           </div>
         </fetcher.Form>
@@ -251,47 +251,47 @@ export default function ReviewPage({ loaderData }: Route.ComponentProps) {
         {STATUS_FILTERS.map((sf) => (
           <button key={sf.key} onClick={() => setStatusFilter(sf.key)}
             className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
-              statusFilter === sf.key ? "bg-[#141718] text-[#F1F1F3]" : "text-[#5C5C66] hover:text-[#8B8B93]"
+              statusFilter === sf.key ? "bg-surface-tertiary text-text-primary" : "text-text-tertiary hover:text-text-secondary"
             }`}
           >{sf.label}</button>
         ))}
       </div>
 
       <div className={`grid gap-6 ${frameworkSubmitted.length > 0 ? "lg:grid-cols-2" : "lg:grid-cols-1"}`}>
-        {/* Control cards — all controls */}
+        {/* Control cards -- all controls */}
         <div className="space-y-2">
-          <h2 className="text-xs font-semibold uppercase tracking-wider text-[#5C5C66]">Controls</h2>
+          <h2 className="text-xs font-semibold uppercase tracking-wider text-text-tertiary">Controls</h2>
           {filteredItems.map(({ control: ctrl, check, status, detail }) => {
             const isOpen = expanded[ctrl.controlId] ?? false;
-            const dot = status === "pass" ? "bg-[#00D4AA]"
-              : status === "fail" ? "bg-[#EF4444]"
-              : status === "warning" ? "bg-[#F59E0B]"
-              : "bg-[#1A1D1E]";
+            const dot = status === "pass" ? "bg-brand"
+              : status === "fail" ? "bg-error"
+              : status === "warning" ? "bg-warning"
+              : "bg-text-tertiary";
 
             return (
-              <div key={ctrl.id} className="overflow-hidden rounded-xl border border-[#1A1D1E] bg-[#0B0D0E] transition-all duration-200 hover:border-[#1C1C24]">
+              <div key={ctrl.id} className="overflow-hidden rounded-xl border border-border-primary bg-surface-secondary transition-all duration-200 hover:border-border-secondary">
                 <button type="button" onClick={() => setExpanded((prev) => ({ ...prev, [ctrl.controlId]: !isOpen }))}
                   className="flex w-full items-start gap-3 p-4 text-left">
                   <span className={`mt-0.5 h-2 w-2 shrink-0 rounded-full ${dot}`} />
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="rounded bg-[#00D4AA]/10 px-2 py-0.5 font-mono text-xs text-[#00D4AA]">{ctrl.controlId}</span>
+                      <span className="rounded bg-brand/10 px-2 py-0.5 font-mono text-xs text-brand">{ctrl.controlId}</span>
                       <span className={`rounded px-1.5 py-0.5 text-[10px] font-semibold leading-none ${
-                        status === "pass" ? "bg-[#00D4AA]/10 text-[#00D4AA]"
-                        : status === "fail" ? "bg-[#EF4444]/10 text-[#EF4444]"
-                        : status === "warning" ? "bg-[#F59E0B]/10 text-[#F59E0B]"
-                        : "bg-[#1A1D1E]/10 text-[#5C5C66]"
+                        status === "pass" ? "bg-brand/10 text-brand"
+                        : status === "fail" ? "bg-error/10 text-error"
+                        : status === "warning" ? "bg-warning/10 text-warning"
+                        : "bg-border-primary/10 text-text-tertiary"
                       }`}>{status}</span>
-                      <span className="text-xs font-medium text-[#F1F1F3]">{ctrl.title}</span>
+                      <span className="text-xs font-medium text-text-primary">{ctrl.title}</span>
                     </div>
                     {detail && (
-                      <p className={`mt-1.5 text-sm leading-relaxed text-[#8B8B93] ${isOpen ? "" : "line-clamp-2"}`}>{detail}</p>
+                      <p className={`mt-1.5 text-sm leading-relaxed text-text-secondary ${isOpen ? "" : "line-clamp-2"}`}>{detail}</p>
                     )}
                   </div>
                 </button>
                 {isOpen && detail && (
-                  <div className="border-t border-[#1A1D1E] px-4 pb-4">
-                    <p className="mt-3 text-sm leading-relaxed text-[#6A6D6E]">{detail}</p>
+                  <div className="border-t border-border-primary px-4 pb-4">
+                    <p className="mt-3 text-sm leading-relaxed text-text-tertiary">{detail}</p>
                   </div>
                 )}
               </div>
@@ -303,29 +303,29 @@ export default function ReviewPage({ loaderData }: Route.ComponentProps) {
         <div className="space-y-2">
           {frameworkSubmitted.length > 0 && (
             <>
-              <h2 className="text-xs font-semibold uppercase tracking-wider text-[#00D4AA]">Submitted ({frameworkSubmitted.length})</h2>
+              <h2 className="text-xs font-semibold uppercase tracking-wider text-brand">Submitted ({frameworkSubmitted.length})</h2>
               {frameworkSubmitted.map((item: any) => (
-                <div key={item.id} className="rounded-xl border border-[#1A1D1E] bg-[#0B0D0E] p-4">
+                <div key={item.id} className="rounded-xl border border-border-primary bg-surface-secondary p-4">
                   <div className="flex items-center gap-2 mb-1.5">
-                    {item.control && <span className="rounded bg-[#00D4AA]/10 px-2 py-0.5 font-mono text-xs text-[#00D4AA]">{item.control.controlId}</span>}
-                    <span className="rounded bg-[#5C5C66]/10 px-2 py-0.5 font-mono text-xs text-[#5C5C66]">Evidence</span>
+                    {item.control && <span className="rounded bg-brand/10 px-2 py-0.5 font-mono text-xs text-brand">{item.control.controlId}</span>}
+                    <span className="rounded bg-text-tertiary/10 px-2 py-0.5 font-mono text-xs text-text-tertiary">Evidence</span>
                   </div>
-                  <p className="text-xs text-[#6A6D6E] leading-relaxed">{item.originalFinding?.detail}</p>
-                  <div className="mt-2 rounded-lg border border-[#1A1D1E] bg-[#07080A] px-3 py-2">
-                    <p className="text-sm text-[#F1F1F3]">{item.content}</p>
+                  <p className="text-xs text-text-tertiary leading-relaxed">{item.originalFinding?.detail}</p>
+                  <div className="mt-2 rounded-lg border border-border-primary bg-surface-primary px-3 py-2">
+                    <p className="text-sm text-text-primary">{item.content}</p>
                   </div>
                   {item.fileUrl && item.originalFilename && (
                     <a href={item.fileUrl} target="_blank" rel="noopener noreferrer"
-                      className="mt-2 flex items-center gap-2 rounded-lg border border-[#1A1D1E] bg-[#07080A] px-3 py-2 hover:border-[#00D4AA]/30 transition-colors">
-                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-[#1A1D1E]">
-                        <svg className="h-4 w-4 text-[#6A6D6E]" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M9 1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V5l-4-4z"/><path d="M9 1v4h4"/></svg>
+                      className="mt-2 flex items-center gap-2 rounded-lg border border-border-primary bg-surface-primary px-3 py-2 hover:border-brand/30 transition-colors">
+                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-border-primary">
+                        <svg className="h-4 w-4 text-text-tertiary" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M9 1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V5l-4-4z"/><path d="M9 1v4h4"/></svg>
                       </span>
-                      <span className="min-w-0 flex-1 truncate text-sm text-[#00D4AA] hover:underline">{item.originalFilename}</span>
+                      <span className="min-w-0 flex-1 truncate text-sm text-brand hover:underline">{item.originalFilename}</span>
                       {extBadge(item.originalFilename)}
-                      <svg className="h-3 w-3 shrink-0 text-[#5C5C66]" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M6 2l5 5-5 5"/></svg>
+                      <svg className="h-3 w-3 shrink-0 text-text-tertiary" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M6 2l5 5-5 5"/></svg>
                     </a>
                   )}
-                  <p className="mt-2 text-[10px] text-[#5C5C66]">Submitted {new Date(item.submittedAt).toLocaleDateString()}</p>
+                  <p className="mt-2 text-[10px] text-text-tertiary">Submitted {new Date(item.submittedAt).toLocaleDateString()}</p>
                 </div>
               ))}
             </>

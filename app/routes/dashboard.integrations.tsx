@@ -47,19 +47,19 @@ function Card({ app, label, desc, initial, connected, loading, onConnect, onDisc
   connected: boolean; loading: string | null; onConnect: (app: string) => void; onDisconnect?: (app: string) => void;
 }) {
   return (
-    <div className={`rounded-2xl border p-5 ${connected ? "border-[#00D4AA]/20 bg-[#00D4AA]/[0.02]" : "border-[#1A1D1E] bg-[#0B0D0E]"}`}>
+    <div className={`rounded-xl border p-5 ${connected ? "border-brand/20 bg-brand/[0.02]" : "border-border-primary bg-surface-secondary"}`}>
       <div className="flex items-start gap-3">
-        <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border text-xs font-bold ${connected ? "border-[#00D4AA]/30 bg-[#00D4AA]/10 text-[#00D4AA]" : "border-[#1A1D1E] bg-[#141718] text-[#8B8B93]"}`}>
+        <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border text-xs font-bold ${connected ? "border-brand/30 bg-brand/10 text-brand" : "border-border-primary bg-surface-tertiary text-text-secondary"}`}>
           {initial}
         </div>
         <div className="min-w-0 flex-1">
-          <h2 className="text-sm font-semibold text-[#F1F1F3]">{label}</h2>
-          <p className="mt-0.5 text-xs leading-relaxed text-[#6A6D6E]">{desc}</p>
+          <h2 className="text-sm font-semibold text-text-primary">{label}</h2>
+          <p className="mt-0.5 text-xs leading-relaxed text-text-tertiary">{desc}</p>
         </div>
       </div>
       {connected ? (
         <button type="button" onClick={() => onDisconnect?.(app)}
-          className="group mt-4 flex w-full items-center justify-center gap-2 rounded-lg border border-[#00D4AA]/20 bg-[#00D4AA]/[0.04] py-2 text-sm text-[#00D4AA] hover:border-[#EF4444]/30 hover:bg-[#EF4444]/[0.04] hover:text-[#EF4444] transition-all duration-200">
+          className="group mt-4 flex w-full items-center justify-center gap-2 rounded-[20px] border border-brand/20 bg-brand/[0.04] py-2 text-sm text-brand hover:border-error/30 hover:bg-error/[0.04] hover:text-error transition-all duration-200">
           <svg className="h-4 w-4 group-hover:hidden" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3.5 8.5l3 3 6-7"/></svg>
           <svg className="hidden h-4 w-4 group-hover:block" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg>
           <span className="group-hover:hidden">Connected</span>
@@ -67,10 +67,10 @@ function Card({ app, label, desc, initial, connected, loading, onConnect, onDisc
         </button>
       ) : (
         <button type="button" onClick={() => onConnect(app)} disabled={loading === app}
-          className="mt-4 w-full rounded-lg border border-[#1A1D1E] bg-[#141718] py-2 text-sm font-medium text-[#8B8B93] hover:border-[#00D4AA]/40 hover:text-[#00D4AA] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+          className="mt-4 w-full rounded-[20px] border border-border-primary bg-surface-tertiary py-2 text-sm font-medium text-text-secondary hover:border-brand/40 hover:text-brand transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
           {loading === app ? (
             <span className="flex items-center justify-center gap-2">
-              <span className="h-3 w-3 animate-spin rounded-full border-2 border-[#1A1D1E] border-t-[#00D4AA]" />
+              <span className="h-3 w-3 animate-spin rounded-full border-2 border-border-primary border-t-brand" />
               Connecting…
             </span>
           ) : (
@@ -143,17 +143,17 @@ export default function IntegrationsPage() {
         <button type="button" onClick={() => setSelectedCategory(null)}
           className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition-colors ${
             activeCategory === "All"
-              ? "bg-[#00D4AA]/[0.08] text-[#E8E8E8]"
-              : "text-[#6A6D6E] hover:bg-[#141718] hover:text-[#E8E8E8]"
+              ? "bg-brand/[0.08] text-text-primary"
+              : "text-text-tertiary hover:bg-surface-tertiary hover:text-text-primary"
           }`}>
           <span>All</span>
           {DASHBOARD_INTEGRATIONS.filter((i) => connectedSet.has(i.app)).length > 0 && (
-            <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[#00D4AA]/15 px-1.5 text-[10px] font-medium text-[#00D4AA]">
+            <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-brand/15 px-1.5 text-[10px] font-medium text-brand">
               {DASHBOARD_INTEGRATIONS.filter((i) => connectedSet.has(i.app)).length}
             </span>
           )}
         </button>
-        <div className="border-t border-[#1A1D1E] pt-1">
+        <div className="border-t border-border-primary pt-1">
           {INTEGRATION_CATEGORIES.map((cat) => {
             const inCat = DASHBOARD_INTEGRATIONS.filter((i) => integrationCategory(i.app) === cat.label);
             const catConnected = inCat.filter((i) => connectedSet.has(i.app)).length;
@@ -161,12 +161,12 @@ export default function IntegrationsPage() {
               <button key={cat.label} onClick={() => setSelectedCategory(cat.label)}
                 className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition-colors ${
                   activeCategory === cat.label
-                    ? "bg-[#00D4AA]/[0.08] text-[#E8E8E8]"
-                    : "text-[#6A6D6E] hover:bg-[#141718] hover:text-[#E8E8E8]"
+                    ? "bg-brand/[0.08] text-text-primary"
+                    : "text-text-tertiary hover:bg-surface-tertiary hover:text-text-primary"
                 }`}>
                 <span>{cat.label}</span>
                 {catConnected > 0 && (
-                  <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[#00D4AA]/15 px-1.5 text-[10px] font-medium text-[#00D4AA]">{catConnected}</span>
+                  <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-brand/15 px-1.5 text-[10px] font-medium text-brand">{catConnected}</span>
                 )}
               </button>
             );
@@ -177,10 +177,10 @@ export default function IntegrationsPage() {
       {/* Integration cards */}
       <div className="flex-1">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold tracking-tight text-[#F1F1F3]">Integrations</h1>
-          <p className="mt-1 text-sm text-[#6A6D6E]">Connect your infrastructure via read-only OAuth. No tokens to handle — we manage the broker.</p>
+          <h1 className="text-2xl font-bold tracking-tight text-text-primary">Integrations</h1>
+          <p className="mt-1 text-sm text-text-tertiary">Connect your infrastructure via read-only OAuth. No tokens to handle - we manage the broker.</p>
         </div>
-        {error && <div className="mb-6 rounded-xl border border-[#EF4444]/20 bg-[#EF4444]/[0.06] px-4 py-3 text-sm text-[#EF4444]">{error}</div>}
+        {error && <div className="mb-6 rounded-xl border border-error/20 bg-error/[0.06] px-4 py-3 text-sm text-error">{error}</div>}
 
         {activeCategory === "All" ? (
           <div className="space-y-8">
@@ -191,7 +191,7 @@ export default function IntegrationsPage() {
               if (catItems.length === 0) return null;
               return (
                 <section key={cat.label}>
-                  <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-[#5C5C66]">{cat.label}</h2>
+                  <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-text-tertiary">{cat.label}</h2>
                   <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
                     {catConnected.map((i) => <Card key={i.app} {...i} connected={true} loading={loading} onConnect={connect} onDisconnect={disconnect} />)}
                     {catAvailable.map((i) => <Card key={i.app} {...i} connected={false} loading={loading} onConnect={connect} />)}
@@ -204,14 +204,14 @@ export default function IntegrationsPage() {
           <div className="space-y-6">
             {inCategoryConnected.length > 0 && (
               <div>
-                <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-[#00D4AA]">Connected ({inCategoryConnected.length})</h2>
+                <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-brand">Connected ({inCategoryConnected.length})</h2>
                 <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
                   {inCategoryConnected.map((i) => <Card key={i.app} {...i} connected={true} loading={loading} onConnect={connect} onDisconnect={disconnect} />)}
                 </div>
               </div>
             )}
             <div>
-              <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-[#5C5C66]">Available ({inCategoryAvailable.length})</h2>
+              <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-text-tertiary">Available ({inCategoryAvailable.length})</h2>
               <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
                 {inCategoryAvailable.map((i) => <Card key={i.app} {...i} connected={false} loading={loading} onConnect={connect} />)}
               </div>
